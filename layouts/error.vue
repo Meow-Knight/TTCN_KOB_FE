@@ -10,7 +10,7 @@
         <span class="cursor" :class="{ typing: typeStatus }">&nbsp;</span>
       </h2>
       <button class="button-50" role="button">
-        <nuxt-link to="/">Về lại trang chủ đêii</nuxt-link>
+        <nuxt-link to="/">Quay lại trang chủ</nuxt-link>
       </button>
     </div>
   </div>
@@ -18,59 +18,63 @@
 
 <script>
 export default {
-  layout: 'default',
+  layout: "default",
   data: () => {
     return {
-      typeValue: '',
+      typeValue: "",
       typeStatus: false,
-      typeArray: ['Bạn say cmnr!!!', 'Hoặc là chúng tôi ko có trang này =))))','Hoặc là có thể bạn say thiệt'],
+      typeArray: [
+        "Bạn say cmnr!!!",
+        "Hoặc là chúng tôi ko có trang này =))))",
+        "Hoặc là có thể bạn say thiệt",
+      ],
       typingSpeed: 100,
       erasingSpeed: 120,
       newTextDelay: 3800,
       typeArrayIndex: 0,
       charIndex: 0,
-    }
+    };
   },
   methods: {
     typeText() {
       if (this.charIndex < this.typeArray[this.typeArrayIndex].length) {
-        if (!this.typeStatus) this.typeStatus = true
+        if (!this.typeStatus) this.typeStatus = true;
         this.typeValue += this.typeArray[this.typeArrayIndex].charAt(
           this.charIndex
-        )
-        this.charIndex += 1
-        setTimeout(this.typeText, this.typingSpeed)
+        );
+        this.charIndex += 1;
+        setTimeout(this.typeText, this.typingSpeed);
       } else {
-        this.typeStatus = false
-        setTimeout(this.eraseText, this.newTextDelay)
+        this.typeStatus = false;
+        setTimeout(this.eraseText, this.newTextDelay);
       }
     },
     eraseText() {
       if (this.charIndex > 0) {
-        if (!this.typeStatus) this.typeStatus = true
+        if (!this.typeStatus) this.typeStatus = true;
         this.typeValue = this.typeArray[this.typeArrayIndex].substring(
           0,
           this.charIndex - 1
-        )
-        this.charIndex -= 1
-        setTimeout(this.eraseText, this.erasingSpeed)
+        );
+        this.charIndex -= 1;
+        setTimeout(this.eraseText, this.erasingSpeed);
       } else {
-        this.typeStatus = false
-        this.typeArrayIndex += 1
+        this.typeStatus = false;
+        this.typeArrayIndex += 1;
         if (this.typeArrayIndex >= this.typeArray.length)
-          this.typeArrayIndex = 0
-        setTimeout(this.typeText, this.typingSpeed + 1000)
+          this.typeArrayIndex = 0;
+        setTimeout(this.typeText, this.typingSpeed + 1000);
       }
     },
   },
   created() {
-    setTimeout(this.typeText, this.newTextDelay + 200)
+    setTimeout(this.typeText, this.newTextDelay + 200);
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
-@import '~/assets/scss/_variables.scss';
+@import "~/assets/scss/_variables.scss";
 .container {
   width: 100%;
   height: 80vh;
@@ -155,7 +159,7 @@ h2 {
     text-decoration: none;
     color: $white2;
     font-weight: bold;
-    font-size:1rem;
+    font-size: 1rem;
   }
 }
 
