@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid">
     <div class="breadcrumb-container">
-      <Breadcrumb :items="breadcrumbItems" />
+      <Breadcrumb :name="producer.name" />
     </div>
     <div class="add-beer-container">
       <div class="left"><sidebar-admin /></div>
@@ -18,7 +18,7 @@
             <div class="input-box">
               <input
                 id="name"
-                v-model="producers.name"
+                v-model="producer.name"
                 type="text"
                 class="form-control"
                 disabled
@@ -37,7 +37,7 @@
 
             <div class="input-box">
               <input
-                v-model="producers.address"
+                v-model="producer.address"
                 type="text"
                 class="form-control"
                 disabled
@@ -49,16 +49,14 @@
             </div>
           </div>
           <div v-if="!editting" class="action">
-            <button class="btn btn-danger" @click="removeProducers">Xóa</button>
+            <button class="btn btn-danger" @click="removeproducer">Xóa</button>
             <button class="btn btn-primary" @click="changeState">
               Chỉnh sửa
             </button>
           </div>
           <div v-else class="action">
             <button class="btn btn-danger" @click="changeState">Hủy</button>
-            <button class="btn btn-primary" @click="updateProducers">
-              Lưu
-            </button>
+            <button class="btn btn-primary" @click="updateproducer">Lưu</button>
           </div>
         </form>
       </div>
@@ -75,26 +73,26 @@ export default {
     Breadcrumb,
     SidebarAdmin,
   },
+  data() {
+    return {
+      // breadcrumbItems: [
+      //   { name: 'Trang chủ', url: '/' },
+      //   { name: 'Quản lý', url: '/dashboard' },
+      //   { name: 'Nhà sản xuất', url: '/dashboard/producer' },
+      //   {
+      //     name: 'Chi tiết nhà sản xuẩt',
+      //     url: `/dashboard/producer/${this.producerId}`,
+      //   },
+      // ],
+      producer: {},
+      editting: false,
+      PRODUCER_URL: '/beer/producer/',
+    }
+  },
   computed: {
     producerId() {
       return this.$route.params.id
     },
-  },
-  data() {
-    return {
-      breadcrumbItems: [
-        { name: 'Trang chủ', url: '/' },
-        { name: 'Quản lý', url: '/dashboard' },
-        { name: 'Nhà sản xuất', url: '/dashboard/producers' },
-        {
-          name: 'Chi tiết nhà sản xuẩt',
-          url: `/dashboard/producers/${this.producerId}`,
-        },
-      ],
-      producers: [],
-      editting: false,
-      PRODUCER_URL: '/beer/producer/',
-    }
   },
   async created() {
     if (process.client) {
@@ -106,8 +104,7 @@ export default {
             headers: { Authorization: authToken },
           }
         )
-        this.producers = response.data
-        console.log(this.producers)
+        this.producer = response.data
       } catch (err) {
         alert(err)
       }
@@ -139,7 +136,7 @@ export default {
       }
       return true
     },
-    async updateProducers(event) {
+    async updateproducer(event) {
       const isValid = this.validate(event)
       if (isValid) {
         if (process.client) {
@@ -147,19 +144,19 @@ export default {
           try {
             await axios.patch(
               `/api/v1${this.PRODUCER_URL}${this.producerId}/`,
-              this.producers,
+              this.producer,
               {
                 headers: { Authorization: authToken },
               }
             )
-            this.$router.push('/dashboard/producers')
+            this.$router.push('/dashboard/producer')
           } catch (err) {
             alert(err)
           }
         }
       }
     },
-    async removeProducers(event) {
+    async removeproducer(event) {
       event.preventDefault()
       if (process.client) {
         const authToken = localStorage.getItem('auth._token.google')
@@ -167,7 +164,7 @@ export default {
           await axios.delete(`/api/v1${this.PRODUCER_URL}${this.producerId}/`, {
             headers: { Authorization: authToken },
           })
-          this.$router.push('/dashboard/producers')
+          this.$router.push('/dashboard/producer')
         } catch (err) {
           alert(err)
         }

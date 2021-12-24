@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid">
     <div class="breadcrumb-container">
-      <Breadcrumb :items="breadcrumbItems" />
+      <Breadcrumb :name="originBeer.name" />
     </div>
     <div class="add-beer-container">
       <div class="left"><sidebar-admin /></div>
@@ -212,14 +212,14 @@ export default {
     beerId() {
       return this.$router.currentRoute.params.id
     },
-    breadcrumbItems() {
-      return [
-        { name: 'Trang chủ', url: '/' },
-        { name: 'Quản lý', url: '/dashboard' },
-        { name: 'Danh sách bia', url: '/dashboard/beers' },
-        { name: this.originBeer.name, url: '/dashboard/beers/update' },
-      ]
-    },
+    // breadcrumbItems() {
+    //   return [
+    //     { name: 'Trang chủ', url: '/' },
+    //     { name: 'Quản lý', url: '/dashboard' },
+    //     { name: 'Danh sách bia', url: '/dashboard/beers' },
+    //     { name: this.originBeer.name, url: '/dashboard/beers/update' },
+    //   ]
+    // },
   },
   async created() {
     const PRODUCER_URL = '/beer/producer/'

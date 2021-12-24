@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid">
     <div class="breadcrumb-container">
-      <Breadcrumb :items="breadcrumbItems" />
+      <Breadcrumb />
     </div>
     <div class="users-container">
       <div class="left"><sidebar-admin /></div>
@@ -84,25 +84,24 @@ export default {
   data() {
     return {
       showModal: false,
-      breadcrumbItems: [
-        { name: 'Trang chủ', url: '/' },
-        { name: 'Quản lý', url: '/dashboard' },
-        { name: 'Nhà sản xuất', url: '/dashboard/producers' },
-      ],
+      // breadcrumbItems: [
+      //   { name: 'Trang chủ', url: '/' },
+      //   { name: 'Quản lý', url: '/dashboard' },
+      //   { name: 'Nhà sản xuất', url: '/dashboard/producers' },
+      // ],
       producers: [],
     }
   },
   async created() {
-    const URL = '/beer/producer/';
+    const URL = '/beer/producer/'
 
-    if (process.client){
-      const authToken = localStorage.getItem("auth._token.google");
+    if (process.client) {
+      const authToken = localStorage.getItem('auth._token.google')
       const response = await axios.get(`/api/v1${URL}`, {
-        headers: {"Authorization" : authToken}
-      });
-      this.producers = response.data;
+        headers: { Authorization: authToken },
+      })
+      this.producers = response.data
     }
-    
   },
 }
 </script>
