@@ -32,9 +32,9 @@
                 <div class="pt-1 mb-4">
                   <a
                     class="btn btn-outline-dark"
-                    @click="userLogin()"
                     role="button"
                     style="text-transform: none"
+                    @click="userLogin()"
                   >
                     <img
                       width="20px"
@@ -65,12 +65,12 @@ export default {
   layout: 'unauth',
   computed: {},
   methods: {
-    async userLogin() {
+    userLogin() {
       try {
-        const response = await this.$auth.loginWith('google', {
+        this.$auth.loginWith('google', {
           params: { prompt: 'select_account' },
         })
-        console.log(response)
+        this.$router.push('/dashboard')
       } catch (err) {
         console.log(err)
       }

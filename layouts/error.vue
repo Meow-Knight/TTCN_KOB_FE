@@ -18,81 +18,93 @@
 
 <script>
 export default {
-  layout: "default",
+  layout: 'default',
   data: () => {
     return {
-      typeValue: "",
+      typeValue: '',
       typeStatus: false,
       typeArray: [
-        "Bạn say cmnr!!!",
-        "Hoặc là chúng tôi ko có trang này =))))",
-        "Hoặc là có thể bạn say thiệt",
+        'Bạn say cmnr!!!',
+        'Hoặc là chúng tôi ko có trang này =))))',
+        'Hoặc là có thể bạn say thiệt',
       ],
       typingSpeed: 100,
       erasingSpeed: 120,
       newTextDelay: 3800,
       typeArrayIndex: 0,
       charIndex: 0,
-    };
+    }
+  },
+  created() {
+    setTimeout(this.typeText, this.newTextDelay + 200)
   },
   methods: {
     typeText() {
       if (this.charIndex < this.typeArray[this.typeArrayIndex].length) {
-        if (!this.typeStatus) this.typeStatus = true;
+        if (!this.typeStatus) this.typeStatus = true
         this.typeValue += this.typeArray[this.typeArrayIndex].charAt(
           this.charIndex
-        );
-        this.charIndex += 1;
-        setTimeout(this.typeText, this.typingSpeed);
+        )
+        this.charIndex += 1
+        setTimeout(this.typeText, this.typingSpeed)
       } else {
-        this.typeStatus = false;
-        setTimeout(this.eraseText, this.newTextDelay);
+        this.typeStatus = false
+        setTimeout(this.eraseText, this.newTextDelay)
       }
     },
     eraseText() {
       if (this.charIndex > 0) {
-        if (!this.typeStatus) this.typeStatus = true;
+        if (!this.typeStatus) this.typeStatus = true
         this.typeValue = this.typeArray[this.typeArrayIndex].substring(
           0,
           this.charIndex - 1
-        );
-        this.charIndex -= 1;
-        setTimeout(this.eraseText, this.erasingSpeed);
+        )
+        this.charIndex -= 1
+        setTimeout(this.eraseText, this.erasingSpeed)
       } else {
-        this.typeStatus = false;
-        this.typeArrayIndex += 1;
+        this.typeStatus = false
+        this.typeArrayIndex += 1
         if (this.typeArrayIndex >= this.typeArray.length)
-          this.typeArrayIndex = 0;
-        setTimeout(this.typeText, this.typingSpeed + 1000);
+          this.typeArrayIndex = 0
+        setTimeout(this.typeText, this.typingSpeed + 1000)
       }
     },
   },
-  created() {
-    setTimeout(this.typeText, this.newTextDelay + 200);
-  },
-};
+}
 </script>
 
 <style lang="scss" scoped>
-@import "~/assets/scss/_variables.scss";
+@import '~/assets/scss/_variables.scss';
 .container {
   width: 100%;
   height: 80vh;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
 }
+img {
+  height: 300px;
+  width: fit-content;
+}
+
 h1 {
   font-size: 5rem;
   span {
     color: $red;
   }
 }
+.text {
+  margin-left: 0px;
+}
 h2 {
-  font-size: 3.2rem;
+  font-size: 2.5rem;
   font-weight: normal;
+  width: 750px;
+  /* margin-left: 30px; */
   span.typed-text {
     color: $yellow;
+    overflow-wrap: break-word;
+    /* max-width: 200px; */
   }
   span.cursor {
     display: inline-block;

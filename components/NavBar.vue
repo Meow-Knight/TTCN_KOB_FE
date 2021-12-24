@@ -11,33 +11,34 @@
             <nuxt-link to="/">Trang Chủ</nuxt-link>
           </li>
           <li class="nav__tab-list__item">
-            <nuxt-link to="/test">tất cả sản phẩm</nuxt-link>
+            <nuxt-link to="/dashboard/beers">Tất cả sản phẩm</nuxt-link>
           </li>
           <li class="nav__tab-list__item">
-            <nuxt-link to="/">Ưu đãi</nuxt-link>
+            <nuxt-link to="/dashboard">Ưu đãi</nuxt-link>
           </li>
           <li class="nav__tab-list__item">
-            <nuxt-link to="/">Giới thiệu</nuxt-link>
+            <nuxt-link to="/about">Giới thiệu</nuxt-link>
           </li>
         </ul>
         <div class="icon">
           <div class="dropdown">
             <i class="fas fa-user">
+              <div v-if="$auth.loggedIn" class="username">
+                {{ user.username }}
+              </div>
               <ul class="dropdown_list">
-                <li v-if="$auth.loggedIn" class="dropdown_item">
+                <li v-if="$auth.loggedIn" class="dropdown_item first">
                   <nuxt-link to="/profile" class="dropdown_text"
                     >Trang cá nhân</nuxt-link
                   >
                 </li>
-                <li v-if="!$auth.loggedIn" class="dropdown_item">
+                <li v-if="!$auth.loggedIn" class="dropdown_item first">
                   <nuxt-link to="/login" class="dropdown_text"
                     >Đăng nhập</nuxt-link
                   >
                 </li>
-                <li v-else class="dropdown_item">
-                  <span class="dropdown_text" @click="userLogOut()"
-                    >Đăng xuất</span
-                  >
+                <li v-else class="dropdown_item" @click="userLogOut()">
+                  <span class="dropdown_text">Đăng xuất</span>
                 </li>
               </ul>
             </i>
@@ -93,7 +94,7 @@ export default {
 // }
 .nav {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   background: $red;
   padding: 15px 0px;
@@ -109,25 +110,29 @@ export default {
   &__tab-list {
     &__item {
       position: relative;
+      display: inline-block;
     }
-    &__item:hover a::before {
-      visibility: visible;
-      animation: show-underline 1s;
-      animation-fill-mode: forwards;
+    &__item:hover a::after {
+      width: 100%;
     }
-    a::before {
+    a::after {
       content: '';
-      position: absolute;
-      bottom: 1px;
+      display: block;
+      background: $white;
+      width: 0;
       height: 1px;
-      // width: 100%;
-      background-color: $white;
-      visibility: hidden;
+      position: absolute;
+      left: 0;
+      transition: 0.75s;
     }
   }
 }
+.nav__right {
+  margin-right: 100px;
+}
 .logo {
   height: 100%;
+  margin-left: 130px;
   img {
     height: 100%;
     transform: scale(1.9);
@@ -141,22 +146,31 @@ export default {
   display: flex;
   flex-direction: row;
   cursor: pointer;
+  width: 175px;
   i {
     font-size: 1.3rem;
     margin-left: 10px;
     color: $white;
+    display: flex;
+    align-items: center;
   }
+}
+.username {
+  margin-left: 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  font-size: 20px;
 }
 ul {
   display: flex;
   list-style: none;
   font-size: 1.2rem;
-  padding: 10px;
+  padding: 5px 10px;
   margin: 10px;
 
   li {
     text-transform: uppercase;
-    margin-left: 15px;
+    margin-left: 30px;
     letter-spacing: 0;
   }
 }
@@ -173,30 +187,63 @@ a {
 }
 .dropdown_list {
   text-align: center;
-  width: 200px;
-  margin: 10px;
+  width: fit-content;
+  padding: 13px 10px;
+  margin: 0;
   display: flex;
   flex-direction: column;
   position: absolute;
-  right: -20px;
-  top: 10px;
+  left: -25px;
+  top: 20px;
   display: none;
-  font-weight: bold;
-  transition: 0.3s ease-in-out;
 }
+
 .dropdown:hover .dropdown_list {
   display: block;
 }
+
 .dropdown_item {
-  padding: 10px;
-  background: $white;
+  padding: 8px;
+  margin: 0;
+  background: $white2;
   color: $black;
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1.1rem;
+  width: 200px;
   cursor: pointer;
   a {
     color: $black;
+    font-weight: normal;
   }
+  transition: 0.5s ease-in-out;
+}
+
+.dropdown_item:hover {
+  background: rgb(199, 178, 178);
+  color: $red;
+  a {
+    color: $red;
+  }
+}
+
+.dropdown_item.first::after {
+  position: absolute;
+  content: '';
+  box-sizing: border-box;
+  width: 12px;
+  height: 12px;
+  transform: rotate(45deg) translateX(-50%);
+  background: $white2;
+  top: 12px;
+  left: 19.5%;
+  transition: 0.5s ease-in-out;
+}
+
+.dropdown_item.first:hover::after {
+  background: rgb(199, 178, 178);
+}
+
+.dropdown_text {
+  font-size: 1rem;
 }
 
 @keyframes show-underline {
