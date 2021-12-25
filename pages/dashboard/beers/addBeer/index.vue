@@ -201,17 +201,17 @@ export default {
         const response = await axios.get(`/api/v1${PRODUCER_URL}`, {
           headers: { Authorization: authToken },
         })
-        this.producers = response.data
+        this.producers = response.data.results
 
         const responseBeerUnit = await axios.get(`/api/v1${BEER_UNIT_URL}`, {
           headers: { Authorization: authToken },
         })
-        this.beerUnits = responseBeerUnit.data
+        this.beerUnits = responseBeerUnit.data.results
 
         const responseNation = await axios.get(`/api/v1${NATION_URL}`, {
           headers: { Authorization: authToken },
         })
-        this.nations = responseNation.data
+        this.nations = responseNation.data.results
       } catch (err) {
         alert(err)
       }

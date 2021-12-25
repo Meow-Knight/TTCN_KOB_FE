@@ -11,13 +11,13 @@
         </nuxt-link>
       </li>
       <li class="menu__item">
-        <nuxt-link to="/dashboard/users">
+        <nuxt-link to="/dashboard/producers">
           <div class="icon"><i class="fas fa-users"></i></div>
-          Khách hàng
+          Nhà sản xuất
         </nuxt-link>
       </li>
       <li class="menu__item">
-        <nuxt-link to="/dashboard/products">
+        <nuxt-link to="/dashboard/beers">
           <div class="icon"><i class="fas fa-beer"></i></div>
           Sản phẩm
         </nuxt-link>

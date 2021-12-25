@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid">
     <div class="breadcrumb-container">
-      <Breadcrumb :items="breadcrumbItems" />
+      <Breadcrumb />
     </div>
     <div class="users-container">
       <div class="left"><sidebar-admin /></div>
@@ -86,11 +86,11 @@ export default {
   middleware: 'auth',
   data() {
     return {
-      breadcrumbItems: [
-        { name: 'Trang chủ', url: '/' },
-        { name: 'Quản lý', url: '/dashboard' },
-        { name: 'Nhà sản xuất', url: '/dashboard/beers' },
-      ],
+      // breadcrumbItems: [
+      //   { name: 'Trang chủ', url: '/' },
+      //   { name: 'Quản lý', url: '/dashboard' },
+      //   { name: 'Sản phẩm', url: '/dashboard/beers' },
+      // ],
       beers: [],
     }
   },
@@ -102,7 +102,7 @@ export default {
       const response = await axios.get(`/api/v1${URL}`, {
         headers: { Authorization: authToken },
       })
-      this.beers = response.data
+      this.beers = response.data.results
     }
   },
 }
