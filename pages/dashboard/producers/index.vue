@@ -84,24 +84,16 @@ export default {
   data() {
     return {
       showModal: false,
-      // breadcrumbItems: [
-      //   { name: 'Trang chủ', url: '/' },
-      //   { name: 'Quản lý', url: '/dashboard' },
-      //   { name: 'Nhà sản xuất', url: '/dashboard/producers' },
-      // ],
       producers: [],
     }
   },
   async created() {
     const URL = '/beer/producer/'
-
-    if (process.client) {
-      const authToken = localStorage.getItem('auth._token.google')
-      const response = await axios.get(`/api/v1${URL}`, {
-        headers: { Authorization: authToken },
-      })
-      this.producers = response.data
-    }
+    const authToken = this.$auth.strategy.token.get()
+    const response = await axios.get(`http://localhost:8000/api/v1${URL}`, {
+      headers: { Authorization: authToken },
+    })
+    this.producers = response.data
   },
 }
 </script>

@@ -233,6 +233,7 @@ export default {
         const response = await axios.get(`/api/v1${PRODUCER_URL}`, {
           headers: { Authorization: authToken },
         })
+        console.log(response)
         this.producers = response.data
 
         const responseBeerUnit = await axios.get(`/api/v1${BEER_UNIT_URL}`, {

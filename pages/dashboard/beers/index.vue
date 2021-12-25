@@ -86,11 +86,6 @@ export default {
   middleware: 'auth',
   data() {
     return {
-      // breadcrumbItems: [
-      //   { name: 'Trang chủ', url: '/' },
-      //   { name: 'Quản lý', url: '/dashboard' },
-      //   { name: 'Sản phẩm', url: '/dashboard/beers' },
-      // ],
       beers: [],
     }
   },

@@ -75,15 +75,6 @@ export default {
   },
   data() {
     return {
-      // breadcrumbItems: [
-      //   { name: 'Trang chủ', url: '/' },
-      //   { name: 'Quản lý', url: '/dashboard' },
-      //   { name: 'Nhà sản xuất', url: '/dashboard/producer' },
-      //   {
-      //     name: 'Chi tiết nhà sản xuẩt',
-      //     url: `/dashboard/producer/${this.producerId}`,
-      //   },
-      // ],
       producer: {},
       editting: false,
       PRODUCER_URL: '/beer/producer/',
