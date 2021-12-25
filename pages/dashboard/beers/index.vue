@@ -102,7 +102,7 @@ export default {
       const response = await axios.get(`/api/v1${URL}`, {
         headers: { Authorization: authToken },
       })
-      this.beers = response.data
+      this.beers = response.data.results
     }
   },
 }

@@ -104,7 +104,7 @@ export default {
             headers: { Authorization: authToken },
           }
         )
-        this.producer = response.data
+        this.producer = response.data.results
       } catch (err) {
         alert(err)
       }
