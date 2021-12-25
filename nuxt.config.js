@@ -61,6 +61,24 @@ export default {
   build: {},
   auth: {
     strategies: {
+      local: {
+        scheme: 'refresh',
+        token: {
+          property: 'access_token',
+          data: "access_token",
+          global: true,
+        },  
+        refreshToken: {
+          property: "refresh_token",
+          data: "refresh_token",
+          maxAge: 60 * 60 * 24 * 30
+        },
+        endpoints: {
+          login: { url: 'http://localhost:8000/admin_login/', method: 'post' },
+          user: { url: 'http://localhost:8000/api/v1/account/info', method: 'get' },
+          refresh: { url: 'http://localhost:8000/token/refresh', method: 'post' },
+        }
+      },  
       google: {
         clientId:
           '998587115630-ubo22cf69riu891huoch6c0nbckm10h0.apps.googleusercontent.com',
@@ -72,10 +90,8 @@ export default {
           maxAge: 60 * 60 * 24 * 30,
         },
         endpoints: {
-          token: 'http://localhost:8000/login/',
-          userInfo: 'http://localhost:8000/api/v1/account/info',
-          // maybe we should add a logout endpoint to black list the refresh_token
-          // logout: { url: '/auth/user/logout', method: 'delete' },
+          token: "http://localhost:8000/login/",
+          userInfo: "http://localhost:8000/api/v1/account/info",
         },
       },
     },
