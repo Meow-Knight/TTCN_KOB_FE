@@ -251,8 +251,8 @@ export default {
             headers: { Authorization: authToken },
           }
         )
-        this.originBeer = responseBeer.data.results
-        Object.assign(this.newBeer, responseBeer.data.results)
+        this.originBeer = responseBeer.data
+        Object.assign(this.newBeer, responseBeer.data)
       } catch (err) {
         alert(err)
       }
