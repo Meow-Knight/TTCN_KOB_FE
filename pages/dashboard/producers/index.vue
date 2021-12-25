@@ -78,9 +78,10 @@ import axios from 'axios'
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import SidebarAdmin from '~/components/SidebarAdmin.vue'
 import Modal from '~/components/Modal/ProducerModal.vue'
+import { roleGuard } from '~/helper/helper'
 export default {
   components: { Breadcrumb, SidebarAdmin, Modal },
-  middleware: 'auth',
+  middleware: ['auth', roleGuard('admin')],
   data() {
     return {
       showModal: false,
@@ -89,11 +90,11 @@ export default {
   },
   async created() {
     const URL = '/beer/producer/'
-    const authToken = this.$auth.strategy.token.get()
+    const authToken = localStorage.getItem('auth._token.local')
     const response = await axios.get(`http://localhost:8000/api/v1${URL}`, {
       headers: { Authorization: authToken },
     })
-    this.producers = response.data
+    this.producers = response.data.results
   },
 }
 </script>

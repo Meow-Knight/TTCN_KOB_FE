@@ -37,7 +37,7 @@
                     >Đăng nhập</nuxt-link
                   >
                 </li>
-                <li v-else class="dropdown_item" @click="userLogOut()">
+                <li v-else class="dropdown_item" @click="logout()">
                   <span class="dropdown_text">Đăng xuất</span>
                 </li>
               </ul>
@@ -58,15 +58,17 @@ export default {
     },
   },
   methods: {
-    async userLogOut() {
+    async logout() {
+      const data = {
+        refreshToken: this.user.is_staff
+          ? localStorage.getItem('auth._token.local')
+          : localStorage.getItem('auth._token.google'),
+      }
       try {
-        const response = await this.$auth.logout({
-          data: {
-            refreshToken: this.$auth.strategies.google.refreshToken.get(),
-          },
+        await this.$auth.logout({
+          data,
         })
         this.$router.go('/')
-        console.log(response)
       } catch (err) {
         console.log(err)
       }

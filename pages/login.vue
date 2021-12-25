@@ -100,10 +100,23 @@
         src="~assets/img/beerBG.jpeg"
       />
     </div>
+    <base-dialog
+      v-if="showDialog"
+      :title="'Wrong credential'"
+      @close="confirmError()"
+    >
+      <template #default>
+        <h3>Your username or password is wrong. Please check and try again!</h3>
+      </template>
+    </base-dialog>
   </div>
 </template>
 <script>
+import BaseDialog from '../components/Modal/BaseDialog.vue'
 export default {
+  components: {
+    BaseDialog,
+  },
   layout: 'unauth',
   data() {
     return {
@@ -116,12 +129,16 @@ export default {
         username: null,
         password: null,
       },
+      showDialog: false,
     }
   },
   computed: {
     isAdminSelected() {
       return this.loginStrategy === 'admin'
     },
+  },
+  mounted() {
+    if (this.$auth.loggedIn) this.$router.push('/')
   },
   methods: {
     userLogin() {
@@ -156,16 +173,21 @@ export default {
       }
       if (this.haveError(this.loginData)) return
       try {
-        const result = await this.$auth.loginWith('local', {
+        await this.$auth.loginWith('local', {
           data: this.loginData,
         })
-        console.log(result)
+        this.$router.push('/')
       } catch (err) {
-        console.log(err)
+        if (err.response && err.response.status === 400) {
+          this.showDialog = true
+        }
       }
     },
     changeLoginStrategy(strategy) {
       this.loginStrategy = strategy
+    },
+    confirmError() {
+      this.showDialog = false
     },
   },
 }

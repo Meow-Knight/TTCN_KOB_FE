@@ -68,11 +68,13 @@
 import axios from 'axios'
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import SidebarAdmin from '~/components/SidebarAdmin.vue'
+import { roleGuard } from '~/helper/helper'
 export default {
   components: {
     Breadcrumb,
     SidebarAdmin,
   },
+  middleware: ['auth', roleGuard('admin')],
   data() {
     return {
       producer: {},
@@ -87,7 +89,7 @@ export default {
   },
   async created() {
     if (process.client) {
-      const authToken = localStorage.getItem('auth._token.google')
+      const authToken = localStorage.getItem('auth._token.local')
       try {
         const response = await axios.get(
           `/api/v1${this.PRODUCER_URL}${this.producerId}`,
@@ -131,7 +133,7 @@ export default {
       const isValid = this.validate(event)
       if (isValid) {
         if (process.client) {
-          const authToken = localStorage.getItem('auth._token.google')
+          const authToken = localStorage.getItem('auth._token.local')
           try {
             await axios.patch(
               `/api/v1${this.PRODUCER_URL}${this.producerId}/`,
@@ -150,7 +152,7 @@ export default {
     async removeproducer(event) {
       event.preventDefault()
       if (process.client) {
-        const authToken = localStorage.getItem('auth._token.google')
+        const authToken = localStorage.getItem('auth._token.local')
         try {
           await axios.delete(`/api/v1${this.PRODUCER_URL}${this.producerId}/`, {
             headers: { Authorization: authToken },

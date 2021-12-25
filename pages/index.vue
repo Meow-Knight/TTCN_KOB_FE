@@ -7,12 +7,11 @@ export default {
   layout: 'default',
   computed: {
     user() {
-      console.log(this.$auth.user)
       return this.$auth.user
     },
   },
   mounted() {
-    if (this.user && this.user.role === 'Admin') {
+    if (this.user && this.user.is_staff) {
       this.$router.push('/dashboard')
     }
   },
