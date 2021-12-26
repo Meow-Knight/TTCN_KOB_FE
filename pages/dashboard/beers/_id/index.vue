@@ -244,8 +244,10 @@ export default {
             headers: { Authorization: authToken },
           }
         )
+        console.log(responseBeer.data)
         this.originBeer = responseBeer.data
         Object.assign(this.newBeer, responseBeer.data)
+        console.log(this.newBeer)
       } catch (err) {
         alert(err)
       }
@@ -317,6 +319,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.container-fluid {
+  /* padding: 150px 0 0 0; */
+}
 .add-beer-container {
   display: flex;
   flex-direction: row;

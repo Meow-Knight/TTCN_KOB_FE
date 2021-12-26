@@ -1,7 +1,6 @@
 <template>
   <div>
-    <!-- <div class="nav_line"></div> -->
-    <div id="nav" class="nav">
+    <div id="nav" class="nav" :class="{ transparent }">
       <div class="logo">
         <img src="~assets/img/logo3.png" alt="" />
       </div>
@@ -22,7 +21,7 @@
         </ul>
         <div class="icon">
           <div class="dropdown">
-            <i class="fas fa-user">
+            <i class="fas fa-user icon-user">
               <div v-if="$auth.loggedIn" class="username">
                 {{ user.username }}
               </div>
@@ -47,11 +46,13 @@
         </div>
       </div>
     </div>
+    <div class="dummy">abc</div>
   </div>
 </template>
 
 <script>
 export default {
+  props: ['transparent'],
   computed: {
     user() {
       return this.$auth.user
@@ -89,12 +90,8 @@ export default {
   height: 20px;
   background: $black;
 }
-// .nav_slide {
-//   width: 100%;
-//   height: 50px;
-//   background: $white2;
-// }
 .nav {
+  position: fixed;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -102,8 +99,10 @@ export default {
   padding: 15px 0px;
   z-index: 99;
   height: 90px;
+  width: 100%;
   font-family: 'Roboto Condensed', sans-serif;
   font-weight: 200;
+  transition: 0.5s;
   &__right {
     display: flex;
     align-items: center;
@@ -129,18 +128,34 @@ export default {
     }
   }
 }
+.nav.transparent {
+  background: transparent;
+  transition: 0.5s;
+  .nav__tab-list {
+    a {
+      color: $red;
+    }
+    a::after {
+      background: $red;
+    }
+  }
+  .icon-user::before {
+    color: $red;
+  }
+  .username {
+    color: $red;
+  }
+}
 .nav__right {
   margin-right: 100px;
 }
+
 .logo {
   height: 100%;
   margin-left: 130px;
   img {
     height: 100%;
     transform: scale(1.9);
-    // width: 130px;
-    // height: 100%;
-    // object-fit: cover;
   }
 }
 .icon {
@@ -246,6 +261,11 @@ a {
 
 .dropdown_text {
   font-size: 1rem;
+}
+
+.dummy {
+  margin-bottom: 80px;
+  visibility: hidden;
 }
 
 @keyframes show-underline {

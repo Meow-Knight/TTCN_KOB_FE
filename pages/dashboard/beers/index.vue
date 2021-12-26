@@ -99,6 +99,7 @@ export default {
         headers: { Authorization: authToken },
       })
       this.beers = response.data.results
+      console.log(this.beers)
     }
   },
 }
