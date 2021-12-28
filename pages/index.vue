@@ -19,7 +19,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import BeerCollection from '../components/BeerCollection.vue'
 export default {
   components: {
@@ -44,13 +43,16 @@ export default {
     const URL = '/beer'
     if (process.client) {
       const authToken = localStorage.getItem('auth._token.google')
-      const response = await axios.get(`/api/v1${URL}`, {
-        headers: { Authorization: authToken },
-      })
-      this.beers = Array(5)
-        .fill(response.data.results)
-        .reduce((prev, cur) => [...prev, ...cur])
-      this.featuredBeers = this.beers.slice(0, 5)
+      try {
+        const response = await this.$axios.get(`/api/v1${URL}`, {
+          headers: { Authorization: authToken },
+        })
+        console.log(response.data.results)
+        this.beers = response.data.results
+        this.featuredBeers = this.beers.slice(0, 5)
+      } catch (err) {
+        console.log(err)
+      }
     }
   },
 }
@@ -79,12 +81,13 @@ h1 {
 }
 .top-image {
   position: absolute;
-  top: -105px;
+  top: 0px;
   left: 0;
-  height: 450px;
+  height: 400px;
   width: 100%;
 }
 .main-content {
+  margin-top: 30px;
   width: 90%;
 }
 .featured-product {

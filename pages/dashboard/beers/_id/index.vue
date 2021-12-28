@@ -180,7 +180,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import SidebarAdmin from '~/components/SidebarAdmin.vue'
 import { roleGuard } from '~/helper/helper'
@@ -223,31 +222,32 @@ export default {
     if (process.client) {
       const authToken = localStorage.getItem('auth._token.local')
       try {
-        const response = await axios.get(`/api/v1${PRODUCER_URL}`, {
+        const response = await this.$axios.get(`/api/v1${PRODUCER_URL}`, {
           headers: { Authorization: authToken },
         })
         this.producers = response.data.results
 
-        const responseBeerUnit = await axios.get(`/api/v1${BEER_UNIT_URL}`, {
-          headers: { Authorization: authToken },
-        })
+        const responseBeerUnit = await this.$axios.get(
+          `/api/v1${BEER_UNIT_URL}`,
+          {
+            headers: { Authorization: authToken },
+          }
+        )
         this.beerUnits = responseBeerUnit.data.results
 
-        const responseNation = await axios.get(`/api/v1${NATION_URL}`, {
+        const responseNation = await this.$axios.get(`/api/v1${NATION_URL}`, {
           headers: { Authorization: authToken },
         })
         this.nations = responseNation.data.results
 
-        const responseBeer = await axios.get(
+        const responseBeer = await this.$axios.get(
           `/api/v1${BEER_URL}${this.beerId}`,
           {
             headers: { Authorization: authToken },
           }
         )
-        console.log(responseBeer.data)
         this.originBeer = responseBeer.data
         Object.assign(this.newBeer, responseBeer.data)
-        console.log(this.newBeer)
       } catch (err) {
         alert(err)
       }
@@ -289,9 +289,13 @@ export default {
         if (process.client) {
           const authToken = localStorage.getItem('auth._token.local')
           try {
-            await axios.patch(`/api/v1${URL}${this.beerId}/`, this.newBeer, {
-              headers: { Authorization: authToken },
-            })
+            await this.$axios.patch(
+              `/api/v1${URL}${this.beerId}/`,
+              this.newBeer,
+              {
+                headers: { Authorization: authToken },
+              }
+            )
             this.$router.push('/dashboard/beers')
           } catch (err) {
             alert(err)
@@ -305,7 +309,7 @@ export default {
       if (process.client) {
         const authToken = localStorage.getItem('auth._token.local')
         try {
-          await axios.delete(`/api/v1${URL}${this.beerId}/`, {
+          await this.$axios.delete(`/api/v1${URL}${this.beerId}/`, {
             headers: { Authorization: authToken },
           })
           this.$router.push('/dashboard/beers')

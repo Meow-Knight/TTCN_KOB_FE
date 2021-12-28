@@ -74,7 +74,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import SidebarAdmin from '~/components/SidebarAdmin.vue'
 import Modal from '~/components/Modal/ProducerModal.vue'
@@ -91,9 +90,12 @@ export default {
   async created() {
     const URL = '/beer/producer/'
     const authToken = localStorage.getItem('auth._token.local')
-    const response = await axios.get(`http://localhost:8000/api/v1${URL}`, {
-      headers: { Authorization: authToken },
-    })
+    const response = await this.$axios.get(
+      `http://localhost:8000/api/v1${URL}`,
+      {
+        headers: { Authorization: authToken },
+      }
+    )
     this.producers = response.data.results
   },
 }

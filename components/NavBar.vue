@@ -10,7 +10,9 @@
             <nuxt-link to="/">Trang Chủ</nuxt-link>
           </li>
           <li class="nav__tab-list__item">
-            <nuxt-link to="/dashboard/beers">Tất cả sản phẩm</nuxt-link>
+            <nuxt-link :to="isAdmin ? '/dashboard/beers' : '/beers'"
+              >Tất cả sản phẩm</nuxt-link
+            >
           </li>
           <li class="nav__tab-list__item">
             <nuxt-link to="/dashboard">Ưu đãi</nuxt-link>
@@ -42,8 +44,8 @@
               </ul>
             </i>
           </div>
-          <i class="fas fa-shopping-cart"></i>
         </div>
+        <nav-cart-icon v-if="isUser" :transparent="transparent"></nav-cart-icon>
       </div>
     </div>
     <div class="dummy">abc</div>
@@ -51,11 +53,21 @@
 </template>
 
 <script>
+import NavCartIcon from './UI/NavCartIcon.vue'
 export default {
+  components: {
+    NavCartIcon,
+  },
   props: ['transparent'],
   computed: {
     user() {
       return this.$auth.user
+    },
+    isAdmin() {
+      return this.user && this.user.is_staff
+    },
+    isUser() {
+      return this.user && !this.user.is_staff
     },
   },
   methods: {
@@ -145,9 +157,12 @@ export default {
   .username {
     color: $red;
   }
+  .cart-icon {
+    color: $red;
+  }
 }
 .nav__right {
-  margin-right: 100px;
+  margin-right: 200px;
 }
 
 .logo {
@@ -163,7 +178,8 @@ export default {
   display: flex;
   flex-direction: row;
   cursor: pointer;
-  width: 175px;
+  width: fit-content;
+  margin-right: 30px;
   i {
     font-size: 1.3rem;
     margin-left: 10px;
@@ -266,6 +282,12 @@ a {
 .dummy {
   margin-bottom: 80px;
   visibility: hidden;
+}
+
+.cart-icon {
+  width: 30px;
+  height: 30px;
+  color: $white;
 }
 
 @keyframes show-underline {

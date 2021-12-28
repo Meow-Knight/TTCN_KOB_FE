@@ -1,10 +1,20 @@
 <template>
-  <div v-if="isInitialLoading" style="height: 100vh"></div>
+  <div v-if="isInitialLoading" style="height: 100vh">We are loading</div>
   <div v-else class="container">
     <div class="product-intro">
       <div class="product-intro-image">
         <div class="img-slide">img list</div>
-        <div class="img-show">img show</div>
+        <div class="img-show">
+          <div id="img-zoom-lens" class="img-zoom-lens"></div>
+          <img
+            id="source-image"
+            :src="displayPhoto"
+            height="100%"
+            width="100%"
+            class="display-image"
+          />
+          <div id="zoom-result" class="zoom-result"></div>
+        </div>
       </div>
       <div class="product-content">
         <div class="content-header">
@@ -156,7 +166,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { imageZoom } from '~/helper/helper'
 export default {
   layout: 'default',
   data() {
@@ -173,6 +183,7 @@ export default {
         price: null,
         producer: null,
         discount: null,
+        photos: [],
       },
       purchaseNumber: 1,
     }
@@ -203,6 +214,20 @@ export default {
         this.beer.beer_unit
       )
     },
+    displayPhoto() {
+      return this.beer.photos[0]
+        ? this.beer.photos[0].link
+        : require('~/assets/img/beer-img-default.jpg')
+    },
+  },
+  watch: {
+    // we want to wait for both XHR result and and the component to
+    // be mounted, after that we can access DOM's elements
+    isInitialLoading() {
+      this.$nextTick(() => {
+        imageZoom('source-image', 'zoom-result', 'img-zoom-lens')
+      })
+    },
   },
   async created() {
     const BEER_URL = '/beer/'
@@ -211,12 +236,13 @@ export default {
       this.isInitialLoading = true
 
       try {
-        const responseBeer = await axios.get(
+        const responseBeer = await this.$axios.get(
           `/api/v1${BEER_URL}${this.beerId}`,
           {
             headers: { Authorization: authToken },
           }
         )
+        console.log(responseBeer)
         this.beer = {
           ...responseBeer.data,
           beer_unit: responseBeer.data.beer_unit.name,
@@ -276,22 +302,43 @@ export default {
   justify-items: center;
 }
 .product-intro-image {
-  width: 400px;
-  height: 300px;
+  width: 540px;
+  height: 360px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
 }
 .img-slide {
   width: 25%;
   height: 100%;
+  margin-left: 25px;
   border: 1px solid rgb(102, 102, 92);
 }
 .img-show {
-  width: 70%;
+  width: 66.67%;
   height: 100%;
-  border: 1px solid salmon;
+  position: relative;
 }
+
+.img-zoom-lens {
+  position: absolute;
+  border: 1px solid #3a3838;
+  background: #f5f3f3;
+  opacity: 0.5;
+  width: 15%;
+  height: 15%;
+}
+
+.zoom-result {
+  border: 2px solid #6a6e69;
+  width: 120%;
+  height: 120%;
+  position: absolute;
+  top: 0;
+  right: -120%;
+  visibility: hidden;
+  z-index: 100;
+}
+
 .product-content {
   width: 90%;
   height: fit-content;

@@ -22,13 +22,24 @@
       {{ beer.review ? beer.review : defaultStat.review }}
     </div>
     <div class="action">
-      <button class="button">Add</button>
-      <button class="button">Buy now</button>
+      <button
+        class="button"
+        @click="changeCartAfterMutate({ item: beer, amount: 1, action: 'add' })"
+      >
+        Add
+      </button>
+      <button
+        class="button"
+        @click="changeCartAfterMutate({ item: beer, amount: 1, action: 'add' })"
+      >
+        Buy now
+      </button>
     </div>
   </div>
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 export default {
   props: ['beer'],
   data() {
@@ -57,6 +68,12 @@ export default {
         : require('../../assets/img/beer-img-default.jpg')
     },
   },
+  // we need some methods from cart mutations to react to add or buy beer
+  methods: {
+    ...mapMutations({
+      changeCartAfterMutate: 'cart/changeCartAfterMutate',
+    }),
+  },
 }
 </script>
 
@@ -68,7 +85,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   height: 400px;
-  width: fit-content;
+  width: 300px;
   padding: 10px 15px;
   color: $black;
   background: $white;

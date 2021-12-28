@@ -9,13 +9,14 @@ export default function ({
   next,
 }) {
   $axios.onRequest((config) => {
-    console.log('Making request to ' + config.url)
+    console.log(
+      `Making ${config.method} request to ` + config.url + ' at ' + new Date()
+    )
   })
 
   // $axios.onResponse((response) => console.log)
 
   $axios.onResponseError(async (err) => {
-    console.log(err.response)
     const code = parseInt(err.response && err.response.status)
 
     const originalRequest = err.config
@@ -41,7 +42,7 @@ export default function ({
         return $axios(originalRequest)
       } catch (e) {
         console.log('Error, redirect to login')
-        app.router.push('/login')
+        // app.router.push('/login')
       }
     } else {
       throw err
