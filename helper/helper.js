@@ -97,8 +97,9 @@ export const imageZoom = (imgID, resultID, lensID) => {
     // get the current ratio between image and the lens
     const currentRatio = lens.offsetHeight / imgHeight
     // set new lens size base on new ratio
-    const newRatio = currentRatio + scale
-    if (newRatio < 0.15 || newRatio > 1) return
+    let newRatio = currentRatio + scale
+    if (newRatio < 0.1) newRatio = 0.1
+    if (newRatio > 1) newRatio = 1
     lens.style.height = img.offsetHeight * newRatio + 'px'
     lens.style.width = img.offsetWidth * newRatio + 'px'
     // re-calculate ratio between lens and result div

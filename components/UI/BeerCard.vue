@@ -84,7 +84,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  height: 400px;
+  height: 420px;
   width: 300px;
   padding: 10px 15px;
   color: $black;
@@ -119,10 +119,25 @@ export default {
 }
 
 .name {
-  width: 100%;
+  width: calc(100%);
+  height: fit-content;
   text-align: start;
   font-weight: 700;
   margin-bottom: 8px;
+
+  .link {
+    width: calc(100%);
+    line-height: 25px;
+    height: 50px;
+    max-height: 50px;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    display: inline-block;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    -webkit-font-smoothing: antialiased;
+  }
 }
 
 .price {
@@ -141,6 +156,7 @@ export default {
 
 .review-badge {
   text-align: center;
+  margin-bottom: 20px;
 }
 
 .action {

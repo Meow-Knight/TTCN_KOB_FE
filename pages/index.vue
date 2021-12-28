@@ -1,34 +1,38 @@
 <template>
-  <div class="container">
-    <section class="slider">
-      <img src="~assets/img/homepage-top-banner.jpg" class="top-image" />
-    </section>
-    <section class="main-content">
-      <section class="home-policy"></section>
-      <section class="featured-product">
-        <div class="title">SẢN PHẨM BÁN CHẠY</div>
-        <beer-collection :beers="featuredBeers"></beer-collection>
+  <with-loading :is-loading="isLoading"
+    ><div class="container">
+      <section class="slider">
+        <img src="~assets/img/homepage-top-banner.jpg" class="top-image" />
       </section>
-      <section class="home-banner"></section>
-      <section class="home-collection">
-        <div class="title">King Of Beer Collection</div>
-        <beer-collection :beers="beers"></beer-collection>
-      </section>
-    </section>
-  </div>
+      <section class="main-content">
+        <section class="home-policy"></section>
+        <section class="featured-product">
+          <div class="title">SẢN PHẨM BÁN CHẠY</div>
+          <beer-collection :beers="featuredBeers"></beer-collection>
+        </section>
+        <section class="home-banner"></section>
+        <section class="home-collection">
+          <div class="title">King Of Beer Collection</div>
+          <beer-collection :beers="beers"></beer-collection>
+        </section>
+      </section></div
+  ></with-loading>
 </template>
 
 <script>
 import BeerCollection from '../components/BeerCollection.vue'
+import WithLoading from '../components/HOC/withLoading.vue'
 export default {
   components: {
     BeerCollection,
+    WithLoading,
   },
   layout: 'default',
   data() {
     return {
       beers: [],
       featuredBeers: [],
+      isLoading: true,
     }
   },
   computed: {
@@ -47,6 +51,7 @@ export default {
         const response = await this.$axios.get(`/api/v1${URL}`, {
           headers: { Authorization: authToken },
         })
+        this.isLoading = false
         console.log(response.data.results)
         this.beers = response.data.results
         this.featuredBeers = this.beers.slice(0, 5)
