@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid">
     <div class="breadcrumb-container">
-      <Breadcrumb :items="breadcrumbItems" />
+      <Breadcrumb />
     </div>
     <div class="add-beer-container">
       <div class="left"><sidebar-admin /></div>
@@ -161,19 +161,14 @@
 </template>
 
 <script>
-import axios from 'axios'
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import SidebarAdmin from '~/components/SidebarAdmin.vue'
+import { roleGuard } from '~/helper/helper'
 export default {
   components: { Breadcrumb, SidebarAdmin },
-  middleware: 'auth',
+  middleware: ['auth', roleGuard('admin')],
   data() {
     return {
-      breadcrumbItems: [
-        { name: 'Trang chủ', url: '/' },
-        { name: 'Quản lý', url: '/dashboard' },
-        { name: 'Thêm bia mới', url: '/dashboard/beers/addBeer' },
-      ],
       producers: [],
       beerUnits: [],
       nations: [],
@@ -196,19 +191,22 @@ export default {
     const NATION_URL = '/beer/nation/'
 
     if (process.client) {
-      const authToken = localStorage.getItem('auth._token.google')
+      const authToken = localStorage.getItem('auth._token.local')
       try {
-        const response = await axios.get(`/api/v1${PRODUCER_URL}`, {
+        const response = await this.$axios.get(`/api/v1${PRODUCER_URL}`, {
           headers: { Authorization: authToken },
         })
         this.producers = response.data.results
 
-        const responseBeerUnit = await axios.get(`/api/v1${BEER_UNIT_URL}`, {
-          headers: { Authorization: authToken },
-        })
+        const responseBeerUnit = await this.$axios.get(
+          `/api/v1${BEER_UNIT_URL}`,
+          {
+            headers: { Authorization: authToken },
+          }
+        )
         this.beerUnits = responseBeerUnit.data.results
 
-        const responseNation = await axios.get(`/api/v1${NATION_URL}`, {
+        const responseNation = await this.$axios.get(`/api/v1${NATION_URL}`, {
           headers: { Authorization: authToken },
         })
         this.nations = responseNation.data.results
@@ -224,9 +222,9 @@ export default {
         const URL = '/beer/'
 
         if (process.client) {
-          const authToken = localStorage.getItem('auth._token.google')
+          const authToken = localStorage.getItem('auth._token.local')
           try {
-            await axios.post(`/api/v1${URL}`, this.newBeer, {
+            await this.$axios.post(`/api/v1${URL}`, this.newBeer, {
               headers: { Authorization: authToken },
             })
             this.$router.push('/dashboard/beers')

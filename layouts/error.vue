@@ -4,7 +4,7 @@
       <img src="~/assets/gif/404Animation_fff.gif" alt="" />
     </div>
     <div class="text">
-      <h1>404 <span>Errors</span></h1>
+      <h1>404 <span>Error</span></h1>
       <h2>
         <span class="typed-text">{{ typeValue }}</span>
         <span class="cursor" :class="{ typing: typeStatus }">&nbsp;</span>
@@ -18,6 +18,7 @@
 
 <script>
 export default {
+  inject: ['setIsInErrorPage'],
   layout: 'default',
   data: () => {
     return {
@@ -35,7 +36,11 @@ export default {
       charIndex: 0,
     }
   },
-  created() {
+  beforeDestroy() {
+    this.setIsInErrorPage(false)
+  },
+  mounted() {
+    this.setIsInErrorPage(true)
     setTimeout(this.typeText, this.newTextDelay + 200)
   },
   methods: {
@@ -100,11 +105,9 @@ h2 {
   font-size: 2.5rem;
   font-weight: normal;
   width: 750px;
-  /* margin-left: 30px; */
   span.typed-text {
     color: $yellow;
     overflow-wrap: break-word;
-    /* max-width: 200px; */
   }
   span.cursor {
     display: inline-block;

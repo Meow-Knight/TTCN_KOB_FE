@@ -1,7 +1,6 @@
 <template>
   <div>
-    <!-- <div class="nav_line"></div> -->
-    <div id="nav" class="nav">
+    <div id="nav" class="nav" :class="{ transparent }">
       <div class="logo">
         <img src="~assets/img/logo3.png" alt="" />
       </div>
@@ -11,7 +10,9 @@
             <nuxt-link to="/">Trang Chủ</nuxt-link>
           </li>
           <li class="nav__tab-list__item">
-            <nuxt-link to="/dashboard/beers">Tất cả sản phẩm</nuxt-link>
+            <nuxt-link :to="isAdmin ? '/dashboard/beers' : '/beers'"
+              >Tất cả sản phẩm</nuxt-link
+            >
           </li>
           <li class="nav__tab-list__item">
             <nuxt-link to="/dashboard">Ưu đãi</nuxt-link>
@@ -22,7 +23,7 @@
         </ul>
         <div class="icon">
           <div class="dropdown">
-            <i class="fas fa-user">
+            <i class="fas fa-user icon-user">
               <div v-if="$auth.loggedIn" class="username">
                 {{ user.username }}
               </div>
@@ -37,36 +38,50 @@
                     >Đăng nhập</nuxt-link
                   >
                 </li>
-                <li v-else class="dropdown_item" @click="userLogOut()">
+                <li v-else class="dropdown_item" @click="logout()">
                   <span class="dropdown_text">Đăng xuất</span>
                 </li>
               </ul>
             </i>
           </div>
-          <i class="fas fa-shopping-cart"></i>
         </div>
+        <nav-cart-icon v-if="isUser" :transparent="transparent"></nav-cart-icon>
       </div>
     </div>
+    <div class="dummy">abc</div>
   </div>
 </template>
 
 <script>
+import NavCartIcon from './UI/NavCartIcon.vue'
 export default {
+  components: {
+    NavCartIcon,
+  },
+  props: ['transparent'],
   computed: {
     user() {
       return this.$auth.user
     },
+    isAdmin() {
+      return this.user && this.user.is_staff
+    },
+    isUser() {
+      return this.user && !this.user.is_staff
+    },
   },
   methods: {
-    async userLogOut() {
+    async logout() {
+      const data = {
+        refreshToken: this.user.is_staff
+          ? localStorage.getItem('auth._token.local')
+          : localStorage.getItem('auth._token.google'),
+      }
       try {
-        const response = await this.$auth.logout({
-          data: {
-            refreshToken: this.$auth.strategies.google.refreshToken.get(),
-          },
+        await this.$auth.logout({
+          data,
         })
         this.$router.go('/')
-        console.log(response)
       } catch (err) {
         console.log(err)
       }
@@ -87,12 +102,8 @@ export default {
   height: 20px;
   background: $black;
 }
-// .nav_slide {
-//   width: 100%;
-//   height: 50px;
-//   background: $white2;
-// }
 .nav {
+  position: fixed;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -100,8 +111,10 @@ export default {
   padding: 15px 0px;
   z-index: 99;
   height: 90px;
+  width: 100%;
   font-family: 'Roboto Condensed', sans-serif;
   font-weight: 200;
+  transition: 0.5s;
   &__right {
     display: flex;
     align-items: center;
@@ -127,18 +140,37 @@ export default {
     }
   }
 }
-.nav__right {
-  margin-right: 100px;
+.nav.transparent {
+  background: transparent;
+  transition: 0.5s;
+  .nav__tab-list {
+    a {
+      color: $red;
+    }
+    a::after {
+      background: $red;
+    }
+  }
+  .icon-user::before {
+    color: $red;
+  }
+  .username {
+    color: $red;
+  }
+  .cart-icon {
+    color: $red;
+  }
 }
+.nav__right {
+  margin-right: 200px;
+}
+
 .logo {
   height: 100%;
   margin-left: 130px;
   img {
     height: 100%;
     transform: scale(1.9);
-    // width: 130px;
-    // height: 100%;
-    // object-fit: cover;
   }
 }
 .icon {
@@ -146,7 +178,8 @@ export default {
   display: flex;
   flex-direction: row;
   cursor: pointer;
-  width: 175px;
+  width: fit-content;
+  margin-right: 30px;
   i {
     font-size: 1.3rem;
     margin-left: 10px;
@@ -244,6 +277,17 @@ a {
 
 .dropdown_text {
   font-size: 1rem;
+}
+
+.dummy {
+  margin-bottom: 80px;
+  visibility: hidden;
+}
+
+.cart-icon {
+  width: 30px;
+  height: 30px;
+  color: $white;
 }
 
 @keyframes show-underline {

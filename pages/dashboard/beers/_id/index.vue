@@ -180,12 +180,12 @@
 </template>
 
 <script>
-import axios from 'axios'
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import SidebarAdmin from '~/components/SidebarAdmin.vue'
+import { roleGuard } from '~/helper/helper'
 export default {
   components: { Breadcrumb, SidebarAdmin },
-  middleware: 'auth',
+  middleware: ['auth', roleGuard('admin')],
   data() {
     return {
       producers: [],
@@ -212,14 +212,6 @@ export default {
     beerId() {
       return this.$router.currentRoute.params.id
     },
-    // breadcrumbItems() {
-    //   return [
-    //     { name: 'Trang chủ', url: '/' },
-    //     { name: 'Quản lý', url: '/dashboard' },
-    //     { name: 'Danh sách bia', url: '/dashboard/beers' },
-    //     { name: this.originBeer.name, url: '/dashboard/beers/update' },
-    //   ]
-    // },
   },
   async created() {
     const PRODUCER_URL = '/beer/producer/'
@@ -228,24 +220,27 @@ export default {
     const BEER_URL = '/beer/'
 
     if (process.client) {
-      const authToken = localStorage.getItem('auth._token.google')
+      const authToken = localStorage.getItem('auth._token.local')
       try {
-        const response = await axios.get(`/api/v1${PRODUCER_URL}`, {
+        const response = await this.$axios.get(`/api/v1${PRODUCER_URL}`, {
           headers: { Authorization: authToken },
         })
         this.producers = response.data.results
 
-        const responseBeerUnit = await axios.get(`/api/v1${BEER_UNIT_URL}`, {
-          headers: { Authorization: authToken },
-        })
+        const responseBeerUnit = await this.$axios.get(
+          `/api/v1${BEER_UNIT_URL}`,
+          {
+            headers: { Authorization: authToken },
+          }
+        )
         this.beerUnits = responseBeerUnit.data.results
 
-        const responseNation = await axios.get(`/api/v1${NATION_URL}`, {
+        const responseNation = await this.$axios.get(`/api/v1${NATION_URL}`, {
           headers: { Authorization: authToken },
         })
         this.nations = responseNation.data.results
 
-        const responseBeer = await axios.get(
+        const responseBeer = await this.$axios.get(
           `/api/v1${BEER_URL}${this.beerId}`,
           {
             headers: { Authorization: authToken },
@@ -292,11 +287,15 @@ export default {
       if (isValid) {
         const URL = '/beer/'
         if (process.client) {
-          const authToken = localStorage.getItem('auth._token.google')
+          const authToken = localStorage.getItem('auth._token.local')
           try {
-            await axios.patch(`/api/v1${URL}${this.beerId}/`, this.newBeer, {
-              headers: { Authorization: authToken },
-            })
+            await this.$axios.patch(
+              `/api/v1${URL}${this.beerId}/`,
+              this.newBeer,
+              {
+                headers: { Authorization: authToken },
+              }
+            )
             this.$router.push('/dashboard/beers')
           } catch (err) {
             alert(err)
@@ -308,9 +307,9 @@ export default {
       event.preventDefault()
       const URL = '/beer/'
       if (process.client) {
-        const authToken = localStorage.getItem('auth._token.google')
+        const authToken = localStorage.getItem('auth._token.local')
         try {
-          await axios.delete(`/api/v1${URL}${this.beerId}/`, {
+          await this.$axios.delete(`/api/v1${URL}${this.beerId}/`, {
             headers: { Authorization: authToken },
           })
           this.$router.push('/dashboard/beers')
@@ -324,6 +323,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.container-fluid {
+  /* padding: 150px 0 0 0; */
+}
 .add-beer-container {
   display: flex;
   flex-direction: row;

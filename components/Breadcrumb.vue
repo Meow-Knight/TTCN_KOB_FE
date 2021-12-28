@@ -22,6 +22,7 @@ export default {
         '/dashboard/sales': 'Doanh thu',
         '/dashboard/producers': 'Nhà sản xuất',
         '/dashboard/vouchers': 'Khuyến mãi',
+        '/dashboard/beers/addBeer': 'Thêm mới bia',
       },
     }
   },
