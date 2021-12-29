@@ -23,7 +23,7 @@ export const roleGuard = (roles) => (context) => {
       (!context.$auth.user.is_staff && roles === 'user')
     )
   ) {
-    return context.app.router.push('/')
+    context.redirect('/')
   }
 }
 
