@@ -3,7 +3,6 @@
   <div v-else class="container">
     <div class="product-intro">
       <div class="product-intro-image">
-        <div class="img-slide">img list</div>
         <div class="img-show">
           <div id="img-zoom-lens" class="img-zoom-lens"></div>
           <img
@@ -14,6 +13,26 @@
             class="display-image"
           />
           <div id="zoom-result" class="zoom-result"></div>
+        </div>
+        <div id="img-slide" class="img-slide">
+          <Slide
+            :item-height="slideHeight"
+            :item-width="slideHeight"
+            :item-type="'image'"
+          >
+            <div
+              v-for="photo in beer.photos"
+              :key="photo.link"
+              class="scroll-item"
+            >
+              <img
+                :src="photo.link"
+                class="item"
+                :class="{ selected: photo.link === selectedPhoto }"
+                @click="changeDisplayPhoto(photo.link)"
+              />
+            </div>
+          </Slide>
         </div>
       </div>
       <div class="product-content">
@@ -31,10 +50,12 @@
         </div>
         <div class="review-badge">Bia khá ngon</div>
         <div class="price">
-          <div class="after-discount">{{ afterDiscount + '₫' }}</div>
-          <div class="origin-price">{{ beer.price + '₫' }}</div>
+          <div class="after-discount">
+            {{ priceFormat(afterDiscount) + '₫' }}
+          </div>
+          <div class="origin-price">{{ priceFormat(beer.price) + '₫' }}</div>
           <div class="saving">
-            {{ '(Bạn đã tiết kiệm được ' + saving + '₫)' }}
+            {{ '(Bạn đã tiết kiệm được ' + priceFormat(saving) + '₫)' }}
           </div>
         </div>
         <ul style="padding-left: 20px">
@@ -166,9 +187,11 @@
 </template>
 
 <script>
-import { imageZoom } from '~/helper/helper'
+import { imageZoom, priceFormat } from '~/helper/helper'
+import Slide from '~/components/Slide/index.vue'
 export default {
   layout: 'default',
+  component: { Slide },
   data() {
     return {
       isInitialLoading: true,
@@ -186,6 +209,8 @@ export default {
         photos: [],
       },
       purchaseNumber: 1,
+      slideHeight: '50px',
+      selectedPhoto: null,
     }
   },
   computed: {
@@ -214,11 +239,15 @@ export default {
         this.beer.beer_unit
       )
     },
+    // set display photo source
     displayPhoto() {
-      return this.beer.photos[0]
+      return this.selectedPhoto
+        ? this.selectedPhoto
+        : this.beer.photos[0]
         ? this.beer.photos[0].link
         : require('~/assets/img/beer-img-default.jpg')
     },
+    // change zoom result background when selectedPhoto is changed
   },
   watch: {
     // we want to wait for both XHR result and and the component to
@@ -226,6 +255,17 @@ export default {
     isInitialLoading() {
       this.$nextTick(() => {
         imageZoom('source-image', 'zoom-result', 'img-zoom-lens')
+        // also we will need to access slider to get height for items
+        this.slideHeight =
+          document.getElementById('img-slide').offsetHeight + 'px'
+      })
+    },
+    // we will need to change result div (the div which will show the zoom
+    // result) source every time selectedPhoto change
+    selectedPhoto() {
+      this.$nextTick(() => {
+        document.getElementById('zoom-result').style.backgroundImage =
+          "url('" + this.selectedPhoto + "')"
       })
     },
   },
@@ -248,10 +288,11 @@ export default {
           beer_unit: responseBeer.data.beer_unit.name,
           origin_nation: responseBeer.data.origin_nation.name,
           producer: responseBeer.data.producer.name,
+          photos: [...responseBeer.data.photos, ...responseBeer.data.photos],
         }
+        this.selectedPhoto = this.beer.photos[0]?.link
         this.isInitialLoading = false
       } catch (err) {
-        console.log(err.response)
         if (err.response && err.response.status === 404) throw err
       }
     }
@@ -274,6 +315,10 @@ export default {
       }
       this.purchaseNumber = parseNumber
     },
+    changeDisplayPhoto(source) {
+      this.selectedPhoto = source
+    },
+    priceFormat,
   },
 }
 </script>
@@ -302,21 +347,22 @@ export default {
   justify-items: center;
 }
 .product-intro-image {
-  width: 540px;
-  height: 360px;
+  width: 450px;
+  height: 600px;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  margin-left: 50px;
 }
 .img-slide {
-  width: 25%;
-  height: 100%;
-  margin-left: 25px;
-  border: 1px solid rgb(102, 102, 92);
+  width: 100%;
+  height: 19%;
+  margin-top: 20px;
 }
 .img-show {
-  width: 66.67%;
-  height: 100%;
+  width: 100%;
+  height: 66.67%;
   position: relative;
+  border: 2px solid $red;
 }
 
 .img-zoom-lens {
@@ -326,6 +372,7 @@ export default {
   opacity: 0.5;
   width: 15%;
   height: 15%;
+  visibility: hidden;
 }
 
 .zoom-result {
@@ -333,10 +380,10 @@ export default {
   width: 120%;
   height: 120%;
   position: absolute;
-  top: 0;
+  top: -2px;
   right: -120%;
   visibility: hidden;
-  z-index: 100;
+  z-index: 10;
 }
 
 .product-content {

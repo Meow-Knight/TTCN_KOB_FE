@@ -15,8 +15,12 @@
       <nuxt-link :to="beerURL" class="link">{{ beer.name }}</nuxt-link>
     </div>
     <div class="price">
-      <div class="after-discount">{{ afterDiscount + 'đ' }}</div>
-      <div class="origin-price">{{ beer.price + 'đ' }}</div>
+      <div class="after-discount">
+        {{ priceFormat(afterDiscount) + 'đ' }}
+      </div>
+      <div class="origin-price">
+        {{ priceFormat(beer.price) + 'đ' }}
+      </div>
     </div>
     <div class="review-badge">
       {{ beer.review ? beer.review : defaultStat.review }}
@@ -40,6 +44,7 @@
 
 <script>
 import { mapMutations } from 'vuex'
+import { priceFormat } from '~/helper/helper'
 export default {
   props: ['beer'],
   data() {
@@ -59,6 +64,7 @@ export default {
             100
         : this.beer.price
     },
+
     beerURL() {
       return '/beers/' + this.beer.id
     },
@@ -73,6 +79,7 @@ export default {
     ...mapMutations({
       changeCartAfterMutate: 'cart/changeCartAfterMutate',
     }),
+    priceFormat,
   },
 }
 </script>

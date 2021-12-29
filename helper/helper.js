@@ -131,3 +131,5 @@ export const imageZoom = (imgID, resultID, lensID) => {
       img.width * cx + 'px ' + img.height * cy + 'px'
   }
 }
+
+export const priceFormat = (price) => price.toLocaleString().replace(',', '.')
