@@ -49,7 +49,17 @@
             </div>
           </div>
           <div v-if="!editting" class="action">
-            <button class="btn btn-danger" @click="removeproducer">Xóa</button>
+            <button
+              class="btn btn-danger"
+              @click="
+                (event) => {
+                  event.preventDefault()
+                  showConfirmModal = true
+                }
+              "
+            >
+              Xóa
+            </button>
             <button class="btn btn-primary" @click="changeState">
               Chỉnh sửa
             </button>
@@ -61,6 +71,18 @@
         </form>
       </div>
     </div>
+    <ConfirmModal
+      v-show="showConfirmModal"
+      @close-modal="showConfirmModal = false"
+      @action-when-confirm="removeProducer"
+    >
+      <template v-slot:header>
+        <h5>Xác nhận xóa bia</h5>
+      </template>
+      <template v-slot:body>
+        <p>Bạn có chắc muốn xóa {{ producer.name }}</p>
+      </template>
+    </ConfirmModal>
   </div>
 </template>
 
@@ -68,15 +90,18 @@
 import axios from 'axios'
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import SidebarAdmin from '~/components/SidebarAdmin.vue'
+import ConfirmModal from '~/components/Modal/ConfirmModal.vue'
 import { roleGuard } from '~/helper/helper'
 export default {
   components: {
     Breadcrumb,
     SidebarAdmin,
+    ConfirmModal,
   },
   middleware: ['auth', roleGuard('admin')],
   data() {
     return {
+      showConfirmModal: false,
       producer: {},
       editting: false,
       PRODUCER_URL: '/beer/producer/',
@@ -142,22 +167,21 @@ export default {
                 headers: { Authorization: authToken },
               }
             )
-            this.$router.push('/dashboard/producer')
+            this.$router.push('/dashboard/producers')
           } catch (err) {
             alert(err)
           }
         }
       }
     },
-    async removeproducer(event) {
-      event.preventDefault()
+    async removeProducer(event) {
       if (process.client) {
         const authToken = localStorage.getItem('auth._token.local')
         try {
           await axios.delete(`/api/v1${this.PRODUCER_URL}${this.producerId}/`, {
             headers: { Authorization: authToken },
           })
-          this.$router.push('/dashboard/producer')
+          this.$router.push('/dashboard/producers')
         } catch (err) {
           alert(err)
         }

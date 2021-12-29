@@ -62,13 +62,35 @@
           </table>
         </div>
         <div class="pagination">
-          <div class="arrow-box">
-            <span class="previos-arrow pagination__arrow"
-              ><i class="far fa-arrow-alt-circle-left"></i
-            ></span>
-            <span class="next-arrow pagination__arrow"
-              ><i class="far fa-arrow-alt-circle-right"></i
-            ></span>
+          <div class="overflow-auto">
+            <b-pagination
+              v-model="currentPage"
+              :total-rows="rows"
+              :per-page="pageSize"
+            >
+              <template #first-text="{ page }"
+                ><span class="text-info" @click="changePage(page)"
+                  >Đầu</span
+                ></template
+              >
+              <template #prev-text
+                ><span class="text-success" @click="getData(previous)"
+                  ><i class="fas fa-chevron-left"></i></span
+              ></template>
+              <template #next-text
+                ><span class="text-success" @click="getData(next)"
+                  ><i class="fas fa-chevron-right"></i></span
+              ></template>
+              <template #last-text="{ page }"
+                ><span class="text-info" @click="changePage(page)"
+                  >Cuối</span
+                ></template
+              >
+              <template #page="{ page, active }">
+                <b v-if="active">{{ page }}</b>
+                <span v-else @click="changePage(page)">{{ page }}</span>
+              </template>
+            </b-pagination>
           </div>
         </div>
       </div>
@@ -87,19 +109,59 @@ export default {
   data() {
     return {
       beers: [],
+      next: null,
+      previous: null,
+      rows: 0,
+      pageSize: 12,
+      currentPage: 1,
+      searchText: '',
+      sortBy: {
+        field: 'name',
+        asc: true,
+      },
     }
   },
-  async created() {
-    const URL = '/beer'
-
-    if (process.client) {
-      const authToken = localStorage.getItem('auth._token.local')
-      const response = await this.$axios.get(`/api/v1${URL}`, {
-        headers: { Authorization: authToken },
-      })
-      this.beers = response.data.results
-      console.log(this.beers)
-    }
+  computed: {
+    sortOption() {
+      let sortOptionText = this.sortBy.field
+      if (!this.sortBy.asc) {
+        sortOptionText = '-' + this.sortBy.field
+      }
+      return sortOptionText
+    },
+  },
+  methods: {
+    async getData(url) {
+      if (!url) return
+      if (process.client) {
+        const authToken = this.$auth.strategy.token.get()
+        const response = await this.$axios.get(`/api/v1${url}`, {
+          headers: { Authorization: authToken },
+        })
+        this.beers = response.data.results
+        this.rows = response.data.count
+        this.previous = response.data.previous
+        this.next = response.data.next
+      }
+    },
+    changePage(pageNumber) {
+      const URL = `/beer/?page=${pageNumber}&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
+      this.getData(URL)
+    },
+    search() {
+      const URL = `/beer/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
+      this.getData(URL)
+    },
+    sort(field) {
+      this.sortBy.field = field
+      this.sortBy.asc = !this.sortBy.asc
+      const URL = `/beer/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
+      this.getData(URL)
+    },
+  },
+  created() {
+    const URL = `/beer/?page=1&page_size=${this.pageSize}`
+    this.getData(URL)
   },
 }
 </script>
