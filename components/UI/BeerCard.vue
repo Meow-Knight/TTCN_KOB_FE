@@ -5,25 +5,27 @@
         <img :src="beerImg" alt="Beer image" height="200px" width="230px" />
       </nuxt-link>
       <div class="discount-label">
-        {{ beer.discount ? beer.discount : defaultStat.discount }}
+        {{ (-beer.discount_percent || defaultStat.discount_percent) + '%' }}
       </div>
     </div>
     <div class="variant">
-      {{ beer.variant ? beer.variant : defaultStat.variant }}
+      {{ beer.variant || defaultStat.variant }}
     </div>
     <div class="name">
       <nuxt-link :to="beerURL" class="link">{{ beer.name }}</nuxt-link>
     </div>
     <div class="price">
       <div class="after-discount">
-        {{ priceFormat(afterDiscount) + 'đ' }}
+        {{
+          priceFormat(afterDiscount(beer.price, beer.discount_percent)) + 'đ'
+        }}
       </div>
       <div class="origin-price">
         {{ priceFormat(beer.price) + 'đ' }}
       </div>
     </div>
     <div class="review-badge">
-      {{ beer.review ? beer.review : defaultStat.review }}
+      {{ beer.review || defaultStat.review }}
     </div>
     <div class="action">
       <button
@@ -44,33 +46,26 @@
 
 <script>
 import { mapMutations } from 'vuex'
-import { priceFormat } from '~/helper/helper'
+import { priceFormat, afterDiscount } from '~/helper/helper'
 export default {
   props: ['beer'],
   data() {
     return {
       defaultStat: {
         img: '~assets/img/beer-img-default.png',
-        discount: 0,
+        discount_percent: 0,
         variant: 'Bia Heineken',
         review: 'Bia ngon',
       },
     }
   },
   computed: {
-    afterDiscount() {
-      return this.beer.discount
-        ? Math.round((this.beer.price * (1 - this.beer.discount / 100)) / 100) *
-            100
-        : this.beer.price
-    },
-
     beerURL() {
       return '/beers/' + this.beer.id
     },
     beerImg() {
-      return this.beer.img
-        ? this.beer.img
+      return this.beer.photo
+        ? this.beer.photo
         : require('../../assets/img/beer-img-default.jpg')
     },
   },
@@ -80,6 +75,7 @@ export default {
       changeCartAfterMutate: 'cart/changeCartAfterMutate',
     }),
     priceFormat,
+    afterDiscount,
   },
 }
 </script>
@@ -109,20 +105,21 @@ export default {
 .discount-label {
   position: absolute;
   top: 10px;
-  right: 15px;
-  padding: 3px 17px;
+  right: 13px;
+  padding: 3px 14px;
   height: fit-content;
-  width: fit-content;
+  width: 60px;
+  text-align: center;
   color: $white;
   background: $red;
-  border-radius: 6px;
+  border-radius: 10px;
 }
 
 .variant {
   width: 100%;
   font-weight: 100;
   text-align: start;
-  margin-bottom: 8px;
+  margin: 8px 0;
 }
 
 .name {
@@ -137,13 +134,14 @@ export default {
     line-height: 25px;
     height: 50px;
     max-height: 50px;
-    overflow: hidden;
     -webkit-box-orient: vertical;
     display: inline-block;
     overflow: hidden !important;
     text-overflow: ellipsis;
     -webkit-line-clamp: 2;
     -webkit-font-smoothing: antialiased;
+    /* white-space: nowrap; */
+    display: -webkit-box;
   }
 }
 

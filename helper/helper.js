@@ -1,18 +1,29 @@
-// role guard used as middleware
-export const roleGuard = (role) => (context) => {
+/**
+ * role guard used as middleware
+ * @param {*} role specify which role will have access the pages
+ * it can be a single string, like "user" , or an array of roles
+ * like ["user", admin]
+ * @returns
+ */
+export const roleGuard = (roles) => (context) => {
+  console.log(context)
   /*
   here we need the isStaff param and the context.$auth.user.is_staff to be match
   say true and true for an admin, or false and false for a user
   otherwise, the user is not authorized to access that page, so maybe we redirect them
   to error page or home page
    */
+  // if (!Array.isArray(roles)) roles = [roles]
+  // if (roles.length && !roles.include(context.$auth.user.role)) {
+  //   return context.$router.push("/")
+  // }
   if (
     !(
-      (context.$auth.user.is_staff && role === 'admin') ||
-      (!context.$auth.user.is_staff && role === 'user')
+      (context.$auth.user.is_staff && roles === 'admin') ||
+      (!context.$auth.user.is_staff && roles === 'user')
     )
   ) {
-    return context.redirect('/')
+    return context.app.router.push('/')
   }
 }
 
@@ -133,3 +144,8 @@ export const imageZoom = (imgID, resultID, lensID) => {
 }
 
 export const priceFormat = (price) => price.toLocaleString().replace(',', '.')
+
+export const afterDiscount = (price, discountPercent) =>
+  discountPercent
+    ? Math.round((price * (1 - discountPercent / 100)) / 100) * 100
+    : price

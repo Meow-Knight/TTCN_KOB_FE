@@ -20,16 +20,12 @@
             :item-width="slideHeight"
             :item-type="'image'"
           >
-            <div
-              v-for="photo in beer.photos"
-              :key="photo.link"
-              class="scroll-item"
-            >
+            <div v-for="photo in beer.photos" :key="photo" class="scroll-item">
               <img
-                :src="photo.link"
+                :src="photo"
                 class="item"
-                :class="{ selected: photo.link === selectedPhoto }"
-                @click="changeDisplayPhoto(photo.link)"
+                :class="{ selected: photo === selectedPhoto }"
+                @click="changeDisplayPhoto(photo)"
               />
             </div>
           </Slide>
@@ -51,7 +47,10 @@
         <div class="review-badge">Bia khá ngon</div>
         <div class="price">
           <div class="after-discount">
-            {{ priceFormat(afterDiscount) + '₫' }}
+            {{
+              priceFormat(afterDiscount(beer.price, beer.discount_percent)) +
+              '₫'
+            }}
           </div>
           <div class="origin-price">{{ priceFormat(beer.price) + '₫' }}</div>
           <div class="saving">
@@ -60,7 +59,9 @@
         </div>
         <ul style="padding-left: 20px">
           <li class="type">Loại bia: Heineken</li>
-          <li class="alcohol">Nồng độ cồn: {{ beer.alcohol_concentration }}</li>
+          <li class="alcohol">
+            Nồng độ cồn: {{ beer.alcohol_concentration }}%
+          </li>
           <li class="capacity">
             {{ size }}
           </li>
@@ -103,7 +104,16 @@
           </div>
         </div>
         <div class="action">
-          <button class="add-to-cart">
+          <button
+            class="add-to-cart"
+            @click="
+              changeCartAfterMutate({
+                item: addToCartData,
+                amount: purchaseNumber,
+                action: 'add',
+              })
+            "
+          >
             <svg
               enable-background="new 0 0 15 15"
               viewBox="0 0 15 15"
@@ -145,7 +155,18 @@
             </svg>
             <span>Thêm vào giỏ hàng</span>
           </button>
-          <button class="buy-now">Mua ngay</button>
+          <button
+            class="buy-now"
+            @click="
+              changeCartAfterMutate({
+                item: addToCartData,
+                amount: purchaseNumber,
+                action: 'add',
+              })
+            "
+          >
+            Mua ngay
+          </button>
         </div>
       </div>
     </div>
@@ -181,21 +202,30 @@
 
       <div class="recommend">
         <div class="header">SẢN PHẨM GỢI Ý</div>
+        <beer-collection
+          :beers="same_producer_beers"
+          :num-columns="1"
+          :column-width="1"
+        ></beer-collection>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { imageZoom, priceFormat } from '~/helper/helper'
+import { mapMutations } from 'vuex'
+import { imageZoom, priceFormat, afterDiscount } from '~/helper/helper'
 import Slide from '~/components/Slide/index.vue'
+import BeerCollection from '~/components/BeerCollection.vue'
 export default {
+  components: { BeerCollection },
   layout: 'default',
-  component: { Slide },
+  component: { Slide, BeerCollection },
   data() {
     return {
       isInitialLoading: true,
       beer: {
+        id: null,
         alcohol_concentration: null,
         beer_unit: null,
         bottle_amount: null,
@@ -205,29 +235,26 @@ export default {
         origin_nation: null,
         price: null,
         producer: null,
-        discount: null,
+        discount_percent: null,
         photos: [],
+        expiration_date: null,
+        note: null,
       },
       purchaseNumber: 1,
       slideHeight: '50px',
       selectedPhoto: null,
+      same_producer_beers: [],
     }
   },
   computed: {
     beerId() {
       return this.$router.currentRoute.params.id
     },
-    afterDiscount() {
-      return this.beer.price
-        ? this.beer.discount
-          ? Math.round(
-              (this.beer.price * (1 - this.beer.discount / 100)) / 100
-            ) * 100
-          : this.beer.price
-        : 0
-    },
     saving() {
-      return this.beer.price ? this.beer.price - this.afterDiscount : 0
+      return this.beer.price
+        ? this.beer.price -
+            afterDiscount(this.beer.price, this.beer.discount_percent)
+        : 0
     },
     size() {
       return (
@@ -244,10 +271,20 @@ export default {
       return this.selectedPhoto
         ? this.selectedPhoto
         : this.beer.photos[0]
-        ? this.beer.photos[0].link
+        ? this.beer.photos[0]
         : require('~/assets/img/beer-img-default.jpg')
     },
-    // change zoom result background when selectedPhoto is changed
+    // get some data needed for add to cart action
+    addToCartData() {
+      const { id, name, price } = this.beer
+      return {
+        id,
+        name,
+        price,
+        discount_percent: this.beer.discount_percent,
+        photo: this.beer.photos[0],
+      }
+    },
   },
   watch: {
     // we want to wait for both XHR result and and the component to
@@ -276,23 +313,24 @@ export default {
       this.isInitialLoading = true
 
       try {
-        const responseBeer = await this.$axios.get(
-          `/api/v1${BEER_URL}${this.beerId}`,
-          {
-            headers: { Authorization: authToken },
-          }
-        )
-        console.log(responseBeer)
+        const {
+          data: { details, photos, same_producer_beers: sameProducerBeers },
+        } = await this.$axios.get(`/api/v1${BEER_URL}${this.beerId}/info`, {
+          headers: { Authorization: authToken },
+        })
         this.beer = {
-          ...responseBeer.data,
-          beer_unit: responseBeer.data.beer_unit.name,
-          origin_nation: responseBeer.data.origin_nation.name,
-          producer: responseBeer.data.producer.name,
-          photos: [...responseBeer.data.photos, ...responseBeer.data.photos],
+          ...details,
+          beer_unit: details.beer_unit.name,
+          origin_nation: details.origin_nation.name,
+          producer: details.producer.name,
+          photos,
         }
-        this.selectedPhoto = this.beer.photos[0]?.link
+        this.same_producer_beers = sameProducerBeers
+        this.selectedPhoto = this.beer.photos[0]
         this.isInitialLoading = false
+        console.log(this.beer)
       } catch (err) {
+        console.log(err.response)
         if (err.response && err.response.status === 404) throw err
       }
     }
@@ -318,7 +356,11 @@ export default {
     changeDisplayPhoto(source) {
       this.selectedPhoto = source
     },
+    ...mapMutations({
+      changeCartAfterMutate: 'cart/changeCartAfterMutate',
+    }),
     priceFormat,
+    afterDiscount,
   },
 }
 </script>
@@ -478,7 +520,7 @@ export default {
   }
 }
 .action {
-  margin: 30px 0 0 15px;
+  margin: 30px 0 10px 15px;
   width: 50%;
   display: flex;
   align-items: center;
@@ -541,7 +583,6 @@ export default {
 
 .description {
   width: 100%;
-  /* height: fit-content; */
   background: $white;
   padding: 30px 20px;
   .header {
@@ -562,12 +603,19 @@ export default {
   .header {
     color: $red;
     padding: 0 10px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     font-weight: 500;
     font-size: 30px;
     width: 100%;
     text-align: center;
     background: rgb(245, 245, 245);
   }
+}
+
+button {
+  transition: 0.3s ease-in-out;
+}
+button:hover {
+  transition: 0.3s ease-in-out;
 }
 </style>

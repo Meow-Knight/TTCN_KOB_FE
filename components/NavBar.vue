@@ -28,19 +28,21 @@
                 {{ user.username }}
               </div>
               <ul class="dropdown_list">
-                <li v-if="$auth.loggedIn" class="dropdown_item first">
-                  <nuxt-link to="/profile" class="dropdown_text"
-                    >Trang cá nhân</nuxt-link
-                  >
-                </li>
-                <li v-if="!$auth.loggedIn" class="dropdown_item first">
-                  <nuxt-link to="/login" class="dropdown_text"
-                    >Đăng nhập</nuxt-link
-                  >
-                </li>
-                <li v-else class="dropdown_item" @click="logout()">
-                  <span class="dropdown_text">Đăng xuất</span>
-                </li>
+                <div class="dropdown-container">
+                  <li v-if="$auth.loggedIn" class="dropdown_item first">
+                    <nuxt-link to="/profile" class="dropdown_text"
+                      >Trang cá nhân</nuxt-link
+                    >
+                  </li>
+                  <li v-if="!$auth.loggedIn" class="dropdown_item first">
+                    <nuxt-link to="/login" class="dropdown_text"
+                      >Đăng nhập</nuxt-link
+                    >
+                  </li>
+                  <li v-else class="dropdown_item" @click="logout()">
+                    <span class="dropdown_text">Đăng xuất</span>
+                  </li>
+                </div>
               </ul>
             </i>
           </div>
@@ -157,9 +159,9 @@ export default {
   .username {
     color: $red;
   }
-  .cart-icon {
+  /* .cart-icon {
     color: $red;
-  }
+  } */
 }
 .nav__right {
   margin-right: 200px;
@@ -221,7 +223,7 @@ a {
 .dropdown_list {
   text-align: center;
   width: fit-content;
-  padding: 13px 10px;
+  padding: 13px 10px 0 10px;
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -229,16 +231,24 @@ a {
   left: -25px;
   top: 20px;
   display: none;
+  /* border: 1px solid red; */
+}
+
+.dropdown-container {
+  border: 1px solid rgb(143, 129, 129);
 }
 
 .dropdown:hover .dropdown_list {
+  /* transition: 3s ease; */
   display: block;
+  /* transition: 3s ease; */
+  /* transition-property: height; */
 }
 
 .dropdown_item {
   padding: 8px;
   margin: 0;
-  background: $white2;
+  background: $white;
   color: $black;
   font-size: 1.1rem;
   width: 200px;
@@ -265,9 +275,11 @@ a {
   width: 12px;
   height: 12px;
   transform: rotate(45deg) translateX(-50%);
-  background: $white2;
-  top: 12px;
+  background: $white;
+  top: 11.5px;
   left: 19.5%;
+  border-top: 1px solid rgb(143, 129, 129);
+  border-left: 1px solid rgb(143, 129, 129);
   transition: 0.5s ease-in-out;
 }
 
@@ -284,11 +296,24 @@ a {
   visibility: hidden;
 }
 
-.cart-icon {
+/* .cart-icon {
   width: 30px;
   height: 30px;
   color: $white;
+} */
+
+/* .cart-dropdown {
+  position: absolute;
+  visibility: hidden;
+  top: 0;
+  right: 0;
 }
+
+.cart-icon-wrapper:hover {
+  .cart-dropdown {
+    visibility: visible;
+  }
+} */
 
 @keyframes show-underline {
   from {
@@ -296,6 +321,42 @@ a {
   }
   to {
     width: 100%;
+  }
+}
+
+@keyframes showDropdown {
+  0% {
+    height: 0;
+  }
+  10% {
+    height: 10%;
+  }
+  20% {
+    height: 20%;
+  }
+  30% {
+    height: 30%;
+  }
+  40% {
+    height: 40%;
+  }
+  50% {
+    height: 50%;
+  }
+  60% {
+    height: 60%;
+  }
+  70% {
+    height: 70%;
+  }
+  80% {
+    height: 80%;
+  }
+  90% {
+    height: 90%;
+  }
+  100% {
+    height: 100%;
   }
 }
 </style>
