@@ -42,14 +42,12 @@
             </div>
           </div>
           <div class="form-group info__content__capacity">
-            <label for=""
-              >Dung tích (ml) <span class="required-note">*</span></label
-            >
+            <label for="">Dung tích <span class="required-note">*</span></label>
 
             <div class="input-box">
               <input
                 v-model="newBeer.capacity"
-                type="number"
+                type="text"
                 class="form-control"
                 disabled
                 required
@@ -60,7 +58,25 @@
           <div class="form-group info__content__origin select-container">
             <label for="">Xuất xứ</label>
             <select
-              v-model="newBeer.origin_nation"
+              v-if="originBeer.origin_nation"
+              v-model="newBeer.origin_nation.id"
+              class="form-select form-control"
+              aria-label=""
+              disabled
+              required
+            >
+              <option
+                v-for="nation in nations"
+                :key="nation.id"
+                :value="nation.id"
+                :selected="originBeer.origin_nation.id == nation.id"
+              >
+                {{ nation.name }}
+              </option>
+            </select>
+            <select
+              v-else
+              v-model="newBeer.origin_nation.id"
               class="form-select form-control"
               aria-label=""
               disabled
@@ -96,7 +112,25 @@
 
             <div class="input-box">
               <select
-                v-model="newBeer.beer_unit"
+                v-if="originBeer.beer_unit"
+                v-model="newBeer.beer_unit.id"
+                class="form-select form-control"
+                aria-label=""
+                disabled
+                required
+              >
+                <option
+                  v-for="unit in beerUnits"
+                  :key="unit.id"
+                  :value="unit.id"
+                  :selected="originBeer.beer_unit.id == unit.id"
+                >
+                  {{ unit.name }}
+                </option>
+              </select>
+              <select
+                v-else
+                v-model="newBeer.beer_unit.id"
                 class="form-select form-control"
                 aria-label=""
                 disabled
@@ -146,7 +180,25 @@
             >
             <div class="input-box">
               <select
-                v-model="newBeer.producer"
+                v-if="originBeer.producer"
+                v-model="newBeer.producer.id"
+                class="form-select form-control"
+                aria-label=""
+                disabled
+                required
+              >
+                <option
+                  v-for="producer in producers"
+                  :key="producer.id"
+                  :value="producer.id"
+                  :selected="originBeer.producer.id == producer.id"
+                >
+                  {{ producer.name }}
+                </option>
+              </select>
+              <select
+                v-else
+                v-model="newBeer.producer.id"
                 class="form-select form-control"
                 aria-label=""
                 disabled
@@ -222,12 +274,18 @@ export default {
         name: null,
         alcohol_concentration: null,
         capacity: null,
-        origin_nation: null,
+        origin_nation: {
+          id: null,
+        },
         price: null,
         bottle_amount: null,
         describe: null,
-        producer: null,
-        beer_unit: null,
+        producer: {
+          id: null,
+        },
+        beer_unit: {
+          id: null,
+        },
       },
       editting: false,
     }
@@ -273,6 +331,21 @@ export default {
         console.log(responseBeer.data)
         this.originBeer = responseBeer.data
         Object.assign(this.newBeer, responseBeer.data)
+        if (!this.newBeer.origin_nation) {
+          this.newBeer.origin_nation = {
+            id: null,
+          }
+        }
+        if (!this.newBeer.beer_unit) {
+          this.newBeer.beer_unit = {
+            id: null,
+          }
+        }
+        if (!this.newBeer.producer) {
+          this.newBeer.producer = {
+            id: null,
+          }
+        }
       } catch (err) {
         alert(err)
       }
@@ -313,10 +386,17 @@ export default {
         const URL = '/beer/'
         if (process.client) {
           const authToken = localStorage.getItem('auth._token.local')
+          const newBeerInput = {
+            ...this.newBeer,
+            origin_nation: this.newBeer.origin_nation.id,
+            producer: this.newBeer.producer.id,
+            beer_unit: this.newBeer.beer_unit.id,
+          }
+
           try {
             await this.$axios.patch(
               `/api/v1${URL}${this.beerId}/`,
-              this.newBeer,
+              newBeerInput,
               {
                 headers: { Authorization: authToken },
               }
