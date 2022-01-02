@@ -24,7 +24,11 @@
           </div>
         </div>
       </div>
-      <button v-if="cartItems.length" class="to-detail">
+      <button
+        v-if="cartItems.length"
+        class="to-detail"
+        @click="$router.push('/user/cart')"
+      >
         Chi tiết giỏ hàng
       </button>
     </div>
@@ -38,7 +42,6 @@ import { priceFormat } from '~/helper/helper'
 export default {
   computed: {
     cartItems() {
-      console.log(this.$store.state.cart.items)
       return this.$store.state.cart.items
     },
   },
@@ -51,13 +54,6 @@ export default {
       return '/beers/' + beerID
     },
   },
-  mounted() {
-    document
-      .querySelector('.cart-container')
-      .addEventListener('mouseover', (event) => {
-        console.log(event.target)
-      })
-  },
 }
 </script>
 
@@ -65,7 +61,6 @@ export default {
 @import '~assets/scss/variables';
 
 .cart-container {
-  /* z-index: 500; */
   padding: 15px 15px;
   height: fit-content;
   width: fit-content;
@@ -74,7 +69,6 @@ export default {
   border-radius: 5px;
   box-shadow: 0 0 20px 0.2px rgba(0, 0, 0, 0.4);
   font-family: sans-serif;
-  /* display: flex; */
   position: relative;
 }
 
@@ -103,7 +97,6 @@ export default {
 .header {
   text-align: start;
   font-size: 30px;
-  /* margin-bottom: 10px; */
 }
 
 .cart-items {
@@ -113,17 +106,13 @@ export default {
   overflow-x: hidden;
   overflow-y: auto;
   max-height: 200px;
-  /* padding: 10px 0 0 10px; */
-  /* margin-bottom: 20px; */
 }
 
 .item {
   display: flex;
   justify-content: space-between;
-  /* align-items: center; */
   height: fit-content;
   width: 100%;
-  /* margin-bottom: 10px; */
 }
 
 .item-img {
@@ -160,7 +149,6 @@ export default {
 
 .action {
   display: flex;
-  /* align-items: center; */
   justify-content: space-evenly;
   width: 20%;
   button {
@@ -170,8 +158,7 @@ export default {
 }
 
 .to-detail {
-  margin-left: auto;
-  margin-right: 0;
+  margin: 10px 0 0 auto;
   padding: 10px 20px;
 }
 

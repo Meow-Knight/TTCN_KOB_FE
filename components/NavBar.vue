@@ -10,8 +10,8 @@
             <nuxt-link to="/">Trang Chủ</nuxt-link>
           </li>
           <li class="nav__tab-list__item">
-            <nuxt-link :to="isAdmin ? '/dashboard/beers' : '/beers'"
-              >Tất cả sản phẩm</nuxt-link
+            <a :href="isAdmin ? '/dashboard/beers' : '/beers'"
+              >Tất cả sản phẩm</a
             >
           </li>
           <li class="nav__tab-list__item">
@@ -22,15 +22,15 @@
           </li>
         </ul>
         <div class="icon">
-          <div class="dropdown">
+          <div class="dropdown" @mouseover="showDropdown = true">
             <i class="fas fa-user icon-user">
               <div v-if="$auth.loggedIn" class="username">
                 {{ user.username }}
               </div>
-              <ul class="dropdown_list">
+              <ul v-if="showDropdown" class="dropdown_list">
                 <div class="dropdown-container">
                   <li v-if="$auth.loggedIn" class="dropdown_item first">
-                    <nuxt-link to="/profile" class="dropdown_text"
+                    <nuxt-link to="/user/account/info" class="dropdown_text"
                       >Trang cá nhân</nuxt-link
                     >
                   </li>
@@ -61,6 +61,11 @@ export default {
     NavCartIcon,
   },
   props: ['transparent'],
+  data() {
+    return {
+      showDropdown: false,
+    }
+  },
   computed: {
     user() {
       return this.$auth.user
@@ -230,8 +235,11 @@ a {
   position: absolute;
   left: -25px;
   top: 20px;
-  display: none;
-  /* border: 1px solid red; */
+  animation: hideDropdown 0.3s cubic-bezier(0.4, 0, 0.6, 1);
+  transform: scale(0);
+  will-change: transform;
+  transform-origin: calc(19.5%) 5px;
+  opacity: 0;
 }
 
 .dropdown-container {
@@ -239,10 +247,10 @@ a {
 }
 
 .dropdown:hover .dropdown_list {
-  /* transition: 3s ease; */
-  display: block;
-  /* transition: 3s ease; */
-  /* transition-property: height; */
+  will-change: transform;
+  transform: scale(1);
+  animation: showDropdown 0.3s cubic-bezier(0.4, 0, 0.6, 1);
+  opacity: 1;
 }
 
 .dropdown_item {
@@ -296,25 +304,6 @@ a {
   visibility: hidden;
 }
 
-/* .cart-icon {
-  width: 30px;
-  height: 30px;
-  color: $white;
-} */
-
-/* .cart-dropdown {
-  position: absolute;
-  visibility: hidden;
-  top: 0;
-  right: 0;
-}
-
-.cart-icon-wrapper:hover {
-  .cart-dropdown {
-    visibility: visible;
-  }
-} */
-
 @keyframes show-underline {
   from {
     width: 0;
@@ -325,38 +314,24 @@ a {
 }
 
 @keyframes showDropdown {
-  0% {
-    height: 0;
+  from {
+    opacity: 0;
+    transform: scale(0);
   }
-  10% {
-    height: 10%;
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
-  20% {
-    height: 20%;
+}
+
+@keyframes hideDropdown {
+  from {
+    opacity: 1;
+    transform: scale(1);
   }
-  30% {
-    height: 30%;
-  }
-  40% {
-    height: 40%;
-  }
-  50% {
-    height: 50%;
-  }
-  60% {
-    height: 60%;
-  }
-  70% {
-    height: 70%;
-  }
-  80% {
-    height: 80%;
-  }
-  90% {
-    height: 90%;
-  }
-  100% {
-    height: 100%;
+  to {
+    opacity: 0;
+    transform: scale(0);
   }
 }
 </style>

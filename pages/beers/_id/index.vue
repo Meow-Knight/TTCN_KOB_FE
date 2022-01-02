@@ -202,11 +202,13 @@
 
       <div class="recommend">
         <div class="header">SẢN PHẨM GỢI Ý</div>
-        <beer-collection
-          :beers="same_producer_beers"
-          :num-columns="1"
-          :column-width="1"
-        ></beer-collection>
+        <div class="recommend-items">
+          <beer-collection
+            :beers="same_producer_beers"
+            :num-columns="1"
+            :column-width="1"
+          ></beer-collection>
+        </div>
       </div>
     </div>
   </div>
@@ -609,6 +611,10 @@ export default {
     width: 100%;
     text-align: center;
     background: rgb(245, 245, 245);
+  }
+  .recommend-items {
+    width: 80%;
+    margin: 0 auto;
   }
 }
 

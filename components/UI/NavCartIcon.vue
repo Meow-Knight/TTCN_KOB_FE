@@ -17,7 +17,7 @@
       </div>
     </div>
     <!-- <div class="dropdown-cart"> -->
-    <div class="dropdown-cart">
+    <div v-if="showDropdown" class="dropdown-cart">
       <cart></cart>
     </div>
     <!-- </div> -->
@@ -37,6 +37,7 @@ export default {
   data() {
     return {
       bump: false,
+      showDropdown: false,
     }
   },
   computed: {
@@ -53,6 +54,11 @@ export default {
         this.bump = false
       }, 300)
     },
+  },
+  mounted() {
+    this.$el.addEventListener('mouseover', () => {
+      this.showDropdown = true
+    })
   },
 }
 </script>
@@ -85,8 +91,11 @@ export default {
     transition: 0.3s ease;
   }
   .dropdown-cart {
-    display: block;
-    transition: 5s;
+    will-change: transform;
+    -webkit-animation: showDropdown 0.3s cubic-bezier(0.4, 0, 0.6, 1);
+    animation: showDropdown 0.3s cubic-bezier(0.4, 0, 0.6, 1);
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
@@ -128,11 +137,14 @@ export default {
 .dropdown-cart {
   padding: 20px 10px 0 0;
   position: absolute;
-  display: none;
   top: 80%;
   right: -100px;
-  transition: 5s;
-  /* background: rgb(245, 245, 245); */
+  transform: scale(0);
+  opacity: 0;
+  animation: hideDropdown 0.3s cubic-bezier(0.4, 0, 0.6, 1);
+  -webkit-animation: hideDropdown 0.3s cubic-bezier(0.4, 0, 0.6, 1);
+  will-change: transform;
+  transform-origin: calc(100% - 130px) 18px;
 }
 
 .wrapper.transparent {
@@ -161,6 +173,28 @@ export default {
   }
   100% {
     transform: scale(1);
+  }
+}
+
+@keyframes showDropdown {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes hideDropdown {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0);
   }
 }
 </style>

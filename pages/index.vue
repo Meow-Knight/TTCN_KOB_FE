@@ -91,10 +91,10 @@ export default {
         this.selectedDiscount = this.discounts.find(
           (discount) => discount.id === discountId
         )
-      }, 500)
+      }, 750)
       setTimeout(() => {
         this.showVeil = false
-      }, 1000)
+      }, 1500)
     },
   },
 }
@@ -187,7 +187,7 @@ h1 {
 }
 .veil.active {
   z-index: 20;
-  animation: showAndHideVeil 1s;
+  animation: showAndHideVeil 1.5s;
   animation-timing-function: linear;
 }
 .discount-button {
@@ -224,16 +224,16 @@ h1 {
     opacity: 1;
   }
   60% {
-    opacity: 0.8;
+    opacity: 0.9;
   }
   70% {
-    opacity: 0.6;
+    opacity: 0.7;
   }
   80% {
-    opacity: 0.4;
+    opacity: 0.5;
   }
   90% {
-    opacity: 0.2;
+    opacity: 0.3;
   }
   100% {
     opacity: 0;

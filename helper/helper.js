@@ -6,7 +6,8 @@
  * @returns
  */
 export const roleGuard = (roles) => (context) => {
-  console.log(context)
+  console.log('init role guard')
+  // console.log(context)
   /*
   here we need the isStaff param and the context.$auth.user.is_staff to be match
   say true and true for an admin, or false and false for a user
@@ -26,6 +27,12 @@ export const roleGuard = (roles) => (context) => {
     context.redirect('/')
   }
 }
+
+// export const getCart = () => (context) => {
+//   console.log('init cart request')
+//   const response = await axios.request("...")
+
+// }
 
 export const imageZoom = (imgID, resultID, lensID) => {
   // source image for zoom
