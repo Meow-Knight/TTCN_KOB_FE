@@ -56,7 +56,9 @@
                 <td>{{ beer.capacity }}</td>
                 <td>{{ beer.price }}</td>
                 <td>{{ beer.bottle_amount }}</td>
-                <td>{{ beer.producer.name }}</td>
+                <td>
+                  <span v-if="beer.producer">{{ beer.producer.name }}</span>
+                </td>
               </tr>
             </tbody>
           </table>
