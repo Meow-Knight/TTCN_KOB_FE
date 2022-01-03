@@ -1,20 +1,38 @@
-// role guard used as middleware
-export const roleGuard = (role) => (context) => {
+/**
+ * role guard used as middleware
+ * @param {*} role specify which role will have access the pages
+ * it can be a single string, like "user" , or an array of roles
+ * like ["user", admin]
+ * @returns
+ */
+export const roleGuard = (roles) => (context) => {
+  console.log('init role guard')
+  // console.log(context)
   /*
   here we need the isStaff param and the context.$auth.user.is_staff to be match
   say true and true for an admin, or false and false for a user
   otherwise, the user is not authorized to access that page, so maybe we redirect them
   to error page or home page
    */
+  // if (!Array.isArray(roles)) roles = [roles]
+  // if (roles.length && !roles.include(context.$auth.user.role)) {
+  //   return context.$router.push("/")
+  // }
   if (
     !(
-      (context.$auth.user.is_staff && role === 'admin') ||
-      (!context.$auth.user.is_staff && role === 'user')
+      (context.$auth.user.is_staff && roles === 'admin') ||
+      (!context.$auth.user.is_staff && roles === 'user')
     )
   ) {
-    return context.redirect('/')
+    context.redirect('/')
   }
 }
+
+// export const getCart = () => (context) => {
+//   console.log('init cart request')
+//   const response = await axios.request("...")
+
+// }
 
 export const imageZoom = (imgID, resultID, lensID) => {
   // source image for zoom
@@ -97,8 +115,9 @@ export const imageZoom = (imgID, resultID, lensID) => {
     // get the current ratio between image and the lens
     const currentRatio = lens.offsetHeight / imgHeight
     // set new lens size base on new ratio
-    const newRatio = currentRatio + scale
-    if (newRatio < 0.15 || newRatio > 1) return
+    let newRatio = currentRatio + scale
+    if (newRatio < 0.1) newRatio = 0.1
+    if (newRatio > 1) newRatio = 1
     lens.style.height = img.offsetHeight * newRatio + 'px'
     lens.style.width = img.offsetWidth * newRatio + 'px'
     // re-calculate ratio between lens and result div
@@ -130,3 +149,10 @@ export const imageZoom = (imgID, resultID, lensID) => {
       img.width * cx + 'px ' + img.height * cy + 'px'
   }
 }
+
+export const priceFormat = (price) => price.toLocaleString().replace(',', '.')
+
+export const afterDiscount = (price, discountPercent) =>
+  discountPercent
+    ? Math.round((price * (1 - discountPercent / 100)) / 100) * 100
+    : price

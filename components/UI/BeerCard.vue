@@ -1,70 +1,80 @@
 <template>
-  <div class="card-container">
-    <div class="image">
-      <nuxt-link :to="beerURL" class="link">
-        <img :src="beerImg" alt="Beer image" height="200px" width="230px" />
-      </nuxt-link>
-      <div class="discount-label">
-        {{ beer.discount ? beer.discount : defaultStat.discount }}
+  <div class="card-wrapper">
+    <div class="card-container">
+      <div class="image">
+        <nuxt-link :to="beerURL" class="link">
+          <img :src="beerImg" alt="Beer image" height="100%" width="100%" />
+        </nuxt-link>
+        <div class="discount-label">
+          {{ (-beer.discount_percent || defaultStat.discount_percent) + '%' }}
+        </div>
       </div>
-    </div>
-    <div class="variant">
-      {{ beer.variant ? beer.variant : defaultStat.variant }}
-    </div>
-    <div class="name">
-      <nuxt-link :to="beerURL" class="link">{{ beer.name }}</nuxt-link>
-    </div>
-    <div class="price">
-      <div class="after-discount">{{ afterDiscount + 'đ' }}</div>
-      <div class="origin-price">{{ beer.price + 'đ' }}</div>
-    </div>
-    <div class="review-badge">
-      {{ beer.review ? beer.review : defaultStat.review }}
-    </div>
-    <div class="action">
-      <button
-        class="button"
-        @click="changeCartAfterMutate({ item: beer, amount: 1, action: 'add' })"
-      >
-        Add
-      </button>
-      <button
-        class="button"
-        @click="changeCartAfterMutate({ item: beer, amount: 1, action: 'add' })"
-      >
-        Buy now
-      </button>
+      <!-- <div class="variant">
+      {{ beer.variant || defaultStat.variant }}
+    </div> -->
+      <div class="name">
+        <nuxt-link :to="beerURL" class="link"
+          >{{ beer.name }} hello mother fucker you know me</nuxt-link
+        >
+      </div>
+
+      <div class="price">
+        <div class="after-discount">
+          {{
+            priceFormat(afterDiscount(beer.price, beer.discount_percent)) + 'đ'
+          }}
+        </div>
+        <div class="origin-price">
+          {{ priceFormat(beer.price) + 'đ' }}
+        </div>
+      </div>
+      <div class="review-badge">
+        {{ beer.review || defaultStat.review }}
+      </div>
+      <div class="action">
+        <button
+          class="button"
+          @click="
+            changeCartAfterMutate({ item: beer, amount: 1, action: 'add' })
+          "
+        >
+          Add
+        </button>
+        <button
+          class="button"
+          @click="
+            changeCartAfterMutate({ item: beer, amount: 1, action: 'add' })
+          "
+        >
+          Buy now
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { mapMutations } from 'vuex'
+import { priceFormat, afterDiscount } from '~/helper/helper'
 export default {
   props: ['beer'],
   data() {
     return {
       defaultStat: {
         img: '~assets/img/beer-img-default.png',
-        discount: 0,
+        discount_percent: 0,
         variant: 'Bia Heineken',
         review: 'Bia ngon',
       },
     }
   },
   computed: {
-    afterDiscount() {
-      return this.beer.discount
-        ? Math.round((this.beer.price * (1 - this.beer.discount / 100)) / 100) *
-            100
-        : this.beer.price
-    },
     beerURL() {
       return '/beers/' + this.beer.id
     },
     beerImg() {
-      return this.beer.img
-        ? this.beer.img
+      return this.beer.photo
+        ? this.beer.photo
         : require('../../assets/img/beer-img-default.jpg')
     },
   },
@@ -73,25 +83,40 @@ export default {
     ...mapMutations({
       changeCartAfterMutate: 'cart/changeCartAfterMutate',
     }),
+    priceFormat,
+    afterDiscount,
   },
 }
 </script>
 
 <style lang="scss" scoped>
 @import '~assets/scss/variables';
+
+.card-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 125%;
+  height: 0;
+}
+
 .card-container {
+  position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  height: 400px;
-  width: 300px;
-  padding: 10px 15px;
+  width: 100%;
+  height: 100%;
+  padding: 5%;
   color: $black;
   background: $white;
-  position: relative;
   border-radius: 10px;
   transition: 0.3s ease-in-out;
+}
+
+.image {
+  height: 45%;
+  width: 55.55%;
 }
 
 .link {
@@ -101,32 +126,50 @@ export default {
 
 .discount-label {
   position: absolute;
-  top: 10px;
-  right: 15px;
-  padding: 3px 17px;
+  top: 5%;
+  right: 5%;
+  padding: 3px 14px;
   height: fit-content;
-  width: fit-content;
+  width: 60px;
+  text-align: center;
   color: $white;
   background: $red;
-  border-radius: 6px;
+  border-radius: 10px;
 }
 
 .variant {
   width: 100%;
   font-weight: 100;
   text-align: start;
-  margin-bottom: 8px;
+  height: 10%;
 }
 
 .name {
-  width: 100%;
+  width: calc(100%);
   text-align: start;
   font-weight: 700;
-  margin-bottom: 8px;
+  font-size: 90%;
+  padding: 8px 0;
+  height: fit-content;
+  line-height: 1.1;
+  min-height: calc(15%);
+
+  .link {
+    width: calc(100%);
+    height: calc(100%);
+    -webkit-box-orient: vertical;
+    display: inline-block;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    -webkit-font-smoothing: antialiased;
+    display: -webkit-box;
+  }
 }
 
 .price {
   width: 100%;
+  height: 10%;
   font-size: 15px;
   display: flex;
   align-items: center;
@@ -141,13 +184,15 @@ export default {
 
 .review-badge {
   text-align: center;
+  height: 10%;
 }
 
 .action {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 60%;
+  justify-content: space-evenly;
+  min-width: 60%;
+  height: 15%;
   .button {
     padding: 4px 8px;
     background: rgb(240, 235, 235);

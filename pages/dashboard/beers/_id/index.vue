@@ -191,10 +191,10 @@
       @close-modal="showConfirmModal = false"
       @action-when-confirm="removeBeer"
     >
-      <template v-slot:header>
+      <template #header>
         <h5>Xác nhận xóa bia</h5>
       </template>
-      <template v-slot:body>
+      <template #body>
         <p>Bạn có chắc muốn xóa {{ originBeer.name }}</p>
       </template>
     </ConfirmModal>
@@ -265,11 +265,12 @@ export default {
         this.nations = responseNation.data.results
 
         const responseBeer = await this.$axios.get(
-          `/api/v1${BEER_URL}${this.beerId}`,
+          `/api/v1${BEER_URL}${this.beerId}/info`,
           {
             headers: { Authorization: authToken },
           }
         )
+        console.log(responseBeer.data)
         this.originBeer = responseBeer.data
         Object.assign(this.newBeer, responseBeer.data)
       } catch (err) {

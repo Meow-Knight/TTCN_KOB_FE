@@ -1,5 +1,5 @@
 <template>
-  <div class="container">Footer</div>
+  <div class="footer-container">Footer</div>
 </template>
 
 <script>
@@ -8,7 +8,7 @@ export default {}
 
 <style lang="scss" scoped>
 @import '~/assets/scss/_variables.scss';
-.container {
+.footer-container {
   width: 100%;
   max-width: 100%;
   height: 150px;

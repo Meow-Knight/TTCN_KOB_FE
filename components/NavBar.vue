@@ -10,8 +10,8 @@
             <nuxt-link to="/">Trang Chủ</nuxt-link>
           </li>
           <li class="nav__tab-list__item">
-            <nuxt-link :to="isAdmin ? '/dashboard/beers' : '/beers'"
-              >Tất cả sản phẩm</nuxt-link
+            <a :href="isAdmin ? '/dashboard/beers' : '/beers'"
+              >Tất cả sản phẩm</a
             >
           </li>
           <li class="nav__tab-list__item">
@@ -22,25 +22,27 @@
           </li>
         </ul>
         <div class="icon">
-          <div class="dropdown">
+          <div class="dropdown" @mouseover="showDropdown = true">
             <i class="fas fa-user icon-user">
               <div v-if="$auth.loggedIn" class="username">
                 {{ user.username }}
               </div>
-              <ul class="dropdown_list">
-                <li v-if="$auth.loggedIn" class="dropdown_item first">
-                  <nuxt-link to="/profile" class="dropdown_text"
-                    >Trang cá nhân</nuxt-link
-                  >
-                </li>
-                <li v-if="!$auth.loggedIn" class="dropdown_item first">
-                  <nuxt-link to="/login" class="dropdown_text"
-                    >Đăng nhập</nuxt-link
-                  >
-                </li>
-                <li v-else class="dropdown_item" @click="logout()">
-                  <span class="dropdown_text">Đăng xuất</span>
-                </li>
+              <ul v-if="showDropdown" class="dropdown_list">
+                <div class="dropdown-container">
+                  <li v-if="$auth.loggedIn" class="dropdown_item first">
+                    <nuxt-link to="/user/account/info" class="dropdown_text"
+                      >Trang cá nhân</nuxt-link
+                    >
+                  </li>
+                  <li v-if="!$auth.loggedIn" class="dropdown_item first">
+                    <nuxt-link to="/login" class="dropdown_text"
+                      >Đăng nhập</nuxt-link
+                    >
+                  </li>
+                  <li v-else class="dropdown_item" @click="logout()">
+                    <span class="dropdown_text">Đăng xuất</span>
+                  </li>
+                </div>
               </ul>
             </i>
           </div>
@@ -59,6 +61,11 @@ export default {
     NavCartIcon,
   },
   props: ['transparent'],
+  data() {
+    return {
+      showDropdown: false,
+    }
+  },
   computed: {
     user() {
       return this.$auth.user
@@ -157,9 +164,9 @@ export default {
   .username {
     color: $red;
   }
-  .cart-icon {
+  /* .cart-icon {
     color: $red;
-  }
+  } */
 }
 .nav__right {
   margin-right: 200px;
@@ -221,24 +228,35 @@ a {
 .dropdown_list {
   text-align: center;
   width: fit-content;
-  padding: 13px 10px;
+  padding: 13px 10px 0 10px;
   margin: 0;
   display: flex;
   flex-direction: column;
   position: absolute;
   left: -25px;
   top: 20px;
-  display: none;
+  animation: hideDropdown 0.3s cubic-bezier(0.4, 0, 0.6, 1);
+  transform: scale(0);
+  will-change: transform;
+  transform-origin: calc(19.5%) 5px;
+  opacity: 0;
+}
+
+.dropdown-container {
+  border: 1px solid rgb(143, 129, 129);
 }
 
 .dropdown:hover .dropdown_list {
-  display: block;
+  will-change: transform;
+  transform: scale(1);
+  animation: showDropdown 0.3s cubic-bezier(0.4, 0, 0.6, 1);
+  opacity: 1;
 }
 
 .dropdown_item {
   padding: 8px;
   margin: 0;
-  background: $white2;
+  background: $white;
   color: $black;
   font-size: 1.1rem;
   width: 200px;
@@ -265,9 +283,11 @@ a {
   width: 12px;
   height: 12px;
   transform: rotate(45deg) translateX(-50%);
-  background: $white2;
-  top: 12px;
+  background: $white;
+  top: 11.5px;
   left: 19.5%;
+  border-top: 1px solid rgb(143, 129, 129);
+  border-left: 1px solid rgb(143, 129, 129);
   transition: 0.5s ease-in-out;
 }
 
@@ -284,18 +304,34 @@ a {
   visibility: hidden;
 }
 
-.cart-icon {
-  width: 30px;
-  height: 30px;
-  color: $white;
-}
-
 @keyframes show-underline {
   from {
     width: 0;
   }
   to {
     width: 100%;
+  }
+}
+
+@keyframes showDropdown {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes hideDropdown {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0);
   }
 }
 </style>

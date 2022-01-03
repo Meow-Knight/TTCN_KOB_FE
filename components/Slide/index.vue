@@ -1,12 +1,8 @@
 <template>
-  <div class="slide">
+  <div class="slide" :class="{ image: itemType }">
+    <!-- we will take list items from parent component and render them -->
     <div id="list-scroll">
-      <div v-for="(item, index) in items" :key="index" class="scroll-item">
-        <div class="img">
-          <img :src="item.img" alt="" />
-        </div>
-        <slot></slot>
-      </div>
+      <slot></slot>
     </div>
     <div class="slide__icon-container">
       <div v-if="iconBack" class="icon icon-back" @click="scroll(-1)">
@@ -21,7 +17,7 @@
 
 <script>
 export default {
-  props: ['items', 'itemHeight', 'itemWidth'],
+  props: ['items', 'itemHeight', 'itemWidth', 'itemType'],
   data() {
     return {
       disabledIconButton: false, // prevent click 2 sequently times
@@ -29,13 +25,21 @@ export default {
       iconNext: true,
     }
   },
-  created() {},
-  beforeMount() {
+  watch: {
+    itemHeight(cur, prev) {
+      const scrollItems = document.getElementsByClassName('scroll-item')
+      for (let index = 0; index < scrollItems.length; index++) {
+        scrollItems[index].style.height = cur
+        scrollItems[index].style.width = cur
+      }
+    },
+  },
+  mounted() {
     // set width and height for all scroll item
     const scrollItems = document.getElementsByClassName('scroll-item')
     for (let index = 0; index < scrollItems.length; index++) {
       scrollItems[index].style.height = this.itemHeight
-      scrollItems[index].style.width = this.itemWidth
+      scrollItems[index].style.width = this.itemHeight
     }
   },
   methods: {
@@ -80,7 +84,6 @@ export default {
         }
         this.iconNext = true
       }
-
       this.disabledIconButton = true
     },
   },
@@ -92,6 +95,10 @@ export default {
 
 .slide {
   position: relative;
+  /* width: 100%; */
+  /* height: 100%; */
+  /* padding: 5px 5px; */
+  background: $breadcrumbBgrColor;
   &__icon-container {
     font-size: 40px;
     color: $red;
@@ -103,11 +110,11 @@ export default {
   }
   .icon-back {
     left: 12px;
-    top: 50%;
+    top: 20%;
   }
   .icon-next {
     right: 12px;
-    top: 50%;
+    top: 20%;
   }
 }
 #list-scroll {
@@ -115,21 +122,31 @@ export default {
   flex-direction: row;
   overflow: hidden;
   scroll-behavior: smooth;
-  margin: 30px;
+  /* width: fit-content; */
+  /* height: 100%; */
+}
+.scroll-item {
+  padding: 5px;
+  display: flex;
+  /* background-color: $breadcrumbBgrColor; */
 
-  .scroll-item {
-    margin-right: 10px;
-    padding: 10px;
+  .item {
+    /* width: 100%;
+    height: 100%; */
     display: flex;
-    background-color: $breadcrumbBgrColor;
-
-    .img {
-      width: 100%;
-      height: 60%;
-      display: flex;
-      overflow: hidden;
-      justify-content: center;
-    }
+    overflow: hidden;
+    justify-content: center;
+  }
+  .item.selected {
+    border: 1px solid $red;
+  }
+}
+.slide.image {
+  .item {
+    cursor: pointer;
+  }
+  .scroll-item:hover {
+    transform: scale(1.1);
   }
 }
 </style>
