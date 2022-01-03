@@ -288,8 +288,6 @@ export default {
         }
       }
       this.previewImage(event)
-      console.log(this.images)
-      console.log(this.imageUrls)
     },
     previewImage(event) {
       const images = event.target.files
