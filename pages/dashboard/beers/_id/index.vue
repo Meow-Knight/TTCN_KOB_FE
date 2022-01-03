@@ -629,8 +629,6 @@ export default {
     flex-direction: row;
     flex-wrap: wrap;
     margin: 0px 20px 50px 20px;
-    align-items: center;
-    justify-content: center;
     background-color: $white;
     border-radius: 10px;
   }

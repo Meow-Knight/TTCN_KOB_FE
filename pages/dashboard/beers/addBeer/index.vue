@@ -320,7 +320,7 @@ export default {
     display: flex;
     flex-direction: column;
     width: 100%;
-    align-items: center;
+    // align-items: center;
 
     .notion {
       width: 100%;
@@ -356,12 +356,10 @@ export default {
   flex-direction: row;
   flex-wrap: wrap;
   margin-bottom: 50px;
-  align-items: center;
-  justify-content: center;
   background-color: $breadcrumbBgrColor;
 }
 .image-item {
-  width: 400px;
+  width: 200px;
   display: inline-block;
   margin: 10px;
 }
