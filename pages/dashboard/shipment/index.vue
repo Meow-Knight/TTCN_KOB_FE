@@ -7,7 +7,7 @@
       <div class="left"><sidebar-admin /></div>
       <div class="right">
         <div class="total-users container-fluid">
-          <span>Tất cả sản phẩm: {{ shipments.length }}</span>
+          <span>Tất cả lô hàng: {{ totalShipment }}</span>
           <div class="search-bar">
             <form class="form-inline">
               <input
@@ -21,7 +21,7 @@
               <nuxt-link
                 to="/dashboard/shipment/addShipment"
                 class="btn btn-outline-success my-2 my-sm-0"
-                >Thêm vận chuyển</nuxt-link
+                >Thêm lô hàng</nuxt-link
               >
             </form>
           </div>
@@ -38,7 +38,7 @@
                     <i v-else class="fas fa-caret-down"></i>
                   </span>
                 </th>
-                <th scope="col">Ngày Ship</th>
+                <th scope="col">Ngày nhập</th>
                 <th scope="col">Số Lượng</th>
                 <th scope="col" @click="sort('price')">
                   Giá (VNĐ)
@@ -133,6 +133,7 @@ export default {
         field: 'name',
         asc: true,
       },
+      totalShipment: 0,
     }
   },
   computed: {
@@ -156,6 +157,7 @@ export default {
         this.rows = response.data.count
         this.previous = response.data.previous
         this.next = response.data.next
+        this.totalShipment = response.data.count
       }
     },
     changePage(pageNumber) {

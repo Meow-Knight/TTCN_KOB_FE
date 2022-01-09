@@ -142,7 +142,7 @@ export default {
       beers: [],
       editting: false,
       SHIPMENT_URL: '/beer/shipment/',
-      BEER_URL: '/beer/',
+      BEER_URL: '/beer/get_all_with_name/',
     }
   },
   async created() {
@@ -152,7 +152,7 @@ export default {
         const responseBeerUnit = await axios.get(`/api/v1${this.BEER_URL}`, {
           headers: { Authorization: authToken },
         })
-        this.beers = responseBeerUnit.data.results
+        this.beers = responseBeerUnit.data
         const response = await axios.get(
           `/api/v1${this.SHIPMENT_URL}${this.shipmentId}`,
           {

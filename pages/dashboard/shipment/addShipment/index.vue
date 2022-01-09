@@ -11,7 +11,7 @@
 
           <div class="form-group info__content__capacity">
             <label for=""
-              >Ngày vận chuyển <span class="required-note">*</span>:</label
+              >Ngày nhập <span class="required-note">*</span>:</label
             >
             <div class="input-box">
               <b-form-datepicker
@@ -20,14 +20,14 @@
                 class="mb-2"
               ></b-form-datepicker>
               <div class="invalid-feedback">
-                Vui lòng nhập ngày vận chuyển !
+                Vui lòng nhập ngày nhập !
               </div>
             </div>
           </div>
 
           <div class="form-group info__content__bottle-amount">
             <label for=""
-              >Số lượng vận chuyển <span class="required-note">*</span>:</label
+              >Số lượng nhập <span class="required-note">*</span>:</label
             >
             <div class="input-box">
               <input
@@ -68,11 +68,11 @@
                   {{ beer.name }}
                 </option>
               </select>
-              <div class="invalid-feedback">Vận chuyển bia gì zzz??</div>
+              <div class="invalid-feedback">Vui lòng chọn bia !</div>
             </div>
           </div>
           <div class="action">
-            <nuxt-link to="/dashboard/beers" class="btn btn-danger"
+            <nuxt-link to="/dashboard/shipment" class="btn btn-danger"
               >Hủy</nuxt-link
             >
             <button class="btn btn-primary" @click="addShipment">Thêm</button>
@@ -108,7 +108,7 @@ export default {
     }
   },
   async created() {
-    const BEER_URL = '/beer/'
+    const BEER_URL = '/beer/get_all_with_name/'
 
     if (process.client) {
       const authToken = this.$auth.strategy.token.get()
@@ -116,7 +116,7 @@ export default {
         const responseBeerUnit = await axios.get(`/api/v1${BEER_URL}`, {
           headers: { Authorization: authToken },
         })
-        this.Beers = responseBeerUnit.data.results
+        this.Beers = responseBeerUnit.data
       } catch (err) {
         alert(err)
       }

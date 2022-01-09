@@ -7,7 +7,7 @@
       <div class="left"><sidebar-admin /></div>
       <div class="right">
         <div class="total-users container-fluid">
-          <span>Tất cả nhà sản xuất: {{ producers.length }}</span>
+          <span>Tất cả nhà sản xuất: {{ totalProducer }}</span>
 
           <div class="search-bar">
             <form class="form-inline">
@@ -117,6 +117,7 @@ export default {
         field: 'name',
         asc: true,
       },
+      totalProducer: 0,
     }
   },
   computed: {
@@ -140,6 +141,7 @@ export default {
         this.rows = response.data.count
         this.previous = response.data.previous
         this.next = response.data.next
+        this.totalProducer = response.data.count
       }
     },
     changePage(pageNumber) {
