@@ -471,23 +471,16 @@ export default {
       }
     },
     async saveImage() {
-      const URL = '/beer/'
+      const URL = '/beer/photo/'
       if (process.client) {
         const authToken = localStorage.getItem('auth._token.local')
 
         try {
           const formData = new FormData()
-
+          formData.append('beer', this.originBeer.id)
           for (const image of this.images) {
             formData.append('images', image)
           }
-
-          await this.$axios.patch(`/api/v1${URL}${this.beerId}/`, formData, {
-            headers: {
-              Authorization: authToken,
-              'Content-Type': 'multipart/form-data',
-            },
-          })
 
           await this.$axios.post(`/api/v1${URL}`, formData, {
             headers: {
@@ -495,7 +488,8 @@ export default {
               'Content-Type': 'multipart/form-data',
             },
           })
-          this.$router.push(`/dashboard/beers/${this.originBeer.id}`)
+
+          this.$router.push(`/dashboard/beers`)
         } catch (err) {
           alert(err)
         }
