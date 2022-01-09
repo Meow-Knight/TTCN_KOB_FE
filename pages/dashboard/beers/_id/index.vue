@@ -276,8 +276,7 @@
               </div>
             </div>
             <div v-if="imageUrls.length > 0" class="action">
-              <button class="btn btn-danger" @click="changeState">Hủy</button>
-              <button class="btn btn-primary" @click="updateBeer">
+              <button class="btn btn-primary" @click="saveImage">
                 Lưu ảnh
               </button>
             </div>
@@ -346,7 +345,7 @@ export default {
     },
   },
   async created() {
-    const PRODUCER_URL = '/beer/producer/'
+    const PRODUCER_URL = '/beer/producer/get_all_with_name/'
     const BEER_UNIT_URL = '/beer/unit/'
     const NATION_URL = '/beer/nation/'
     const BEER_URL = '/beer/'
@@ -357,7 +356,7 @@ export default {
         const response = await this.$axios.get(`/api/v1${PRODUCER_URL}`, {
           headers: { Authorization: authToken },
         })
-        this.producers = response.data.results
+        this.producers = response.data
 
         const responseBeerUnit = await this.$axios.get(
           `/api/v1${BEER_UNIT_URL}`,
