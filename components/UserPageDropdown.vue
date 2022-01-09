@@ -71,7 +71,7 @@ export default {
 
 .dropdown {
   display: flex;
-  width: 130px;
+  width: 220px;
   align-items: center;
   justify-content: space-between;
   padding: 5px 10px;
@@ -92,6 +92,7 @@ export default {
   left: 0;
   border-radius: 3px;
   border-top: none;
+  z-index: 20;
 }
 
 .dropdown-content.show {
@@ -102,6 +103,7 @@ export default {
 
 .dropdown-content-item {
   padding: 5px 6px;
+  text-align: left;
   background: $white;
 }
 

@@ -6,12 +6,13 @@
     </section>
     <section class="main-content">
       <div class="search-bar-container">
-        <form class="search-form" @submit.prevent="initSearchBeer()">
+        <form class="search-form" @submit.prevent="initSearchBeer($event)">
           <input
             ref="searchInput"
             type="text"
             class="search-input"
             placeholder="Ưu đãi lớn từ King of Beer"
+            :value="searchQuery"
           />
           <button class="submit-button" type="submit">
             <search-icon
@@ -175,8 +176,8 @@ export default {
      * - filteredBeers: beers after filtered
      */
     return {
-      searchQuery: '',
-      URL: '/beer/homepage',
+      searchQuery: undefined,
+      URL: '/beer/user_search',
       searchBeers: [],
       filteredBeers: [],
       isLoading: true,
@@ -249,7 +250,7 @@ export default {
             },
           ],
           filterFunc: (object, option) =>
-            object.producer && object.producer === option.value,
+            object.producer && object.producer.name === option.value,
         },
       ],
       /**
@@ -314,25 +315,31 @@ export default {
     },
   },
   watch: {
-    // whenever searchQuery change, we will init a XHR to fetch data base on searchQuery
-    async searchQuery() {
-      const authToken = localStorage.getItem('auth._token.google')
-      this.isLoading = true
-      try {
-        const {
-          data: { randoms },
-        } = await this.$axios.get(`/api/v1${this.URL}?random_amount=16`, {
-          headers: { Authorization: authToken },
-        })
-        this.isLoading = false
-        this.searchBeers = randoms
-      } catch (err) {
-        console.log(err)
-      }
+    // we will watch for route change to init search request
+    // the data chain will be route -> searchQuery property -> UI
+    // when user submit form, we just have to change the route to match user's input
+    $route: {
+      immediate: true,
+      async handler(to, from) {
+        this.searchQuery = to.query.q
+        if (process.client) {
+          const authToken = localStorage.getItem('auth._token.google')
+          this.isLoading = true
+          try {
+            const { data: searchBeers } = await this.$axios.get(
+              `/api/v1${this.URL}?q=` + (this.searchQuery || ''),
+              {
+                headers: { Authorization: authToken },
+              }
+            )
+            this.isLoading = false
+            this.searchBeers = searchBeers
+          } catch (err) {
+            console.log(err)
+          }
+        }
+      },
     },
-  },
-  created() {
-    this.searchQuery = this.$router.currentRoute.query.keyword
   },
   methods: {
     // set the new filtered list after filtering
@@ -363,9 +370,9 @@ export default {
       // close dropdown
     },
     afterDiscount,
-    initSearchBeer() {
-      this.searchQuery = this.$refs.searchInput.value.trim()
-      this.$router.push('/beers?keyword=' + this.$refs.searchInput.value)
+    // change the route when submitting form
+    initSearchBeer(event) {
+      this.$router.push('/beers?q=' + this.$refs.searchInput.value.trim())
     },
   },
 }
@@ -399,7 +406,7 @@ export default {
 .search-bar-container {
   height: fit-content;
   width: 100%;
-  padding: 15px 10px 15px calc(30% + 20px);
+  padding: 15px 10px;
   display: flex;
   align-items: center;
   justify-content: start;
@@ -408,6 +415,7 @@ export default {
 .search-form {
   height: 50px;
   width: fit-content;
+  margin: auto;
   position: relative;
 }
 
@@ -455,7 +463,7 @@ export default {
 
 .loading-items {
   width: 100%;
-  height: 50%;
+  height: 50vh;
   text-align: center;
 }
 
@@ -488,7 +496,7 @@ export default {
 }
 
 .filter-header {
-  text-align: start;
+  text-align: left;
   height: fit-content;
   margin-bottom: 20px;
 }
@@ -642,6 +650,7 @@ export default {
 }
 
 .no-item-match-filter {
+  margin-top: 50px;
   text-align: center;
   padding-right: 100px;
 }

@@ -10,8 +10,8 @@
             <nuxt-link to="/">Trang Chủ</nuxt-link>
           </li>
           <li class="nav__tab-list__item">
-            <a :href="isAdmin ? '/dashboard/beers' : '/beers'"
-              >Tất cả sản phẩm</a
+            <nuxt-link :to="isAdmin ? '/dashboard/beers' : '/beers'"
+              >Tất cả sản phẩm</nuxt-link
             >
           </li>
           <li class="nav__tab-list__item">
@@ -76,6 +76,11 @@ export default {
     isUser() {
       return this.user && !this.user.is_staff
     },
+  },
+  created() {
+    // this component will be used for all pages, so we will leverage it to fetch cart data
+    this.$store.commit('cart/setLoadingState', true)
+    this.$store.dispatch('cart/getCartData')
   },
   methods: {
     async logout() {

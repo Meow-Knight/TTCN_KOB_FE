@@ -34,17 +34,13 @@
       <div class="action">
         <button
           class="button"
-          @click="
-            changeCartAfterMutate({ item: beer, amount: 1, action: 'add' })
-          "
+          @click="addNewItem({ beer: beer.id, amount: 1 })"
         >
           Add
         </button>
         <button
           class="button"
-          @click="
-            changeCartAfterMutate({ item: beer, amount: 1, action: 'add' })
-          "
+          @click="addNewItemAndBuy({ beer: beer.id, amount: 1 })"
         >
           Buy now
         </button>
@@ -54,7 +50,7 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapActions } from 'vuex'
 import { priceFormat, afterDiscount } from '~/helper/helper'
 export default {
   props: ['beer'],
@@ -82,6 +78,10 @@ export default {
   methods: {
     ...mapMutations({
       changeCartAfterMutate: 'cart/changeCartAfterMutate',
+    }),
+    ...mapActions({
+      addNewItem: 'cart/addNewItem',
+      addNewItemAndBuy: 'cart/addNewItemAndBuy',
     }),
     priceFormat,
     afterDiscount,
@@ -211,6 +211,6 @@ export default {
 }
 
 .card-container:hover {
-  transform: scale(1.07);
+  transform: scale(1.05);
 }
 </style>

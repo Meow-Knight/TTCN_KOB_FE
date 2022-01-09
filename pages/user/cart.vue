@@ -1,129 +1,179 @@
 <template>
   <div class="cart-page-container">
-    <div class="header">GIỎ HÀNG CỦA BẠN</div>
-    <div v-if="!cart.items.length" class="no-item">
+    <div class="header">GIỎ HÀNG</div>
+    <div v-if="cart.loadingState" class="initial-loading">Loading ...</div>
+    <div v-else-if="!cart.items.length" class="no-item">
       <div class="no-item-text">Giỏ hàng của bạn còn trống</div>
       <nuxt-link to="/" class="no-item-link">Mua ngay</nuxt-link>
     </div>
-    <div v-else class="cart-content-container">
-      <div class="cart-content-header">
-        <div class="name-column placeholder">Sản phẩm</div>
-        <div class="price-column placeholder">Đơn giá</div>
-        <div class="amount-column placeholder">Số lượng</div>
-        <div class="total-column placeholder">Thành tiền</div>
-        <div class="action-column placeholder">Thao tác</div>
-      </div>
-      <div class="cart-items-container">
-        <div
-          v-for="item in cart.items"
-          :key="item.id"
-          class="item-card-container"
-        >
-          <div class="item-info">
-            <nuxt-link class="item-image-wrapper" to="">
-              <img
-                :src="require('~/assets/img/logo3.png')"
-                class="item-image"
+    <div v-else class="outer-container">
+      <div class="cart-content-container">
+        <div class="cart-content-header">
+          <div class="name-column placeholder">Sản phẩm</div>
+          <div class="price-column placeholder">Đơn giá</div>
+          <div class="amount-column placeholder">Số lượng</div>
+          <div class="total-column placeholder">Thành tiền</div>
+          <div class="action-column placeholder">Thao tác</div>
+        </div>
+        <div class="cart-items-container">
+          <div
+            v-for="{ id, beer, amount } in cart.items"
+            :key="id"
+            class="item-card-container"
+          >
+            <div class="item-info">
+              <nuxt-link class="item-image-wrapper" :to="getBeerURL(beer.id)">
+                <img
+                  :src="beer.photo || require('~/assets/img/logo3.png')"
+                  class="item-image"
+                />
+              </nuxt-link>
+              <nuxt-link :to="getBeerURL(beer.id)" class="item-name">{{
+                beer.name
+              }}</nuxt-link>
+            </div>
+            <div class="item-price">
+              <div class="origin-price">
+                {{ priceFormat(beer.price) + 'đ' }}
+              </div>
+              <div class="after-discount">
+                {{
+                  priceFormat(
+                    afterDiscount(beer.price, beer.discount_percent)
+                  ) + 'đ'
+                }}
+              </div>
+            </div>
+            <div class="item-amount-wrapper">
+              <div class="amount-button-wrapper">
+                <button
+                  class="change-amount-button"
+                  @click="
+                    updateItem({
+                      beer: beer.id,
+                      amount: amount - 1,
+                      recordId: id,
+                    })
+                  "
+                >
+                  -
+                </button>
+              </div>
+              <input
+                type="text"
+                class="item-amount-input"
+                :value="amount"
+                @input="validateInput($event, amount)"
+                @blur="handleConfirmInput($event, beer.id, amount, id)"
               />
-            </nuxt-link>
-            <nuxt-link to="" class="item-name"
-              >{{ item.name }} manwe dnanwe dkawle djawe dawklen dajwek dawje
-              dajwlel dawjenja dawjkenjwa dăneaw</nuxt-link
-            >
-          </div>
-          <div class="item-price">
-            <div class="origin-price">{{ priceFormat(item.price) + 'đ' }}</div>
-            <div class="after-discount">
+              <div class="amount-button-wrapper">
+                <button
+                  class="change-amount-button"
+                  @click="
+                    updateItem({
+                      beer: beer.id,
+                      amount: amount + 1,
+                      recordId: id,
+                    })
+                  "
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <div class="total-price">
               {{
-                priceFormat(afterDiscount(item.price, item.discount_percent)) +
-                'đ'
+                priceFormat(
+                  afterDiscount(beer.price, beer.discount_percent) * amount
+                ) + 'đ'
               }}
             </div>
-          </div>
-          <div class="item-amount-wrapper">
-            <div class="amount-button-wrapper">
-              <button class="change-amount-button">-</button>
-            </div>
-            <input type="text" class="item-amount-input" value="3" />
-            <div class="amount-button-wrapper">
-              <button class="change-amount-button">+</button>
+            <div class="item-action" @click="removeItem({ recordId: id })">
+              Xóa khỏi giỏ hàng
             </div>
           </div>
-          <div class="total-price">
-            {{
-              priceFormat(
-                afterDiscount(item.price, item.discount_percent) * item.amount
-              ) + 'đ'
-            }}
-          </div>
-          <div class="item-action">Xóa khỏi giỏ hàng</div>
         </div>
       </div>
-    </div>
-    <div class="separate-zone"></div>
-    <div class="checkout-panel">
-      <div class="row total-before-discount">
-        <div class="text">Tổng giá</div>
-        <div class="value">{{ priceFormat(120000) + 'đ' }}</div>
+      <div class="separate-zone"></div>
+      <div class="checkout-panel">
+        <div class="row total-before-discount">
+          <div class="text">Tổng giá</div>
+          <div class="value">{{ priceFormat(totalPrice) + 'đ' }}</div>
+        </div>
+        <div class="row total-saving">
+          <div class="text">Tiết kiệm</div>
+          <div class="value">{{ priceFormat(totalSaving) + 'đ' }}</div>
+        </div>
+        <div class="row total-after-discount">
+          <div class="text">Tổng thanh toán</div>
+          <div class="value">{{ priceFormat(totalAfterDiscount) + 'đ' }}</div>
+        </div>
+        <button class="checkout-button" @click="$router.push('/user/checkout')">
+          Đặt hàng
+        </button>
       </div>
-      <div class="row total-saving">
-        <div class="text">Tiết kiệm</div>
-        <div class="value">{{ priceFormat(20000) + 'đ' }}</div>
-      </div>
-      <div class="row total-after-discount">
-        <div class="text">Tổng thanh toán</div>
-        <div class="value">{{ priceFormat(100000) + 'đ' }}</div>
-      </div>
-      <button class="checkout-button" @click="$router.push('/checkout')">
-        Đặt hàng
-      </button>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import { priceFormat, afterDiscount } from '~/helper/helper'
 export default {
   layout: 'user',
   data() {
     return {
-      cart: {
-        items: [
-          {
-            id: 'lmnbaw',
-            name: 'Thùng 12 lon bia Huda',
-            price: 120000,
-            discount_percent: 5,
-            amount: 3,
-          },
-          {
-            id: 'lmnbaw',
-            name: 'Thùng 12 lon bia Huda',
-            price: 120000,
-            discount_percent: 5,
-            amount: 3,
-          },
-          {
-            id: 'lmnbaw',
-            name: 'Thùng 12 lon bia Huda',
-            price: 120000,
-            discount_percent: 5,
-            amount: 3,
-          },
-          {
-            id: 'lmnbaw',
-            name: 'Thùng 12 lon bia Huda',
-            price: 120000,
-            discount_percent: 5,
-            amount: 3,
-          },
-        ],
-      },
+      cart: this.$store.state.cart,
     }
+  },
+  computed: {
+    totalPrice() {
+      return this.cart.items.reduce(
+        (prev, cur) => prev + cur.amount * cur.beer.price,
+        0
+      )
+    },
+    totalAfterDiscount() {
+      return this.cart.items.reduce(
+        (prev, cur) =>
+          prev +
+          afterDiscount(cur.beer.price, cur.beer.discount_percent) * cur.amount,
+        0
+      )
+    },
+    totalSaving() {
+      return this.totalAfterDiscount - this.totalPrice
+    },
   },
   methods: {
     priceFormat,
     afterDiscount,
+    getBeerURL(beerId) {
+      return '/beers/' + beerId
+    },
+    ...mapActions({
+      removeItem: 'cart/removeItem',
+      updateItem: 'cart/updateItem',
+      getCartData: 'cart/getCartData',
+    }),
+    validateInput(event, prevAmount) {
+      event.target.value = event.target.value.trim()
+      const parseNumber = +event.target.value
+      if (Number.isNaN(parseNumber) || parseNumber < 0) {
+        event.target.value = event.target.value.slice(0, -1)
+      }
+    },
+    handleConfirmInput(event, beerId, amount, recordId) {
+      // input is blank, reset data
+      if (event.target.value === '') {
+        event.target.value = amount
+        return
+      }
+      // data not change
+      if (amount === +event.target.value) return
+      // dispatch update action
+      this.updateItem({ beer: beerId, amount: event.target.value, recordId })
+    },
   },
 }
 </script>
@@ -169,6 +219,11 @@ export default {
   background: $red;
   color: $white2;
   border-radius: 3px;
+}
+
+.initial-loading {
+  text-align: center;
+  margin-top: 20px;
 }
 
 .cart-content-container {
@@ -292,10 +347,14 @@ export default {
 .total-price {
   text-align: center;
   color: $red;
+  font-weight: 500;
 }
 
 .item-action {
   text-align: center;
+  cursor: pointer;
+  color: $red;
+  font-weight: 500;
 }
 
 .separate-zone {
@@ -311,7 +370,7 @@ export default {
   position: sticky;
   bottom: 0;
   z-index: 20;
-  padding: 15px 20px;
+  padding: 15px 40px;
 }
 
 .checkout-panel::before {

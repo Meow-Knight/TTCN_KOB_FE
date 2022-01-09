@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isInitialLoading" style="height: 100vh">We are loading</div>
+  <div v-if="isInitialLoading" class="initial-loading">We are loading</div>
   <div v-else class="container">
     <div class="product-intro">
       <div class="product-intro-image">
@@ -107,10 +107,9 @@
           <button
             class="add-to-cart"
             @click="
-              changeCartAfterMutate({
-                item: addToCartData,
+              addNewItem({
+                beer: beer.id,
                 amount: purchaseNumber,
-                action: 'add',
               })
             "
           >
@@ -158,10 +157,9 @@
           <button
             class="buy-now"
             @click="
-              changeCartAfterMutate({
-                item: addToCartData,
+              addNewItemAndBuy({
+                beer: beer.id,
                 amount: purchaseNumber,
-                action: 'add',
               })
             "
           >
@@ -215,7 +213,7 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapActions } from 'vuex'
 import { imageZoom, priceFormat, afterDiscount } from '~/helper/helper'
 import Slide from '~/components/Slide/index.vue'
 import BeerCollection from '~/components/BeerCollection.vue'
@@ -330,7 +328,6 @@ export default {
         this.same_producer_beers = sameProducerBeers
         this.selectedPhoto = this.beer.photos[0]
         this.isInitialLoading = false
-        console.log(this.beer)
       } catch (err) {
         console.log(err.response)
         if (err.response && err.response.status === 404) throw err
@@ -361,6 +358,10 @@ export default {
     ...mapMutations({
       changeCartAfterMutate: 'cart/changeCartAfterMutate',
     }),
+    ...mapActions({
+      addNewItem: 'cart/addNewItem',
+      addNewItemAndBuy: 'cart/addNewItemAndBuy',
+    }),
     priceFormat,
     afterDiscount,
   },
@@ -369,6 +370,15 @@ export default {
 
 <style lang="scss" scoped>
 @import '~/assets/scss/_variables.scss';
+
+.initial-loading {
+  width: 100%;
+  min-height: 80vh;
+  background: $white2;
+  text-align: center;
+  margin-top: -110px;
+  padding-top: 100px;
+}
 
 .container {
   width: 100%;

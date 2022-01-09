@@ -29,7 +29,7 @@ export default {
   middleware: ['auth', roleGuard('user')],
   data() {
     return {
-      transparentNavBar: false,
+      transparentNavBar: true,
       isInErrorPage: false,
     }
   },
