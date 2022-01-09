@@ -256,6 +256,13 @@
               class="image-list__item"
             >
               <img :src="photo.link" alt="" class="image-list__item__image" />
+              <div class="image-list__item__overlay-container">
+                <Overlay>
+                  <button class="btn btn-danger" @click="removeImage(photo.id)">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </Overlay>
+              </div>
             </div>
           </div>
           <div class="add-image">
@@ -276,8 +283,7 @@
               </div>
             </div>
             <div v-if="imageUrls.length > 0" class="action">
-              <button class="btn btn-danger" @click="changeState">Hủy</button>
-              <button class="btn btn-primary" @click="updateBeer">
+              <button class="btn btn-primary" @click="saveImage">
                 Lưu ảnh
               </button>
             </div>
@@ -304,9 +310,10 @@
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import SidebarAdmin from '~/components/SidebarAdmin.vue'
 import ConfirmModal from '~/components/Modal/ConfirmModal.vue'
+import Overlay from '~/components/Overlay'
 import { roleGuard } from '~/helper/helper'
 export default {
-  components: { Breadcrumb, SidebarAdmin, ConfirmModal },
+  components: { Breadcrumb, SidebarAdmin, ConfirmModal, Overlay },
   middleware: ['auth', roleGuard('admin')],
   data() {
     return {
@@ -346,7 +353,7 @@ export default {
     },
   },
   async created() {
-    const PRODUCER_URL = '/beer/producer/'
+    const PRODUCER_URL = '/beer/producer/get_all_with_name/'
     const BEER_UNIT_URL = '/beer/unit/'
     const NATION_URL = '/beer/nation/'
     const BEER_URL = '/beer/'
@@ -357,7 +364,7 @@ export default {
         const response = await this.$axios.get(`/api/v1${PRODUCER_URL}`, {
           headers: { Authorization: authToken },
         })
-        this.producers = response.data.results
+        this.producers = response.data
 
         const responseBeerUnit = await this.$axios.get(
           `/api/v1${BEER_UNIT_URL}`,
@@ -450,7 +457,7 @@ export default {
                 headers: { Authorization: authToken },
               }
             )
-            this.$router.push('/dashboard/beers')
+            window.location.reload(true)
           } catch (err) {
             alert(err)
           }
@@ -472,23 +479,16 @@ export default {
       }
     },
     async saveImage() {
-      const URL = '/beer/'
+      const URL = '/beer/photo/'
       if (process.client) {
         const authToken = localStorage.getItem('auth._token.local')
 
         try {
           const formData = new FormData()
-
+          formData.append('beer', this.originBeer.id)
           for (const image of this.images) {
             formData.append('images', image)
           }
-
-          await this.$axios.patch(`/api/v1${URL}${this.beerId}/`, formData, {
-            headers: {
-              Authorization: authToken,
-              'Content-Type': 'multipart/form-data',
-            },
-          })
 
           await this.$axios.post(`/api/v1${URL}`, formData, {
             headers: {
@@ -496,7 +496,8 @@ export default {
               'Content-Type': 'multipart/form-data',
             },
           })
-          this.$router.push(`/dashboard/beers/${this.originBeer.id}`)
+
+          window.location.reload(true)
         } catch (err) {
           alert(err)
         }
@@ -524,6 +525,25 @@ export default {
             this.imageUrls.push(reader.result)
           }
           reader.readAsDataURL(images[i])
+        }
+      }
+    },
+    async removeImage(imageId) {
+      const URL = '/beer/photo'
+      if (process.client) {
+        const authToken = localStorage.getItem('auth._token.local')
+
+        try {
+          await this.$axios.delete(`/api/v1${URL}/${imageId}`, {
+            headers: {
+              Authorization: authToken,
+              'Content-Type': 'multipart/form-data',
+            },
+          })
+
+          window.location.reload(true)
+        } catch (err) {
+          alert(err)
         }
       }
     },
@@ -611,9 +631,26 @@ export default {
     display: flex;
     justify-content: center;
     margin: 20px 10px;
+    position: relative;
 
     &__image {
       width: 50%;
+    }
+    &__overlay-container {
+      position: absolute;
+      height: 100%;
+      width: 50%;
+      opacity: 0;
+    }
+    &:hover &__overlay-container {
+      opacity: 1;
+    }
+    .btn {
+      margin: 0;
+      font-size: 30px;
+      width: 40px;
+      height: 50px;
+      padding: 0;
     }
   }
 }
