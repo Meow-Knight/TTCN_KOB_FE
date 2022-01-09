@@ -1,6 +1,6 @@
 /* eslint-disable vue/no-multiple-template-root */
 <template>
-  <teleport>
+  <teleport to="body">
     <div @click="$emit('close')"></div>
     <dialog open>
       <header>
@@ -12,8 +12,8 @@
         <slot></slot>
       </section>
       <menu>
-        <slot name="actions">
-          <button @click="$emit('close')">Close</button>
+        <slot v-if="needConfirm" name="actions">
+          <button @click="$emit('close')">Đóng</button>
         </slot>
       </menu>
     </dialog>
@@ -28,8 +28,25 @@ export default {
       required: false,
       default: 'Error',
     },
+    needConfirm: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    timeToDisappear: {
+      type: Number,
+      required: false,
+      default: null,
+    },
   },
   emits: ['close'],
+  mounted() {
+    if (!this.needConfirm && this.timeToDisappear) {
+      setTimeout(() => {
+        this.$emit('close')
+      }, this.timeToDisappear)
+    }
+  },
 }
 </script>
 
@@ -87,6 +104,13 @@ button {
   color: $red;
   border: 1px solid $red;
   border-radius: 8px;
+  transition: 0.3s ease;
+}
+
+button:hover {
+  background: $red;
+  color: $white;
+  transition: 0.3s ease;
 }
 
 @media (min-width: 768px) {

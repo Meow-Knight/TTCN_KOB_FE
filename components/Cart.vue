@@ -3,25 +3,30 @@
     <div v-if="cartItems.length" class="cart-content">
       <div class="header">Giỏ hàng của bạn</div>
       <div v-if="cartItems.length" class="cart-items">
-        <div v-for="item in cartItems" :key="item.id" class="item">
+        <div v-for="{ beer, id } in cartItems" :key="id" class="item">
           <!-- <nuxt-link :to="getBeerURL(item.id)"> -->
           <div class="item-img">
-            <nuxt-link :to="getBeerURL(item.id)">
-              <img :src="item.photo" width="75px" height="75px" />
-            </nuxt-link>
+            <!-- @click="$router.push(getBeerURL(beer.id))" -->
+            <div>
+              <img :src="beer.photo" width="75px" height="75px" />
+            </div>
           </div>
 
           <!-- </nuxt-link> -->
           <div class="item-name-wrapper">
-            <nuxt-link :to="getBeerURL(item.id)" class="item-name">
-              {{ item.name }} motherfucker what are you doung
-            </nuxt-link>
+            <div class="item-name">
+              {{ beer.name }} motherfucker what are you doing
+            </div>
           </div>
-          <span class="item-price">{{ priceFormat(item.price) + 'đ' }}</span>
-          <div class="action">
+
+          <span class="item-price">{{ priceFormat(beer.price) + 'đ' }}</span>
+          <span class="after-discount">{{
+            priceFormat(afterDiscount(beer.price, beer.discount_percent)) + 'đ'
+          }}</span>
+          <!-- <div class="action">
             <button>+</button>
             <button>-</button>
-          </div>
+          </div> -->
         </div>
       </div>
       <button
@@ -37,8 +42,7 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
-import { priceFormat } from '~/helper/helper'
+import { priceFormat, afterDiscount } from '~/helper/helper'
 export default {
   computed: {
     cartItems() {
@@ -46,10 +50,8 @@ export default {
     },
   },
   methods: {
-    ...mapMutations({
-      changeCartAfterMutate: 'cart/changeCartAfterMutate',
-    }),
     priceFormat,
+    afterDiscount,
     getBeerURL(beerID) {
       return '/beers/' + beerID
     },
@@ -143,8 +145,17 @@ export default {
 }
 
 .item-price {
+  color: $black;
+  text-decoration: line-through;
+  width: 10%;
+  margin: 0 5%;
+}
+
+.after-discount {
+  margin: 0 5%;
+  width: 10%;
   color: $red;
-  width: 15%;
+  font-weight: 600;
 }
 
 .action {

@@ -49,13 +49,12 @@ export default {
   },
   computed: {
     user() {
-      console.log(this.$auth.user)
       return this.$auth.user
     },
     menuItems() {
       return [
         {
-          name: 'Tài khoản của tôi',
+          name: 'Tài khoản',
           category: 'account',
           icon: require('~/assets/img/user.png'),
           basePath: '/user/account',
@@ -87,7 +86,7 @@ export default {
           icon: require('~/assets/img/cart.jpg'),
         },
         {
-          name: 'Đơn mua',
+          name: 'Đơn hàng',
           category: 'purchase',
           basePath: '/user/purchase',
           path: '/user/purchase',

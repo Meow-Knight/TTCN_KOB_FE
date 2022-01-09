@@ -40,10 +40,10 @@
               {{ address.name }}
             </div>
           </div>
-          <div class="card-row">
+          <!-- <div class="card-row">
             <div class="row-name">Số điện thoại</div>
             <div class="row-content">{{ address.phone }}</div>
-          </div>
+          </div> -->
           <div class="card-row">
             <div class="row-name">Địa chỉ</div>
             <div class="row-content">
@@ -155,12 +155,12 @@ export default {
 
 .card-row {
   display: flex;
+  margin-bottom: 10px;
 }
 
 .row-name {
   width: 20%;
   text-align: right;
-  margin-bottom: 10px;
 }
 
 .row-content {
@@ -183,10 +183,10 @@ export default {
   .row-content.name::after {
     content: 'Mặc định';
     position: absolute;
-    top: 10%;
+    top: 0%;
     left: 100%;
     width: fit-content;
-    height: 80%;
+    height: 100%;
     padding: 0 5px;
     display: flex;
     align-items: center;

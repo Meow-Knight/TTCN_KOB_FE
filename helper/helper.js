@@ -150,9 +150,21 @@ export const imageZoom = (imgID, resultID, lensID) => {
   }
 }
 
-export const priceFormat = (price) => price.toLocaleString().replace(',', '.')
+export const priceFormat = (price) => {
+  return price.toLocaleString().replaceAll(',', '.')
+}
 
 export const afterDiscount = (price, discountPercent) =>
   discountPercent
     ? Math.round((price * (1 - discountPercent / 100)) / 100) * 100
     : price
+
+/**
+ *
+ * @param {*} date Date string
+ * @returns Date string with locale format
+ */
+export const getTimeFormat = (date) => {
+  console.log(date)
+  return new Date(date).toLocaleString()
+}

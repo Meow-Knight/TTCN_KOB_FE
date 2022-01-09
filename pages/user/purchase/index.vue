@@ -3,88 +3,99 @@
     <div class="header">
       <div class="header-text">LỊCH SỬ MUA HÀNG</div>
     </div>
-    <div v-if="false" class="no-purchase">Bạn chưa có đơn hàng nào.</div>
-    <div v-else class="purchase-content">
+
+    <div class="purchase-content">
       <div class="status-select">
         <div
           v-for="option in statusFilter.options"
           :key="option.status"
           class="status-filter-option"
-          :class="{ selected: currentStatus.status === option.status }"
-          @click="setCurrentStatus(option)"
+          :class="{ selected: currentStatus === option.status }"
+          @click="setCurrentStatus(option.status)"
         >
           {{ option.display }}
         </div>
       </div>
-      <div
-        v-for="(purchase, index) in filteredPurchase"
-        :key="index"
-        class="purchase-card-container"
-      >
-        <div class="card-top">
-          <div class="purchase-information">
-            <div class="purchase-status">
-              {{ getDisplayByStatus(purchase.status) }}
+      <div v-if="isLoading" class="is-loading">Loading...</div>
+      <div v-else-if="!allPurchase.length" class="no-purchase">
+        Không có đơn hàng nào.
+      </div>
+      <div v-else>
+        <div
+          v-for="(purchase, index) in allPurchase"
+          :key="index"
+          class="purchase-card-container"
+        >
+          <div class="card-top">
+            <div class="purchase-information">
+              <div class="purchase-id">{{ 'Mã đơn hàng: ' + purchase.id }}</div>
+              <div class="purchase-status">
+                {{ getDisplayByStatus(purchase.order_status) }}
+              </div>
             </div>
-          </div>
-          <div class="purchase-items-container">
-            <div
-              v-for="(item, index) in purchase.items"
-              :key="item.name"
-              class="purchase-item"
-              :class="{ last: index === purchase.items.length - 1 }"
-            >
-              <div class="item-image-wrapper">
-                <img
-                  :src="require('~/assets/img/logo3.png')"
-                  class="item-image"
-                />
-              </div>
-              <div class="item-information">
-                <div class="item-name">{{ item.name }}</div>
-                <div class="item-amount">{{ item.amount }}</div>
-              </div>
-              <div class="item-price">
-                <div class="after-discount">
-                  {{
-                    priceFormat(
-                      afterDiscount(item.price, item.discount_percent) *
-                        item.amount
-                    ) + 'đ'
-                  }}
+            <div class="purchase-items-container">
+              <div class="receiver-info-row">
+                <div class="receiver-info-text">Địa chỉ giao hàng</div>
+                <div class="receiver-info-content">
+                  {{ purchase.shipping_address }}
                 </div>
-                <div class="origin-price">
-                  {{ priceFormat(item.price * item.amount) + 'đ' }}
+              </div>
+              <div class="receiver-info-row">
+                <div class="receiver-info-text">Số điện thoại</div>
+                <div class="receiver-info-content">
+                  {{ purchase.shipping_phone }}
                 </div>
               </div>
             </div>
+            <!-- <div
+                v-for="(item, idx) in purchase.items"
+                :key="item.name"
+                class="purchase-item"
+                :class="{ last: idx === purchase.items.length - 1 }"
+              >
+                <div class="item-image-wrapper">
+                  <img
+                    :src="require('~/assets/img/logo3.png')"
+                    class="item-image"
+                  />
+                </div>
+                <div class="item-information">
+                  <div class="item-name">{{ item.name }}</div>
+                  <div class="item-amount">{{ item.amount }}</div>
+                </div>
+                <div class="item-price">
+                  <div class="after-discount">
+                    {{
+                      priceFormat(
+                        afterDiscount(item.price, item.discount_percent) *
+                          item.amount
+                      ) + 'đ'
+                    }}
+                  </div>
+                  <div class="origin-price">
+                    {{ priceFormat(item.price * item.amount) + 'đ' }}
+                  </div>
+                </div>
+              </div>
+            </div> -->
           </div>
-        </div>
-        <div class="card-bottom">
-          <div class="purchase-total-wrapper">
-            <div class="purchase-total-text">Tổng số tiền:</div>
-            <div class="purchase-total">
-              {{
-                priceFormat(
-                  purchase.items.reduce(
-                    (prev, cur) =>
-                      prev +
-                      afterDiscount(cur.price, cur.discount_percent) *
-                        cur.amount,
-                    0
-                  )
-                ) + 'đ'
-              }}
+          <div class="card-bottom">
+            <div class="purchase-total-wrapper">
+              <div class="purchase-total-text">Tổng số tiền:</div>
+              <div class="purchase-total">
+                {{ priceFormat(purchase.total_price) + 'đ' }}
+              </div>
+            </div>
+            <div class="purchase-action-container">
+              <nuxt-link
+                :to="purchaseDetailURL(purchase.id)"
+                class="purchase-detail-link"
+                >Xem chi tiết đơn hàng</nuxt-link
+              >
             </div>
           </div>
-          <div class="purchase-action-container">
-            <nuxt-link
-              :to="purchaseDetailPath(purchase.id)"
-              class="purchase-detail-link"
-              >Xem chi tiết đơn hàng</nuxt-link
-            >
-          </div>
         </div>
+        <div v-if="isLoadingMore" class="is-loading-more">...</div>
       </div>
     </div>
   </div>
@@ -96,71 +107,11 @@ export default {
   layout: 'user',
   data() {
     return {
-      currentStatus: {
-        display: null,
-        status: null,
-      },
-      allPurchase: [
-        {
-          id: '1232',
-          status: 'waiting-for-acceptance',
-          items: [
-            {
-              image: '~/assets/img/logo3.png',
-              name: 'Thùng 12 lon bia Heineken',
-              amount: 1,
-              price: 200000,
-              discount_percent: 5,
-            },
-            {
-              image: '~/assets/img/logo3.png',
-              name: 'Thùng 14 lon bia Heineken',
-              amount: 1,
-              price: 250000,
-              discount_percent: 3,
-            },
-          ],
-        },
-        {
-          id: '12323',
-          status: 'delivering',
-          items: [
-            {
-              image: '~/assets/img/logo3.png',
-              name: 'Thùng 20 lon bia Heineken',
-              amount: 3,
-              price: 150000,
-              discount_percent: 12,
-            },
-          ],
-        },
-        {
-          id: '12232',
-          status: 'delivered',
-          items: [
-            {
-              image: '~/assets/img/logo3.png',
-              name: 'Thùng 8 lon bia Heineken',
-              amount: 2,
-              price: 95000,
-              discount_percent: 25,
-            },
-          ],
-        },
-        {
-          id: '123232',
-          status: 'canceled',
-          items: [
-            {
-              image: '@/assets/img/logo3.png',
-              name: 'Lốc 20 lon bia Huda',
-              amount: 5,
-              price: 50000,
-              discount_percent: 21,
-            },
-          ],
-        },
-      ],
+      currentStatus: null,
+      allPurchase: [],
+      isLoading: true,
+      isLoadingMore: false,
+      nextPage: null,
     }
   },
   computed: {
@@ -169,43 +120,84 @@ export default {
         options: [
           {
             display: 'Tất cả',
-            status: 'all',
+            status: 'ALL',
           },
           {
             display: 'Chờ xác nhận',
-            status: 'waiting-for-acceptance',
+            status: 'PENDING',
+          },
+          {
+            display: 'Đã xác nhận',
+            status: 'ACCEPTED',
           },
           {
             display: 'Đang giao',
-            status: 'delivering',
+            status: 'SHIPPING',
           },
           {
             display: 'Đã giao',
-            status: 'delivered',
+            status: 'DONE',
           },
           {
             display: 'Đã hủy',
-            status: 'canceled',
+            status: 'CANCELED',
           },
         ],
       }
     },
-    filteredPurchase() {
-      return this.allPurchase.filter(
-        (purchase) =>
-          this.currentStatus.status === 'all' ||
-          purchase.status === this.currentStatus.status
-      )
+    getOrderApiURL() {
+      return '/api/v1/order/list?page_size=5&q='
+    },
+  },
+  watch: {
+    $route: {
+      immediate: true,
+      async handler(to, from) {
+        // get status query
+        const statusQuery = to.query.status
+        // if status query is not in filter options, set route to base path
+        if (
+          statusQuery &&
+          !this.statusFilter.options.find(
+            (option) => option.status === statusQuery
+          )
+        ) {
+          this.$router.push('/user/purchase')
+          return
+        }
+        // set status and fetch data
+        this.currentStatus = statusQuery ? to.query.status.toUpperCase() : 'ALL'
+        if (process.client) {
+          const authToken = localStorage.getItem('auth._token.google')
+          this.isLoading = true
+          try {
+            const { data } = await this.$axios.get(
+              this.getOrderApiURL +
+                (this.currentStatus === 'ALL' ? '' : this.currentStatus),
+              {
+                headers: { Authorization: authToken },
+              }
+            )
+            this.isLoading = false
+            this.nextPage = data.next
+            this.allPurchase = data.results
+          } catch (err) {
+            console.log(err)
+          }
+        }
+      },
     },
   },
   mounted() {
-    this.currentStatus = {
-      status: 'all',
-    }
+    window.addEventListener('scroll', this.loadMore)
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.loadMore)
   },
   methods: {
-    setCurrentStatus(option) {
-      this.currentStatus = option
+    setCurrentStatus(status) {
+      if (status === 'ALL') return this.$router.push('/user/purchase')
+      this.$router.push('/user/purchase?status=' + status)
     },
     getDisplayByStatus(status) {
       return this.statusFilter.options.find(
@@ -215,11 +207,42 @@ export default {
     getImage(source) {
       return require(source)
     },
-    purchaseDetailPath(purchaseId) {
+    purchaseDetailURL(purchaseId) {
       return '/user/purchase/' + purchaseId
     },
     afterDiscount,
     priceFormat,
+    shouldLoadMore() {
+      // first check for current order list, if it is an empty array then we dont need to
+      // load more
+      if (!this.allPurchase.length) return
+      // we need to load more item when scroll to the bottom of the list container, maybe
+      // a bit shorter than the viewport height
+      // first get the element itself
+      const containerElement = document.querySelector('.purchase')
+      // we will get the bottom of element client rectangle, which is the distance from
+      // top of the viewport to the bottom of element including border and padding
+      const distance = containerElement.getBoundingClientRect().bottom
+      if (distance < window.innerHeight - 200) return true
+      return false
+    },
+    async loadMore() {
+      try {
+        if (!this.shouldLoadMore() || this.isLoadingMore || !this.nextPage)
+          return
+        // loading more item here
+        this.isLoadingMore = true
+        const authToken = localStorage.getItem('auth._token.google')
+        const { data } = await this.$axios.get(this.nextPage, {
+          Authorization: 'Bearer ' + authToken,
+        })
+        this.allPurchase.push(...data.results)
+        this.nextPage = data.next
+        this.isLoadingMore = false
+      } catch (err) {
+        console.log(err.response || err)
+      }
+    },
   },
 }
 </script>
@@ -256,7 +279,7 @@ export default {
 
 .status-select {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   justify-items: center;
   height: fit-content;
   margin-bottom: 20px;
@@ -308,12 +331,40 @@ export default {
   margin-bottom: 20px;
   border-bottom: 1px solid #e6dbdb;
   padding: 10px 5% 10px 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.purchase-id {
+  margin-right: 15px;
+  padding-right: 15px;
+  border-right: 1px solid black;
+  width: fit-content;
 }
 
 .purchase-status {
   width: fit-content;
   height: fit-content;
-  margin: 0 0 0 auto;
+  /* margin: 0 0 0 auto; */
+  color: $red;
+}
+
+.receiver-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 0 10%;
+}
+
+.receiver-info-text {
+  width: 20%;
+  text-align: left;
+}
+
+.receiver-info-content {
+  width: 70%;
+  text-align: left;
 }
 
 .purchase-item {
@@ -399,84 +450,22 @@ export default {
   margin: 0 0 0 auto;
 }
 
-.add-address-button {
-  display: flex;
-  align-items: center;
-  width: 200px;
-  justify-content: space-around;
-}
-
 .no-purchase {
   margin: 30px auto;
   font-size: 25px;
   width: fit-content;
 }
 
-.address-card-container {
-  padding: 40px 0 40px 30px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.14);
-  display: flex;
-  justify-content: space-between;
-}
-
-.address-card-container.last {
-  border: none;
-}
-
-.card-content {
-  width: 70%;
-}
-
-.card-row {
-  display: flex;
-}
-
-.row-name {
-  width: 20%;
-  text-align: right;
-  margin-bottom: 10px;
-}
-
-.row-content {
+.is-loading {
+  margin: 30px auto;
+  font-size: 25px;
   width: fit-content;
-  padding: 0 20px 0 10%;
-  position: relative;
 }
 
-.modify-action {
-  margin-bottom: 20px;
-  text-align: right;
-}
-
-.delete-button {
-  background: $red;
-  color: $white;
-}
-
-.address-card-container.default {
-  .row-content.name::after {
-    content: 'Mặc định';
-    position: absolute;
-    top: 10%;
-    left: 100%;
-    width: fit-content;
-    height: 80%;
-    padding: 0 5px;
-    display: flex;
-    align-items: center;
-    color: $white;
-    background: $red;
-    border-radius: 5px;
-  }
-
-  .delete-button {
-    display: none;
-  }
-
-  .set-default-button {
-    pointer-events: none;
-    opacity: 0.5;
-  }
+.is-loading-more {
+  margin: 30px auto;
+  font-size: 25px;
+  width: fit-content;
 }
 
 button {
