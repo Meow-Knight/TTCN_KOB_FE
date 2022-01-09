@@ -29,6 +29,7 @@
               <input
                 v-model="newBeer.alcohol_concentration"
                 type="number"
+                step="any"
                 class="form-control"
                 required
               />

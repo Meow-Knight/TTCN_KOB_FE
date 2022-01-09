@@ -38,6 +38,7 @@
                 <input
                   v-model="newBeer.alcohol_concentration"
                   type="number"
+                  step="any"
                   class="form-control"
                   disabled
                   required
@@ -372,12 +373,11 @@ export default {
         this.nations = responseNation.data.results
 
         const responseBeer = await this.$axios.get(
-          `/api/v1${BEER_URL}${this.beerId}/info`,
+          `/api/v1${BEER_URL}${this.beerId}`,
           {
             headers: { Authorization: authToken },
           }
         )
-        console.log(responseBeer.data)
         this.originBeer = responseBeer.data
         Object.assign(this.newBeer, responseBeer.data)
         if (!this.newBeer.origin_nation) {
