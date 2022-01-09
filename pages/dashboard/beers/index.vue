@@ -7,7 +7,7 @@
       <div class="left"><sidebar-admin /></div>
       <div class="right">
         <div class="total-users container-fluid">
-          <span>Tất cả sản phẩm: {{ beers.length }}</span>
+          <span>Tất cả sản phẩm: {{ totalBeer }}</span>
           <div class="search-bar">
             <form class="form-inline">
               <input
@@ -121,6 +121,7 @@ export default {
         field: 'name',
         asc: true,
       },
+      totalBeer: 0,
     }
   },
   computed: {
@@ -144,6 +145,7 @@ export default {
         this.rows = response.data.count
         this.previous = response.data.previous
         this.next = response.data.next
+        this.totalBeer = response.data.count
       }
     },
     changePage(pageNumber) {
