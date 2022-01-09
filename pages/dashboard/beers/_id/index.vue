@@ -256,6 +256,13 @@
               class="image-list__item"
             >
               <img :src="photo.link" alt="" class="image-list__item__image" />
+              <div class="image-list__item__overlay-container">
+                <Overlay>
+                  <button class="btn btn-danger" @click="removeImage(photo.id)">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </Overlay>
+              </div>
             </div>
           </div>
           <div class="add-image">
@@ -303,9 +310,10 @@
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import SidebarAdmin from '~/components/SidebarAdmin.vue'
 import ConfirmModal from '~/components/Modal/ConfirmModal.vue'
+import Overlay from '~/components/Overlay'
 import { roleGuard } from '~/helper/helper'
 export default {
-  components: { Breadcrumb, SidebarAdmin, ConfirmModal },
+  components: { Breadcrumb, SidebarAdmin, ConfirmModal, Overlay },
   middleware: ['auth', roleGuard('admin')],
   data() {
     return {
@@ -449,7 +457,7 @@ export default {
                 headers: { Authorization: authToken },
               }
             )
-            this.$router.push('/dashboard/beers')
+            window.location.reload(true)
           } catch (err) {
             alert(err)
           }
@@ -489,7 +497,7 @@ export default {
             },
           })
 
-          this.$router.push(`/dashboard/beers`)
+          window.location.reload(true)
         } catch (err) {
           alert(err)
         }
@@ -517,6 +525,25 @@ export default {
             this.imageUrls.push(reader.result)
           }
           reader.readAsDataURL(images[i])
+        }
+      }
+    },
+    async removeImage(imageId) {
+      const URL = '/beer/photo'
+      if (process.client) {
+        const authToken = localStorage.getItem('auth._token.local')
+
+        try {
+          await this.$axios.delete(`/api/v1${URL}/${imageId}`, {
+            headers: {
+              Authorization: authToken,
+              'Content-Type': 'multipart/form-data',
+            },
+          })
+
+          window.location.reload(true)
+        } catch (err) {
+          alert(err)
         }
       }
     },
@@ -604,9 +631,26 @@ export default {
     display: flex;
     justify-content: center;
     margin: 20px 10px;
+    position: relative;
 
     &__image {
       width: 50%;
+    }
+    &__overlay-container {
+      position: absolute;
+      height: 100%;
+      width: 50%;
+      opacity: 0;
+    }
+    &:hover &__overlay-container {
+      opacity: 1;
+    }
+    .btn {
+      margin: 0;
+      font-size: 30px;
+      width: 40px;
+      height: 50px;
+      padding: 0;
     }
   }
 }
