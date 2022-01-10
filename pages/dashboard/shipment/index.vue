@@ -1,14 +1,13 @@
 <template>
   <div class="container-fluid">
     <div class="breadcrumb-container">
-      <Breadcrumb />
+      <Breadcrumb :items="breadcrumbItems" />
     </div>
     <div class="users-container">
       <div class="left"><sidebar-admin /></div>
       <div class="right">
         <div class="total-users container-fluid">
-          <span>Tất cả nhà sản xuất: {{ totalProducer }}</span>
-
+          <span>Tất cả lô hàng: {{ totalShipment }}</span>
           <div class="search-bar">
             <form class="form-inline">
               <input
@@ -16,22 +15,15 @@
                 type="search"
                 placeholder="Tìm kiếm"
                 aria-label="Search"
+                v-model="searchText"
+                @keyup="search"
               />
-              <button
+              <nuxt-link
+                to="/dashboard/shipment/addShipment"
                 class="btn btn-outline-success my-2 my-sm-0"
-                type="submit"
+                >Thêm lô hàng</nuxt-link
               >
-                <i class="fas fa-search"></i>
-              </button>
             </form>
-            <div class="add-button">
-              <button
-                class="btn btn-outline-success my-2 my-sm-0 ml-2"
-                @click="showModal = true"
-              >
-                Thêm NXS
-              </button>
-            </div>
           </div>
         </div>
         <div class="user-list container-fluid">
@@ -39,20 +31,36 @@
             <thead>
               <tr>
                 <th scope="col">STT</th>
-                <th scope="col">Tên</th>
-                <th scope="col">Địa chỉ</th>
+                <th scope="col" @click="sort('name')">
+                  Bia
+                  <span v-if="sortBy.field == 'name'">
+                    <i v-if="sortBy.asc" class="fas fa-caret-up"></i>
+                    <i v-else class="fas fa-caret-down"></i>
+                  </span>
+                </th>
+                <th scope="col">Ngày nhập</th>
+                <th scope="col">Số Lượng</th>
+                <th scope="col" @click="sort('price')">
+                  Giá (VNĐ)
+                  <span v-if="sortBy.field == 'price'">
+                    <i v-if="sortBy.asc" class="fas fa-caret-up"></i>
+                    <i v-else class="fas fa-caret-down"></i>
+                  </span>
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr
-                v-for="(producer, index) in producers"
-                :key="producer.id"
+                v-for="(shipment, index) in shipments"
+                :key="shipment.id"
                 class="user-list__item"
-                @click="$router.push(`producers/${producer.id}`)"
+                @click="$router.push(`shipment/${shipment.id}`)"
               >
                 <th scope="row">{{ index + 1 }}</th>
-                <td>{{ producer.name }}</td>
-                <td>{{ producer.address }}</td>
+                <td>{{ shipment.beer.name }}</td>
+                <td>{{ shipment.shipment_date }}</td>
+                <td>{{ shipment.amount }}</td>
+                <td>{{ shipment.price }}</td>
               </tr>
             </tbody>
           </table>
@@ -62,7 +70,7 @@
             <b-pagination
               v-model="currentPage"
               :total-rows="rows"
-              :per-page="perPage"
+              :per-page="pageSize"
             >
               <template #first-text="{ page }"
                 ><span class="text-info" @click="changePage(page)"
@@ -91,33 +99,41 @@
         </div>
       </div>
     </div>
-    <Modal v-show="showModal" @close-modal="showModal = false" />
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import SidebarAdmin from '~/components/SidebarAdmin.vue'
-import Modal from '~/components/Modal/ProducerModal.vue'
 import { roleGuard } from '~/helper/helper'
+
 export default {
-  components: { Breadcrumb, SidebarAdmin, Modal },
+  components: {
+    Breadcrumb,
+    SidebarAdmin,
+  },
   middleware: ['auth', roleGuard('admin')],
   data() {
     return {
+      breadcrumbItems: [
+        { name: 'Trang chủ', url: '/' },
+        { name: 'Quản lý', url: '/dashboard' },
+        { name: 'Vận Chuyển', url: '/dashboard/shipment' },
+      ],
+      shipments: [],
       showModal: false,
-      producers: [],
       next: null,
       previous: null,
       rows: 0,
-      perPage: 12,
+      pageSize: 3,
       currentPage: 1,
       searchText: '',
       sortBy: {
         field: 'name',
         asc: true,
       },
-      totalProducer: 0,
+      totalShipment: 0,
     }
   },
   computed: {
@@ -134,33 +150,33 @@ export default {
       if (!url) return
       if (process.client) {
         const authToken = this.$auth.strategy.token.get()
-        const response = await this.$axios.get(`/api/v1${url}`, {
+        const response = await axios.get(`/api/v1${url}`, {
           headers: { Authorization: authToken },
         })
-        this.producers = response.data.results
+        this.shipments = response.data.results
         this.rows = response.data.count
         this.previous = response.data.previous
         this.next = response.data.next
-        this.totalProducer = response.data.count
+        this.totalShipment = response.data.count
       }
     },
     changePage(pageNumber) {
-      const URL = `/beer/producer/?page=${pageNumber}&page_size=${this.perPage}&q=${this.searchText}&sort=${this.sortOption}`
+      const URL = `/beer/shipment/?page=${pageNumber}&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
       this.getData(URL)
     },
     search() {
-      const URL = `/beer/producer/?page=1&page_size=${this.perPage}&q=${this.searchText}&sort=${this.sortOption}`
+      const URL = `/beer/shipment/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
       this.getData(URL)
     },
     sort(field) {
       this.sortBy.field = field
       this.sortBy.asc = !this.sortBy.asc
-      const URL = `/beer/producer/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
+      const URL = `/beer/shipment/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
       this.getData(URL)
     },
   },
   created() {
-    const URL = `/beer/producer/?page=1&page_size=${this.perPage}`
+    const URL = `/beer/shipment/?page=1&page_size=${this.pageSize}`
     this.getData(URL)
   },
 }
@@ -168,7 +184,6 @@ export default {
 
 <style lang="scss" scoped>
 @import '~assets/scss/variables';
-
 .users-container {
   display: flex;
   flex-direction: row;
@@ -180,6 +195,9 @@ export default {
     flex-direction: column;
     width: 100%;
   }
+  .btn-add-beer {
+    margin-left: 20px;
+  }
 }
 .total-users {
   display: flex;
@@ -190,7 +208,6 @@ export default {
 .search-bar {
   margin-top: 10px;
   margin-bottom: 10px;
-  display: flex;
   .form-control {
     box-shadow: none;
   }
@@ -211,10 +228,6 @@ export default {
   }
   &__arrow {
     font-size: 30px;
-  }
-}
-.add-button {
-  button {
   }
 }
 </style>

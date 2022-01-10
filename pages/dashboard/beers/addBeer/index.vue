@@ -29,6 +29,7 @@
               <input
                 v-model="newBeer.alcohol_concentration"
                 type="number"
+                step="any"
                 class="form-control"
                 required
               />
@@ -148,11 +149,27 @@
               <div class="invalid-feedback">Vui lòng chọn nhà sản xuất !</div>
             </div>
           </div>
+          <div class="images">
+            <label for="image" class="btn btn-secondary">Thêm ảnh</label>
+            <input
+              id="image"
+              type="file"
+              multiple
+              accept="image/*"
+              :hidden="true"
+              @change="addImage"
+            />
+          </div>
+          <div class="preview-image">
+            <div v-for="imgUrl in imageUrls" :key="imgUrl">
+              <img :src="imgUrl" alt="" class="image-item" />
+            </div>
+          </div>
           <div class="action">
             <nuxt-link to="/dashboard/beers" class="btn btn-danger"
               >Hủy</nuxt-link
             >
-            <button class="btn btn-primary" @click="addBeer">Thêm</button>
+            <button class="btn btn-primary" @click="addBeer">Thêm Bia</button>
           </div>
         </form>
       </div>
@@ -164,6 +181,7 @@
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import SidebarAdmin from '~/components/SidebarAdmin.vue'
 import { roleGuard } from '~/helper/helper'
+
 export default {
   components: { Breadcrumb, SidebarAdmin },
   middleware: ['auth', roleGuard('admin')],
@@ -183,10 +201,12 @@ export default {
         producer: null,
         beer_unit: null,
       },
+      imageUrls: [],
+      images: [],
     }
   },
   async created() {
-    const PRODUCER_URL = '/beer/producer/'
+    const PRODUCER_URL = '/beer/producer/get_all_with_name/'
     const BEER_UNIT_URL = '/beer/unit/'
     const NATION_URL = '/beer/nation/'
 
@@ -196,7 +216,7 @@ export default {
         const response = await this.$axios.get(`/api/v1${PRODUCER_URL}`, {
           headers: { Authorization: authToken },
         })
-        this.producers = response.data.results
+        this.producers = response.data
 
         const responseBeerUnit = await this.$axios.get(
           `/api/v1${BEER_UNIT_URL}`,
@@ -224,8 +244,21 @@ export default {
         if (process.client) {
           const authToken = localStorage.getItem('auth._token.local')
           try {
-            await this.$axios.post(`/api/v1${URL}`, this.newBeer, {
-              headers: { Authorization: authToken },
+            const formData = new FormData()
+
+            for (const [key, value] of Object.entries(this.newBeer)) {
+              formData.append(key, value)
+            }
+
+            for (const image of this.images) {
+              formData.append('images', image)
+            }
+
+            await this.$axios.post(`/api/v1${URL}`, formData, {
+              headers: {
+                Authorization: authToken,
+                'Content-Type': 'multipart/form-data',
+              },
             })
             this.$router.push('/dashboard/beers')
           } catch (err) {
@@ -246,11 +279,38 @@ export default {
 
       return true
     },
+    addImage(event) {
+      const imageFile = document.querySelector('#image')
+      const images = Array.from(imageFile.files)
+
+      for (const image of images) {
+        if (!this.images.includes(image)) {
+          this.images.push(image)
+        }
+      }
+      this.previewImage(event)
+    },
+    previewImage(event) {
+      const images = event.target.files
+      if (images) {
+        const imageAmount = images.length
+
+        for (let i = 0; i < imageAmount; i++) {
+          const reader = new FileReader()
+          reader.onload = () => {
+            this.imageUrls.push(reader.result)
+          }
+          reader.readAsDataURL(images[i])
+        }
+      }
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
+@import '~assets/scss/variables';
+
 .add-beer-container {
   display: flex;
   flex-direction: row;
@@ -261,7 +321,7 @@ export default {
     display: flex;
     flex-direction: column;
     width: 100%;
-    align-items: center;
+    // align-items: center;
 
     .notion {
       width: 100%;
@@ -292,7 +352,20 @@ export default {
     flex-direction: column;
   }
 }
+.preview-image {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-bottom: 50px;
+  background-color: $breadcrumbBgrColor;
+}
+.image-item {
+  width: 200px;
+  display: inline-block;
+  margin: 10px;
+}
 .btn {
   width: 100px;
+  margin-bottom: 30px;
 }
 </style>
