@@ -64,7 +64,7 @@ div {
 
 dialog {
   position: fixed;
-  top: 20vh;
+  top: 30vh;
   left: 10%;
   width: 80%;
   z-index: 100;

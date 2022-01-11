@@ -213,9 +213,6 @@ export default {
     afterDiscount,
     priceFormat,
     shouldLoadMore() {
-      // first check for current order list, if it is an empty array then we dont need to
-      // load more
-      if (!this.allPurchase.length) return
       // we need to load more item when scroll to the bottom of the list container, maybe
       // a bit shorter than the viewport height
       // first get the element itself
@@ -223,8 +220,7 @@ export default {
       // we will get the bottom of element client rectangle, which is the distance from
       // top of the viewport to the bottom of element including border and padding
       const distance = containerElement.getBoundingClientRect().bottom
-      if (distance < window.innerHeight - 200) return true
-      return false
+      return distance < 0.8 * window.innerHeight
     },
     async loadMore() {
       try {

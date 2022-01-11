@@ -177,23 +177,10 @@
             <li>a</li>
           </ul>
         </div>
-        <div class="review">
+        <div class="review-section">
           <div class="header">ĐÁNH GIÁ</div>
-          <div class="review-content">
-            <ul>
-              <li>a</li>
-              <li>a</li>
-              <li>a</li>
-              <li>a</li>
-              <li>a</li>
-              <li>a</li>
-              <li>a</li>
-              <li>a</li>
-              <li>a</li>
-              <li>a</li>
-              <li>a</li>
-              <li>a</li>
-            </ul>
+          <div class="wrapper">
+            <review-panel :beer-id="beer.id"> </review-panel>
           </div>
         </div>
       </div>
@@ -217,8 +204,9 @@ import { mapMutations, mapActions } from 'vuex'
 import { imageZoom, priceFormat, afterDiscount } from '~/helper/helper'
 import Slide from '~/components/Slide/index.vue'
 import BeerCollection from '~/components/BeerCollection.vue'
+import ReviewPanel from '~/components/ReviewPanel.vue'
 export default {
-  components: { BeerCollection },
+  components: { BeerCollection, ReviewPanel },
   layout: 'default',
   component: { Slide, BeerCollection },
   data() {
@@ -244,6 +232,12 @@ export default {
       slideHeight: '50px',
       selectedPhoto: null,
       same_producer_beers: [],
+      review: {
+        reviewList: [],
+        selectedRating: null,
+        nextPage: null,
+        canReview: null,
+      },
     }
   },
   computed: {
@@ -328,6 +322,11 @@ export default {
         this.same_producer_beers = sameProducerBeers
         this.selectedPhoto = this.beer.photos[0]
         this.isInitialLoading = false
+
+        // const response = await this.$axios.get(
+        //   '/api/v1/account/review/get_by_beer/681e8256-d98c-4958-a02a-7fbeede42002'
+        // )
+        // console.log(response)
       } catch (err) {
         console.log(err.response)
         if (err.response && err.response.status === 404) throw err
@@ -595,6 +594,7 @@ export default {
 
 .description {
   width: 100%;
+  height: fit-content;
   background: $white;
   padding: 30px 20px;
   .header {
@@ -606,6 +606,12 @@ export default {
     text-align: start;
     background: rgb(245, 245, 245);
   }
+}
+
+.review-section {
+  /* .wrapper {
+    padding: 5px 10px;
+  } */
 }
 
 .recommend {

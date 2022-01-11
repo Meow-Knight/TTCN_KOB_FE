@@ -85,14 +85,16 @@
             class="item-card-container"
           >
             <div class="item-info">
-              <div class="img-wrapper">
+              <nuxt-link class="img-wrapper" :to="getBeerURL(beer.id)">
                 <img
                   class="item-image"
                   :src="beer.photo || require('~/assets/img/logo3.png')"
                   alt="Beer image"
                 />
-              </div>
-              <div class="item-name">{{ beer.name }}</div>
+              </nuxt-link>
+              <nuxt-link class="item-name" :to="getBeerURL(beer.id)">{{
+                beer.name
+              }}</nuxt-link>
             </div>
             <div class="item-price">
               <div class="origin-price">
@@ -224,6 +226,9 @@ export default {
     priceFormat,
     afterDiscount,
     getTimeFormat,
+    getBeerURL(beerId) {
+      return '/beers/' + beerId
+    },
   },
 }
 </script>
@@ -446,6 +451,11 @@ export default {
       -webkit-line-clamp: 2;
       -webkit-font-smoothing: antialiased;
       display: -webkit-box;
+    }
+
+    a {
+      text-decoration: none;
+      color: $black;
     }
   }
 
