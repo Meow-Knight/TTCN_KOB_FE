@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="rating-wrapper"
-    @mouseout="currentRating = selectedRating || currentRating"
-  >
+  <div class="rating-wrapper" @mouseout="handleMouseOut">
     <div
       v-for="index in 5"
       :key="index"
@@ -64,6 +61,10 @@ export default {
     handleMouseOver(index) {
       if (!this.interactive) return
       this.currentRating = index
+    },
+    handleMouseOut() {
+      if (!this.interactive) return
+      this.currentRating = this.selectedRating
     },
     handleSelectRating(value) {
       if (!this.interactive) return

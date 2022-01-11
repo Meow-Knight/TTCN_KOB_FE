@@ -7,6 +7,8 @@ export default {
    * @param {*} amount: amount to add
    */
   async addNewItem({ dispatch }, { beer, amount }) {
+    // check if user is logged on and if user have the permission to afford the action
+    if (!this.$auth.user) return this.$router.push('/login')
     try {
       await this.$axios.post(baseURL, {
         beer,

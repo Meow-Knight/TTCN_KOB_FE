@@ -228,10 +228,8 @@ export default {
           return
         // loading more item here
         this.isLoadingMore = true
-        const authToken = localStorage.getItem('auth._token.google')
-        const { data } = await this.$axios.get(this.nextPage, {
-          Authorization: 'Bearer ' + authToken,
-        })
+        // const authToken = localStorage.getItem('auth._token.google')
+        const { data } = await this.$axios.get(this.nextPage)
         this.allPurchase.push(...data.results)
         this.nextPage = data.next
         this.isLoadingMore = false

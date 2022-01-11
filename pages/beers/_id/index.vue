@@ -37,11 +37,7 @@
             {{ beer.name }}
           </h4>
           <div class="categories">
-            <span class="brand">Thương hiệu: Heineken</span>
-            <span>|</span>
-            <span class="type">Loại: Bia Heineken</span>
-            <span>|</span>
-            <span class="id">Mã sản phẩm: HEINE092716</span>
+            <span class="type">Loại: {{ beer.producer }}</span>
           </div>
         </div>
         <div class="review-badge">Bia khá ngon</div>
@@ -58,7 +54,6 @@
           </div>
         </div>
         <ul style="padding-left: 20px">
-          <li class="type">Loại bia: Heineken</li>
           <li class="alcohol">
             Nồng độ cồn: {{ beer.alcohol_concentration }}%
           </li>
@@ -174,7 +169,6 @@
         <div class="description-content">
           <ul>
             <li>{{ beer.describe }}</li>
-            <li>a</li>
           </ul>
         </div>
         <div class="review-section">

@@ -268,7 +268,8 @@ export default {
 
 .purchase-status-bar {
   width: 100%;
-  border: 1px solid red;
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  border-top: none;
   padding: 10px;
   display: flex;
   justify-content: flex-end;
@@ -287,7 +288,7 @@ export default {
 
 .purchase-deliver-progress {
   margin-top: 30px;
-  border: 1px solid red;
+  border: 1px solid rgba(0, 0, 0, 0.09);
   width: 100%;
   /* height: fit-content; */
   /* display: flex;
@@ -373,7 +374,7 @@ export default {
   margin-top: 30px;
   padding: 20px;
   width: 100%;
-  border: 1px solid red;
+  border: 1px solid rgba(0, 0, 0, 0.09);
   display: flex;
   flex-direction: column;
 
@@ -401,7 +402,7 @@ export default {
 }
 
 .purchase-items-container {
-  border: 1px solid red;
+  border: 1px solid rgba(0, 0, 0, 0.09);
   margin-top: 30px;
   padding: 20px;
   height: fit-content;
@@ -487,13 +488,13 @@ export default {
 .price-panel {
   margin-top: 30px;
   padding: 20px;
-  border: 1px solid red;
+  border: 1px solid rgba(0, 0, 0, 0.09);
   .panel-row {
     display: grid;
     grid-template-columns: 2.5fr 1fr 1fr 1fr;
     text-align: center;
     padding-bottom: 10px;
-    border: 1px dotted rgba(0, 0, 0, 0.09);
+    /* border: 1px solid rgba(0, 0, 0, 0.09); */
     border-bottom: none;
 
     .row-title {
