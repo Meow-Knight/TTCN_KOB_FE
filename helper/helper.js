@@ -164,7 +164,4 @@ export const afterDiscount = (price, discountPercent) =>
  * @param {*} date Date string
  * @returns Date string with locale format
  */
-export const getTimeFormat = (date) => {
-  console.log(date)
-  return new Date(date).toLocaleString()
-}
+export const getTimeFormat = (date) => new Date(date).toLocaleString()

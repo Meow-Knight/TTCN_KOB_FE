@@ -93,7 +93,7 @@ export default {
         await this.$auth.logout({
           data,
         })
-        this.$router.go('/')
+        this.$router.push('/')
       } catch (err) {
         console.log(err)
       }

@@ -85,14 +85,16 @@
             class="item-card-container"
           >
             <div class="item-info">
-              <div class="img-wrapper">
+              <nuxt-link class="img-wrapper" :to="getBeerURL(beer.id)">
                 <img
                   class="item-image"
                   :src="beer.photo || require('~/assets/img/logo3.png')"
                   alt="Beer image"
                 />
-              </div>
-              <div class="item-name">{{ beer.name }}</div>
+              </nuxt-link>
+              <nuxt-link class="item-name" :to="getBeerURL(beer.id)">{{
+                beer.name
+              }}</nuxt-link>
             </div>
             <div class="item-price">
               <div class="origin-price">
@@ -212,6 +214,7 @@ export default {
     this.shippingPhone = detail.shipping_phone || 'Default phone'
     this.totalDiscount = detail.total_discount || 0
     this.totalPrice = detail.total_price || 'Default price'
+    console.log(detail)
     this.orderProgress = [
       ...detail.progress,
       ...detail.progress,
@@ -223,6 +226,9 @@ export default {
     priceFormat,
     afterDiscount,
     getTimeFormat,
+    getBeerURL(beerId) {
+      return '/beers/' + beerId
+    },
   },
 }
 </script>
@@ -262,7 +268,8 @@ export default {
 
 .purchase-status-bar {
   width: 100%;
-  border: 1px solid red;
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  border-top: none;
   padding: 10px;
   display: flex;
   justify-content: flex-end;
@@ -281,7 +288,7 @@ export default {
 
 .purchase-deliver-progress {
   margin-top: 30px;
-  border: 1px solid red;
+  border: 1px solid rgba(0, 0, 0, 0.09);
   width: 100%;
   /* height: fit-content; */
   /* display: flex;
@@ -367,7 +374,7 @@ export default {
   margin-top: 30px;
   padding: 20px;
   width: 100%;
-  border: 1px solid red;
+  border: 1px solid rgba(0, 0, 0, 0.09);
   display: flex;
   flex-direction: column;
 
@@ -395,7 +402,7 @@ export default {
 }
 
 .purchase-items-container {
-  border: 1px solid red;
+  border: 1px solid rgba(0, 0, 0, 0.09);
   margin-top: 30px;
   padding: 20px;
   height: fit-content;
@@ -446,6 +453,11 @@ export default {
       -webkit-font-smoothing: antialiased;
       display: -webkit-box;
     }
+
+    a {
+      text-decoration: none;
+      color: $black;
+    }
   }
 
   .item-price {
@@ -476,13 +488,13 @@ export default {
 .price-panel {
   margin-top: 30px;
   padding: 20px;
-  border: 1px solid red;
+  border: 1px solid rgba(0, 0, 0, 0.09);
   .panel-row {
     display: grid;
     grid-template-columns: 2.5fr 1fr 1fr 1fr;
     text-align: center;
     padding-bottom: 10px;
-    border: 1px dotted rgba(0, 0, 0, 0.09);
+    /* border: 1px solid rgba(0, 0, 0, 0.09); */
     border-bottom: none;
 
     .row-title {
