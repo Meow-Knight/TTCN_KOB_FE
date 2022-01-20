@@ -4,7 +4,6 @@
       <Breadcrumb />
     </div>
     <div class="users-container">
-      <div class="left"><sidebar-admin /></div>
       <div class="right">
         <div class="total-users container-fluid">
           <span>Tất cả sản phẩm: {{ totalBeer }}</span>
@@ -102,11 +101,11 @@
 
 <script>
 import Breadcrumb from '~/components/Breadcrumb.vue'
-import SidebarAdmin from '~/components/SidebarAdmin.vue'
 import { roleGuard } from '~/helper/helper'
 
 export default {
-  components: { Breadcrumb, SidebarAdmin },
+  components: { Breadcrumb },
+  layout: 'admin',
   middleware: ['auth', roleGuard('admin')],
   data() {
     return {

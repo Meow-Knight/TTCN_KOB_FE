@@ -4,7 +4,6 @@
       <Breadcrumb :items="breadcrumbItems" />
     </div>
     <div class="add-beer-container">
-      <div class="left"><sidebar-admin /></div>
       <div class="right">
         <form id="needs-validation">
           <p class="notion required-note">(*) Bắt buộc</p>
@@ -19,9 +18,7 @@
                 v-model="newShipment.shipment_date"
                 class="mb-2"
               ></b-form-datepicker>
-              <div class="invalid-feedback">
-                Vui lòng nhập ngày nhập !
-              </div>
+              <div class="invalid-feedback">Vui lòng nhập ngày nhập !</div>
             </div>
           </div>
 
@@ -86,10 +83,10 @@
 <script>
 import axios from 'axios'
 import Breadcrumb from '~/components/Breadcrumb.vue'
-import SidebarAdmin from '~/components/SidebarAdmin.vue'
 import { roleGuard } from '~/helper/helper'
 export default {
-  components: { Breadcrumb, SidebarAdmin },
+  components: { Breadcrumb },
+  layout: 'admin',
   middleware: ['auth', roleGuard('admin')],
   data() {
     return {
