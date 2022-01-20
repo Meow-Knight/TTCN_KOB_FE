@@ -159,7 +159,7 @@
 import SearchIcon from '~/components/UI/SearchIcon.vue'
 import FilterPanel from '~/components/FilterPanel.vue'
 import BeerCollection from '~/components/BeerCollection.vue'
-import { afterDiscount } from '~/helper/helper'
+import { afterDiscount, roleGuard } from '~/helper/helper'
 export default {
   components: {
     SearchIcon,
@@ -167,6 +167,7 @@ export default {
     BeerCollection,
   },
   layout: 'default',
+  middleware: [roleGuard(['GUEST', 'CUSTOMER'])],
   data() {
     /**
      * we need to define some data:

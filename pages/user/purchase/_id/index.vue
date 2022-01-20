@@ -41,8 +41,8 @@
           :style="
             orderProgress.slice(-1)[0].order_status !== 'CANCELED' && {
               padding: `0 ${
-                (20 + 20 / 3) * (4 - orderProgress.length) + 14
-              }% 0 14%`,
+                (16 + 20 / 4) * (5 - orderProgress.length) + 11.6
+              }% 0 11.6%`,
             }
           "
         >
@@ -131,7 +131,28 @@
           </div>
         </div>
       </div>
+      <div class="action-panel">
+        <button
+          v-if="orderStatus === 'PENDING'"
+          class="cancel-order"
+          @click="cancelOrder"
+        >
+          Hủy đơn hàng
+        </button>
+      </div>
     </div>
+    <base-dialog
+      v-if="notification.title"
+      :title="notification.title"
+      :need-confirm="notification.needConfirm"
+      @close="confirmNotification"
+    >
+      <template #default>
+        <h3>
+          {{ notification.message }}
+        </h3>
+      </template>
+    </base-dialog>
   </div>
 </template>
 
@@ -142,13 +163,17 @@ import ProgressConfirmed from '~/components/SVG/ProgressConfirmed.vue'
 import ProgressDelivering from '~/components/SVG/ProgressDelivering.vue'
 import ProgressDelivered from '~/components/SVG/ProgressDelivered.vue'
 import ProgressCanceled from '~/components/SVG/ProgressCanceled.vue'
+import ProgressCompleted from '~/components/SVG/ProgressCompleted.vue'
+import BaseDialog from '~/components/Modal/BaseDialog.vue'
 export default {
   components: {
     ProgressNew,
     ProgressConfirmed,
     ProgressDelivering,
     ProgressDelivered,
+    ProgressCompleted,
     ProgressCanceled,
+    BaseDialog,
   },
   layout: 'user',
   data() {
@@ -171,23 +196,32 @@ export default {
           display: 'Đơn hàng đã đặt',
           component: 'progress-new',
         },
-        ACCEPTED: {
+        CONFIRMED: {
           display: 'Đơn hàng đã được xác nhận',
           component: 'progress-confirmed',
         },
-        SHIPPING: {
+        DELIVERING: {
           status: 'DELIVERING',
           display: 'Đơn hàng đang được vận chuyển',
           component: 'progress-delivering',
         },
-        DONE: {
+        DELIVERED: {
           display: 'Đơn hàng đã giao',
           component: 'progress-delivered',
+        },
+        COMPLETED: {
+          display: 'Đơn hàng đã hoàn thành',
+          component: 'progress-completed',
         },
         CANCELED: {
           display: 'Đơn hàng đã hủy',
           component: 'progress-canceled',
         },
+      },
+      notification: {
+        title: null,
+        message: null,
+        needConfirm: true,
       },
     }
   },
@@ -198,36 +232,62 @@ export default {
     getReceiverFullName() {
       return this.receiverInfo.lastName + ' ' + this.receiverInfo.firstName
     },
+    cancelOrderApiURL() {
+      return '/api/v1/order/cancel'
+    },
   },
-  async created() {
-    const {
-      data: { detail },
-    } = await this.$axios.get(this.purchaseDetailURL)
-    this.orderId = detail.id || 'Default ID'
-    this.receiverInfo = {
-      firstName: detail.account.first_name || 'Default First',
-      lastName: detail.account.last_name || 'Default Last',
-    }
-    this.orderDetail = detail.order_detail || []
-    this.orderStatus = detail.order_status || 'Default status'
-    this.shippingAddress = detail.shipping_address || 'Default address'
-    this.shippingPhone = detail.shipping_phone || 'Default phone'
-    this.totalDiscount = detail.total_discount || 0
-    this.totalPrice = detail.total_price || 'Default price'
-    console.log(detail)
-    this.orderProgress = [
-      ...detail.progress,
-      ...detail.progress,
-      ...detail.progress,
-    ]
-    this.initialLoading = false
+  created() {
+    this.fetchOrderData()
   },
   methods: {
+    async fetchOrderData() {
+      const {
+        data: { detail },
+      } = await this.$axios.get(this.purchaseDetailURL)
+      this.orderId = detail.id || 'Default ID'
+      this.receiverInfo = {
+        firstName: detail.account.first_name || 'Default First',
+        lastName: detail.account.last_name || 'Default Last',
+      }
+      this.orderDetail = detail.order_detail || []
+      this.orderStatus = detail.order_status || 'Default status'
+      this.shippingAddress = detail.shipping_address || 'Default address'
+      this.shippingPhone = detail.shipping_phone || 'Default phone'
+      this.totalDiscount = detail.total_discount || 0
+      this.totalPrice = detail.total_price || 'Default price'
+      this.orderProgress = detail.progress
+      this.initialLoading = false
+    },
     priceFormat,
     afterDiscount,
     getTimeFormat,
     getBeerURL(beerId) {
       return '/beers/' + beerId
+    },
+    async cancelOrder() {
+      try {
+        const { data } = await this.$axios.put(this.cancelOrderApiURL, {
+          id: this.orderId,
+        })
+        if (data?.detail?.success) {
+          await this.fetchOrderData()
+          return (this.notification = {
+            ...this.notification,
+            title: 'Thành công',
+            message: 'Hủy đơn hàng thành công',
+          })
+        }
+        this.notification = {
+          ...this.notification,
+          title: 'Thất bại',
+          message: 'Hủy đơn hàng thất bại',
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    confirmNotification() {
+      this.notification = { ...this.notification, title: null, message: null }
     },
   },
 }
@@ -263,9 +323,6 @@ export default {
   height: 80px;
 }
 
-.purchase-detail-content {
-}
-
 .purchase-status-bar {
   width: 100%;
   border: 1px solid rgba(0, 0, 0, 0.09);
@@ -290,14 +347,9 @@ export default {
   margin-top: 30px;
   border: 1px solid rgba(0, 0, 0, 0.09);
   width: 100%;
-  /* height: fit-content; */
-  /* display: flex;
-  align-items: center; */
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  /* grid-template-rows: auto; */
-  column-gap: calc(20% / 3);
-  /* justify-content: space-between; */
+  grid-template-columns: repeat(5, 1fr);
+  column-gap: calc(20% / 4);
   position: relative;
   overflow: hidden;
 
@@ -307,8 +359,8 @@ export default {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    aspect-ratio: 1/1;
-    padding: 10%;
+    aspect-ratio: 1/1.2;
+    padding: 10% 5%;
 
     .icon-wrapper {
       box-sizing: border-box;
@@ -317,8 +369,8 @@ export default {
       border: 3px solid $red;
       border-radius: 50%;
       padding: 10%;
-      z-index: 20;
       background: $white;
+      z-index: 5;
     }
 
     .status-icon {
@@ -336,14 +388,14 @@ export default {
     .status-time {
       height: 10%;
       text-align: center;
-      font-size: 15px;
-      font-weight: 300;
+      font-size: 14px;
+      font-weight: 400;
     }
   }
 
   .progress-line {
     position: absolute;
-    top: 30%;
+    top: 25%;
     left: 0;
     padding: 0 14%;
     width: 100%;
@@ -517,6 +569,16 @@ export default {
       color: $red;
     }
   }
+}
+
+.cancel-order {
+  display: block;
+  border: none;
+  background: $red;
+  color: $white2;
+  padding: 10px 15px;
+  border-radius: 3px;
+  margin: 30px 0 0 auto;
 }
 
 @keyframes progress-line {

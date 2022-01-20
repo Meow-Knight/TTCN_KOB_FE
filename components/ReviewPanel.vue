@@ -3,11 +3,11 @@
     <div class="panel-header">
       <div class="header-left">
         <div class="rating-score-wrapper">
-          <div class="overall-score">{{ ratingScore || 0 }}</div>
+          <div class="overall-score">{{ ratingScore }}</div>
           <div class="score-out-of">trên 5</div>
         </div>
         <rating-star-display
-          :rating="ratingScore || 0"
+          :rating="ratingScore"
           :width="35"
           :height="35"
         ></rating-star-display>
@@ -20,13 +20,17 @@
           :class="{ selected: selectedRate === option.value }"
           @click="setRatingFilter(option.value)"
         >
-          {{ option.display + ` (${overallStat[option.value]})` }}
+          {{ option.display + ` (${overallStat[option.value] || 0})` }}
         </div>
       </div>
     </div>
-    <div v-if="!yourReview.canMake" class="make-review">
+    <div v-if="yourReview.canMake" class="make-review">
       <div class="your-avatar-wrapper">
-        <div class="your-avatar"></div>
+        <img
+          class="your-avatar"
+          alt="your-avatar"
+          :src="user.avatar || require('~/assets/img/logo3.png')"
+        />
       </div>
       <div class="your-review-content">
         <div class="content-row">
@@ -61,23 +65,103 @@
           v-for="(review, index) in allReview"
           :key="review.id"
           class="review-container"
-          :class="{ last: index === allReview.length - 1 }"
+          :class="{
+            last: index === allReview.length - 1,
+          }"
         >
           <div class="reviewer-avatar-wrapper">
-            <div class="reviewer-avatar"></div>
+            <img
+              class="reviewer-avatar"
+              :src="review.account.avatar || require('~/assets/img/logo3.png')"
+            />
           </div>
-          <div class="review-main-content">
-            <div class="reviewer-name">{{ review.reviewer.name }}</div>
+          <div
+            v-if="!reviewAction[review.id] || !reviewAction[review.id].editing"
+            class="review-main-content"
+          >
+            <div class="reviewer-name">
+              {{ review.account.last_name + ' ' + review.account.first_name }}
+            </div>
             <div class="review-star">
               <rating-star-display
-                :rating="3"
+                :rating="review.rate"
                 :width="16"
                 :height="16"
               ></rating-star-display>
             </div>
             <div class="review-comment">{{ review.comment }}</div>
             <div class="review-time">
-              {{ getTimeFormat(review.reviewTime) }}
+              {{ getTimeFormat(review.updated_at) }}
+            </div>
+          </div>
+          <div v-else class="review-editing">
+            <div class="your-review-content">
+              <div class="content-row">
+                <label for="rating" class="label-text">Đánh giá:</label>
+                <div class="your-rating">
+                  <rating-star-display
+                    :interactive="true"
+                    :width="30"
+                    :height="30"
+                    :rating="reviewAction[review.id].rate"
+                    @handleSelectRating="
+                      (value) => setEditRatingValue(value, review.id)
+                    "
+                  ></rating-star-display>
+                </div>
+              </div>
+              <div class="content-row">
+                <label for="comment" class="label-text">Bình luận:</label>
+                <textarea
+                  v-model.trim="reviewAction[review.id].comment"
+                  class="your-comment"
+                ></textarea>
+              </div>
+              <div class="action-wrapper">
+                <button
+                  class="confirm-editing"
+                  @click="handleEditReview(review.id)"
+                >
+                  Xác nhận
+                </button>
+                <button
+                  class="cancel-editing"
+                  @click="cancelEditingReview(review.id)"
+                >
+                  Hủy
+                </button>
+              </div>
+            </div>
+          </div>
+          <div
+            v-if="
+              user.id === review.account.id &&
+              (!reviewAction[review.id] || !reviewAction[review.id].editing)
+            "
+            class="review-action"
+          >
+            <div
+              class="action-dotted-display"
+              :class="{
+                show_action:
+                  reviewAction[review.id] && reviewAction[review.id].showAction,
+              }"
+              @click="changeReviewActionDisplay(review.id)"
+            >
+              . . .
+            </div>
+            <div
+              v-if="
+                reviewAction[review.id] && reviewAction[review.id].showAction
+              "
+              class="action-dropdown"
+            >
+              <div class="action-select" @click="startEditingReview(review.id)">
+                Sửa
+              </div>
+              <div class="action-select" @click="handleDeleteReview(review.id)">
+                Xóa
+              </div>
             </div>
           </div>
         </div>
@@ -109,28 +193,7 @@ export default {
   data() {
     return {
       ratingScore: 0,
-      allReview: [
-        {
-          id: 'abc',
-          reviewer: {
-            name: 'Trần Ngọc Long',
-            avatar: null,
-          },
-          star: 5,
-          comment: 'Bia ngon hehe',
-          reviewTime: Date.now(),
-        },
-        {
-          id: 'abcd',
-          reviewer: {
-            name: 'Trần Ngọc Longd',
-            avatar: null,
-          },
-          star: 5,
-          comment: 'Bia ngon hehe',
-          reviewTime: Date.now(),
-        },
-      ],
+      allReview: [],
       rateFilter: {
         options: [
           {
@@ -179,6 +242,7 @@ export default {
         title: null,
         message: null,
       },
+      reviewAction: {},
     }
   },
   computed: {
@@ -273,13 +337,20 @@ export default {
         })
       try {
         const authToken = localStorage.getItem('auth._token.google')
-        const response = await this.$axios.post(this.makeNewReviewURL(), {
+        await this.$axios.post(this.makeNewReviewURL(), {
           rate: this.yourReview.ratingScore,
           comment: this.yourReview.comment,
           beer: this.beerId,
           headers: { Authorization: authToken },
         })
-        console.log(response)
+        if (!this.selectedRate === 'all') {
+          this.selectedRate = 'all'
+        } else {
+          this.fetchReview()
+        }
+        this.checkCanReview()
+        this.fetchReviewOverallStat()
+        this.fetchAverageRatingScore()
       } catch (err) {
         console.log(err.response || err)
       }
@@ -287,14 +358,26 @@ export default {
     /**
      * this method is used to handle review editing
      */
-    async handleEditReview(newRate, newComment, reviewId) {
-      try {
-        const authToken = localStorage.getItem('auth._token.google')
-        const response = await this.$axios.patch(this.editReviewURL(reviewId), {
-          comment: newComment,
-          headers: { Authorization: authToken },
+    async handleEditReview(reviewId) {
+      if (this.reviewAction[reviewId].comment === '') {
+        return (this.notification = {
+          ...this.notification,
+          title: 'Lỗi',
+          message: 'Vui lòng nhập vào bình luận',
         })
-        console.log(response)
+      }
+      try {
+        await this.$axios.patch(this.editReviewURL(reviewId), {
+          comment: this.reviewAction[reviewId].comment,
+          rate: this.reviewAction[reviewId].rate,
+        })
+        this.fetchReview()
+        this.fetchReviewOverallStat()
+        this.fetchAverageRatingScore()
+        this.reviewAction = {
+          ...this.reviewAction,
+          [reviewId]: null,
+        }
       } catch (err) {
         console.log(err.response || err)
       }
@@ -304,14 +387,11 @@ export default {
      */
     async handleDeleteReview(reviewId) {
       try {
-        const authToken = localStorage.getItem('auth._token.google')
-        const response = await this.$axios.delete(
-          this.deleteReviewURL(reviewId),
-          {
-            headers: { Authorization: authToken },
-          }
-        )
-        console.log(response)
+        await this.$axios.delete(this.deleteReviewURL(reviewId))
+        this.fetchReview()
+        this.checkCanReview()
+        this.fetchReviewOverallStat()
+        this.fetchAverageRatingScore()
       } catch (err) {
         console.log(err.response || err)
       }
@@ -339,12 +419,15 @@ export default {
             overallStat: {
               ...prev.overallStat,
               [cur.rate]: cur.total,
-              all: prev.total + cur.total,
+              total: prev.overallStat.total + cur.total,
             },
           }),
-          { overallStat: { all: 0 } }
+          { overallStat: { total: 0 } }
         )
-        this.overallStat = { ...this.overallStat, ...overallStat }
+        this.overallStat = {
+          ...overallStat,
+          all: overallStat.total,
+        }
       } catch (err) {
         console.log(err.response.data || err)
       }
@@ -397,6 +480,50 @@ export default {
     setRatingValue(value) {
       this.yourReview.ratingScore = value
     },
+    setEditRatingValue(value, reviewId) {
+      this.reviewAction = {
+        ...this.reviewAction,
+        [reviewId]: {
+          ...this.reviewAction[reviewId],
+          rate: value,
+        },
+      }
+    },
+    changeReviewActionDisplay(reviewId) {
+      this.reviewAction = {
+        ...this.reviewAction,
+        [reviewId]: {
+          ...this.reviewAction[reviewId],
+          showAction: !this.reviewAction[reviewId]?.showAction,
+        },
+      }
+    },
+    changeReviewEditingStatus(reviewId) {
+      this.reviewAction = {
+        ...this.reviewAction,
+        [reviewId]: {
+          ...this.reviewAction[reviewId],
+          editing: !this.reviewAction[reviewId]?.editing,
+        },
+      }
+    },
+    startEditingReview(reviewId) {
+      const review = this.allReview.find(({ id }) => id === reviewId)
+      this.reviewAction = {
+        ...this.reviewAction,
+        [reviewId]: {
+          editing: true,
+          comment: review.comment,
+          rate: review.rate,
+        },
+      }
+    },
+    cancelEditingReview(reviewId) {
+      this.reviewAction = {
+        ...this.reviewAction,
+        [reviewId]: null,
+      }
+    },
   },
 }
 </script>
@@ -446,18 +573,20 @@ export default {
 
 .header-right {
   width: 75%;
-  /* padding-left: 5%; */
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   column-gap: 15px;
 
   .filter-option {
+    width: 100%;
     border: 1px solid rgba(0, 0, 0, 0.09);
-    text-align: center;
     background: $white;
     padding: 5px 7px;
     border-radius: 3px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .filter-option:hover {
@@ -490,7 +619,6 @@ export default {
       left: 0;
       width: 100%;
       height: 100%;
-      background: rosybrown;
       border-radius: 50%;
     }
   }
@@ -571,8 +699,8 @@ export default {
     border-bottom: 1px solid rgba(0, 0, 0, 0.09);
 
     .reviewer-avatar-wrapper {
-      width: 8%;
-      padding-bottom: 8%;
+      width: 7%;
+      padding-bottom: 7%;
       height: 0;
       position: relative;
 
@@ -582,7 +710,6 @@ export default {
         left: 0;
         height: 100%;
         width: 100%;
-        background: aqua;
         border-radius: 50%;
       }
     }
@@ -610,6 +737,122 @@ export default {
         font-size: 15px;
         font-weight: 200;
       }
+    }
+
+    .review-editing {
+      width: 90%;
+      .your-review-content {
+        width: 100%;
+        padding-left: 10%;
+
+        .content-row {
+          display: flex;
+          width: 100%;
+        }
+
+        .label-text {
+          padding: 0 5% 0 0;
+          margin: 0;
+          width: 30%;
+        }
+
+        .your-rating {
+          width: 100%;
+          margin-bottom: 25px;
+        }
+
+        .your-comment {
+          padding: 5px;
+          border: 1px solid rgba(0, 0, 0, 0.29);
+          width: 100%;
+          resize: none;
+        }
+
+        .your-comment:focus {
+          border: 1px solid rgba(0, 0, 0, 0.8);
+          outline: none;
+          height: 100%;
+        }
+
+        .action-wrapper {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          margin-top: 20px;
+        }
+
+        button {
+          display: block;
+          padding: 5px;
+          border: 1px solid $red;
+          background: $white;
+          color: $red;
+          border-radius: 3px;
+          transition: 0.3s ease-in-out;
+        }
+
+        button:hover {
+          background: $red;
+          color: $white;
+          transition: 0.3s ease-in-out;
+        }
+
+        .confirm-editing {
+          margin-right: 10px;
+        }
+      }
+    }
+
+    .review-action {
+      position: relative;
+    }
+
+    .action-dotted-display {
+      margin: 0;
+      font-size: 25px;
+      font-weight: 500;
+      padding: 5px 15px;
+      height: 50px;
+      line-height: 10px;
+      width: 35px;
+      cursor: pointer;
+      border-radius: 20px;
+    }
+
+    .action-dotted-display:not(.show_action) {
+      display: none;
+    }
+
+    .action-dotted-display:hover {
+      background: $white2;
+    }
+
+    .action-dropdown {
+      height: fit-content;
+      width: 100px;
+      position: absolute;
+      top: 50px;
+      border: 1px solid rgba(0, 0, 0, 0.29);
+      padding: 5px;
+      z-index: 3;
+      border-radius: 3px;
+
+      .action-select {
+        padding: 5px;
+        cursor: pointer;
+        background: $white;
+        border-radius: 5px;
+      }
+
+      .action-select:hover {
+        background: $white2;
+      }
+    }
+  }
+
+  .review-container:hover {
+    .action-dotted-display {
+      display: block;
     }
   }
 

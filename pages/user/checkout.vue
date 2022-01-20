@@ -123,7 +123,7 @@ import BaseDialog from '~/components/Modal/BaseDialog.vue'
 export default {
   components: { BaseDialog },
   layout: 'default',
-  middleware: ['auth', roleGuard('user')],
+  middleware: ['auth', roleGuard('CUSTOMER')],
   component: {
     UserPageDropdown,
     BaseDialog,

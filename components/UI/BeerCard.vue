@@ -13,9 +13,7 @@
       {{ beer.variant || defaultStat.variant }}
     </div> -->
       <div class="name">
-        <nuxt-link :to="beerURL" class="link"
-          >{{ beer.name }} hello mother fucker you know me</nuxt-link
-        >
+        <nuxt-link :to="beerURL" class="link">{{ beer.name }}</nuxt-link>
       </div>
 
       <div class="price">
@@ -149,7 +147,7 @@ export default {
   text-align: start;
   font-weight: 700;
   font-size: 90%;
-  padding: 8px 0;
+  padding: 10px 0 8px 0;
   height: fit-content;
   line-height: 1.1;
   min-height: calc(15%);

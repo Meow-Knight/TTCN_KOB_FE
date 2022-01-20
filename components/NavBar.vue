@@ -243,7 +243,7 @@ a {
   animation: hideDropdown 0.3s cubic-bezier(0.4, 0, 0.6, 1);
   transform: scale(0);
   will-change: transform;
-  transform-origin: calc(19.5%) 5px;
+  transform-origin: calc(19.5%) 2px;
   opacity: 0;
 }
 

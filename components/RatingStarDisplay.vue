@@ -53,9 +53,15 @@ export default {
       selectedRating: 0,
     }
   },
+  watch: {
+    rating(cur, prev) {
+      this.currentRating = cur
+    },
+  },
   // rating is property pass to this component, used on non-interactive star
   mounted() {
     this.currentRating = this.rating || 0
+    this.selectedRating = this.interactive && (this.rating || 0)
   },
   methods: {
     handleMouseOver(index) {

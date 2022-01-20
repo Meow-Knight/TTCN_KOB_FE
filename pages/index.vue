@@ -36,12 +36,14 @@
 <script>
 import BeerCollection from '../components/BeerCollection.vue'
 import WithLoading from '../components/HOC/withLoading.vue'
+import { roleGuard } from '~/helper/helper'
 export default {
   components: {
     BeerCollection,
     WithLoading,
   },
   layout: 'default',
+  middleware: [roleGuard(['GUEST', 'CUSTOMER'])],
   data() {
     return {
       randoms: [],
@@ -58,9 +60,6 @@ export default {
     },
   },
   async created() {
-    if (this.user && this.user.is_staff) {
-      return this.$router.push('/dashboard')
-    }
     const URL = '/beer/homepage'
     if (process.client) {
       const authToken = localStorage.getItem('auth._token.google')

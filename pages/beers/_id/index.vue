@@ -195,13 +195,19 @@
 
 <script>
 import { mapMutations, mapActions } from 'vuex'
-import { imageZoom, priceFormat, afterDiscount } from '~/helper/helper'
+import {
+  imageZoom,
+  priceFormat,
+  afterDiscount,
+  roleGuard,
+} from '~/helper/helper'
 import Slide from '~/components/Slide/index.vue'
 import BeerCollection from '~/components/BeerCollection.vue'
 import ReviewPanel from '~/components/ReviewPanel.vue'
 export default {
   components: { BeerCollection, ReviewPanel },
   layout: 'default',
+  middleware: [roleGuard(['GUEST', 'CUSTOMER'])],
   component: { Slide, BeerCollection },
   data() {
     return {

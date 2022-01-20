@@ -47,37 +47,6 @@
                 </div>
               </div>
             </div>
-            <!-- <div
-                v-for="(item, idx) in purchase.items"
-                :key="item.name"
-                class="purchase-item"
-                :class="{ last: idx === purchase.items.length - 1 }"
-              >
-                <div class="item-image-wrapper">
-                  <img
-                    :src="require('~/assets/img/logo3.png')"
-                    class="item-image"
-                  />
-                </div>
-                <div class="item-information">
-                  <div class="item-name">{{ item.name }}</div>
-                  <div class="item-amount">{{ item.amount }}</div>
-                </div>
-                <div class="item-price">
-                  <div class="after-discount">
-                    {{
-                      priceFormat(
-                        afterDiscount(item.price, item.discount_percent) *
-                          item.amount
-                      ) + 'đ'
-                    }}
-                  </div>
-                  <div class="origin-price">
-                    {{ priceFormat(item.price * item.amount) + 'đ' }}
-                  </div>
-                </div>
-              </div>
-            </div> -->
           </div>
           <div class="card-bottom">
             <div class="purchase-total-wrapper">
@@ -87,6 +56,13 @@
               </div>
             </div>
             <div class="purchase-action-container">
+              <button
+                v-if="purchase.order_status === 'PENDING'"
+                class="cancel-purchase"
+                @click="cancelOrder(purchase.id)"
+              >
+                Hủy đơn hàng
+              </button>
               <nuxt-link
                 :to="purchaseDetailURL(purchase.id)"
                 class="purchase-detail-link"
@@ -98,12 +74,26 @@
         <div v-if="isLoadingMore" class="is-loading-more">...</div>
       </div>
     </div>
+    <base-dialog
+      v-if="notification.title"
+      :title="notification.title"
+      :need-confirm="notification.needConfirm"
+      @close="confirmNotification"
+    >
+      <template #default>
+        <h3>
+          {{ notification.message }}
+        </h3>
+      </template>
+    </base-dialog>
   </div>
 </template>
 
 <script>
+import BaseDialog from '~/components/Modal/BaseDialog.vue'
 import { afterDiscount, priceFormat } from '~/helper/helper'
 export default {
+  components: { BaseDialog },
   layout: 'user',
   data() {
     return {
@@ -112,6 +102,11 @@ export default {
       isLoading: true,
       isLoadingMore: false,
       nextPage: null,
+      notification: {
+        title: null,
+        message: null,
+        needConfirm: true,
+      },
     }
   },
   computed: {
@@ -128,15 +123,23 @@ export default {
           },
           {
             display: 'Đã xác nhận',
-            status: 'ACCEPTED',
+            status: 'CONFIRMED',
           },
           {
             display: 'Đang giao',
-            status: 'SHIPPING',
+            status: 'DELIVERING',
           },
           {
             display: 'Đã giao',
-            status: 'DONE',
+            status: 'DELIVERED',
+          },
+          {
+            display: 'Đã hoàn thành',
+            status: 'COMPLETED',
+          },
+          {
+            display: 'Chưa nhận',
+            status: 'NOTRECEIVED',
           },
           {
             display: 'Đã hủy',
@@ -147,6 +150,9 @@ export default {
     },
     getOrderApiURL() {
       return '/api/v1/order/list?page_size=5&q='
+    },
+    cancelOrderApiURL() {
+      return '/api/v1/order/cancel'
     },
   },
   watch: {
@@ -237,6 +243,35 @@ export default {
         console.log(err.response || err)
       }
     },
+    async cancelOrder(orderId) {
+      try {
+        const { data } = await this.$axios.put(this.cancelOrderApiURL, {
+          id: orderId,
+        })
+        if (data?.detail?.success) {
+          this.notification = {
+            ...this.notification,
+            title: 'Thành công',
+            message: 'Hủy đơn hàng thành công',
+            needConfirm: false,
+          }
+          return setTimeout(() => {
+            this.confirmNotification()
+            this.$router.push(this.purchaseDetailURL(orderId))
+          }, 3000)
+        }
+        this.notification = {
+          ...this.notification,
+          title: 'Thất bại',
+          message: 'Hủy đơn hàng thất bại',
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    confirmNotification() {
+      this.notification = { ...this.notification, title: null, message: null }
+    },
   },
 }
 </script>
@@ -273,7 +308,7 @@ export default {
 
 .status-select {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(8, 1fr);
   justify-items: center;
   height: fit-content;
   margin-bottom: 20px;
@@ -431,6 +466,19 @@ export default {
 .purchase-action-container {
   height: fit-content;
   padding: 20px 5%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cancel-purchase {
+  display: block;
+  width: fit-content;
+  text-decoration: none;
+  color: $black;
+  padding: 10px 15px;
+  background: rgb(223, 107, 107);
+  border-radius: 3px;
+  margin-right: 10px;
 }
 
 .purchase-detail-link {
@@ -441,7 +489,6 @@ export default {
   padding: 10px 15px;
   background: rgb(223, 107, 107);
   border-radius: 3px;
-  margin: 0 0 0 auto;
 }
 
 .no-purchase {
@@ -468,12 +515,6 @@ button {
   color: $black;
   padding: 10px 15px;
   border-radius: 5px;
-  transition: 0.3s ease-in-out;
-}
-
-button:hover {
-  background: $red;
-  color: $white2;
   transition: 0.3s ease-in-out;
 }
 </style>

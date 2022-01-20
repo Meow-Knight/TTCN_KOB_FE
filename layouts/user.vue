@@ -26,7 +26,7 @@ export default {
       setIsInErrorPage: this.setIsInErrorPage,
     }
   },
-  middleware: ['auth', roleGuard('user')],
+  middleware: ['auth', roleGuard('CUSTOMER')],
   data() {
     return {
       transparentNavBar: true,
