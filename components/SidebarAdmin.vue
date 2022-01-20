@@ -11,6 +11,12 @@
         </nuxt-link>
       </li>
       <li class="menu__item">
+        <nuxt-link to="/dashboard/orders">
+          <div class="icon"><i class="far fa-clipboard"></i></div>
+          Đơn hàng
+        </nuxt-link>
+      </li>
+      <li class="menu__item">
         <nuxt-link to="/dashboard/producers">
           <div class="icon"><i class="fas fa-users"></i></div>
           Nhà sản xuất
