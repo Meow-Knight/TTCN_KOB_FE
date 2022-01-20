@@ -29,6 +29,12 @@
         </nuxt-link>
       </li>
       <li class="menu__item">
+        <nuxt-link to="/dashboard/shipment">
+          <div class="icon"><i class="fas fa-beer"></i></div>
+          Lô hàng
+        </nuxt-link>
+      </li>
+      <li class="menu__item">
         <nuxt-link to="/dashboard/vouchers">
           <div class="icon"><i class="fas fa-gift"></i></div>
           Khuyến mãi
