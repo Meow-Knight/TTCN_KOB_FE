@@ -2,7 +2,10 @@
   <div class="sidebar">
     <div class="header">
       <nuxt-link to="/user/account/info" class="avatar-wrapper">
-        <img class="avatar" src="~/assets/img/logo3.png" />
+        <img
+          class="avatar"
+          :src="user.avatar || require('~/assets/img/logo3.png')"
+        />
       </nuxt-link>
       <div class="username">{{ user.username }}</div>
     </div>
@@ -139,7 +142,6 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  border: 1px solid red;
   border-radius: 50%;
   perspective: 1px;
 }

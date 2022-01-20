@@ -214,12 +214,7 @@ export default {
     this.shippingPhone = detail.shipping_phone || 'Default phone'
     this.totalDiscount = detail.total_discount || 0
     this.totalPrice = detail.total_price || 'Default price'
-    console.log(detail)
-    this.orderProgress = [
-      ...detail.progress,
-      ...detail.progress,
-      ...detail.progress,
-    ]
+    this.orderProgress = detail.progress
     this.initialLoading = false
   },
   methods: {

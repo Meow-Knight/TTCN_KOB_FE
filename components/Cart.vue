@@ -85,7 +85,7 @@ export default {
   border-top: 1px solid rgb(143, 129, 129);
   border-left: 1px solid rgb(143, 129, 129);
   top: -18px;
-  right: 115px;
+  right: 105px;
 }
 
 .cart-content {

@@ -70,15 +70,15 @@ export default {
   position: relative;
   height: fit-content;
   width: fit-content;
-  padding: 0;
+  padding: 0 0 20px 0;
   margin: 0;
 }
 
 .wrapper {
   position: relative;
   z-index: 100;
-  height: 60px;
-  width: 60px;
+  height: 40px;
+  width: 40px;
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -117,10 +117,10 @@ export default {
   position: absolute;
   border-radius: 50%;
   color: $white;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: bold;
-  top: 7px;
-  left: 17px;
+  top: 10px;
+  left: 7px;
   width: 30px;
   height: 30px;
   transition: 0.5s;
@@ -144,7 +144,7 @@ export default {
   animation: hideDropdown 0.3s cubic-bezier(0.4, 0, 0.6, 1);
   -webkit-animation: hideDropdown 0.3s cubic-bezier(0.4, 0, 0.6, 1);
   will-change: transform;
-  transform-origin: calc(100% - 130px) 18px;
+  transform-origin: calc(100% - 120px) 0px;
 }
 
 .wrapper.transparent {

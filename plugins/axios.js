@@ -41,8 +41,8 @@ export default function ({
         }
         return $axios(originalRequest)
       } catch (e) {
-        console.log('Error, redirect to login')
-        // app.router.push('/login')
+        console.log('Error, redirect to homepage')
+        app.router.push('/')
       }
     } else {
       throw err
