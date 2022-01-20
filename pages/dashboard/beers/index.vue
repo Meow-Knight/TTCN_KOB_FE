@@ -107,7 +107,7 @@ import { roleGuard } from '~/helper/helper'
 
 export default {
   components: { Breadcrumb, SidebarAdmin },
-  middleware: ['auth', roleGuard('admin')],
+  middleware: ['auth', roleGuard('ADMIN')],
   data() {
     return {
       beers: [],
@@ -132,6 +132,10 @@ export default {
       }
       return sortOptionText
     },
+  },
+  created() {
+    const URL = `/beer/?page=1&page_size=${this.pageSize}`
+    this.getData(URL)
   },
   methods: {
     async getData(url) {
@@ -162,10 +166,6 @@ export default {
       const URL = `/beer/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
       this.getData(URL)
     },
-  },
-  created() {
-    const URL = `/beer/?page=1&page_size=${this.pageSize}`
-    this.getData(URL)
   },
 }
 </script>

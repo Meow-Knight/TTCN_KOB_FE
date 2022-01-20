@@ -314,7 +314,7 @@ import Overlay from '~/components/Overlay'
 import { roleGuard } from '~/helper/helper'
 export default {
   components: { Breadcrumb, SidebarAdmin, ConfirmModal, Overlay },
-  middleware: ['auth', roleGuard('admin')],
+  middleware: ['auth', roleGuard('ADMIN')],
   data() {
     return {
       showConfirmModal: false,
