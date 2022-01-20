@@ -20,6 +20,7 @@ export default {
         '/dashboard': 'Quản lý',
         '/dashboard/beers': 'Sản phẩm',
         '/dashboard/sales': 'Doanh thu',
+        '/dashboard/orders': 'Đơn hàng',
         '/dashboard/producers': 'Nhà sản xuất',
         '/dashboard/vouchers': 'Khuyến mãi',
         '/dashboard/beers/addBeer': 'Thêm mới bia',
