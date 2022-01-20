@@ -4,7 +4,6 @@
       <Breadcrumb :name="originShipment.beer.name" />
     </div>
     <div class="add-beer-container">
-      <div class="left"><sidebar-admin /></div>
       <div class="right">
         <form id="needs-validation">
           <div class="right__top">
@@ -99,15 +98,14 @@
 <script>
 import axios from 'axios'
 import Breadcrumb from '~/components/Breadcrumb.vue'
-import SidebarAdmin from '~/components/SidebarAdmin.vue'
 import { roleGuard } from '~/helper/helper'
 
 export default {
   middleware: ['auth', roleGuard('admin')],
   components: {
     Breadcrumb,
-    SidebarAdmin,
   },
+  layout: 'admin',
   computed: {
     shipmentId() {
       return this.$route.params.id

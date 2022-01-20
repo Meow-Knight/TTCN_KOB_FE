@@ -4,7 +4,6 @@
       <Breadcrumb :name="producer.name" />
     </div>
     <div class="add-beer-container">
-      <div class="left"><sidebar-admin /></div>
       <div class="right">
         <form id="needs-validation">
           <div class="right__top">
@@ -89,15 +88,14 @@
 <script>
 import axios from 'axios'
 import Breadcrumb from '~/components/Breadcrumb.vue'
-import SidebarAdmin from '~/components/SidebarAdmin.vue'
 import ConfirmModal from '~/components/Modal/ConfirmModal.vue'
 import { roleGuard } from '~/helper/helper'
 export default {
   components: {
     Breadcrumb,
-    SidebarAdmin,
     ConfirmModal,
   },
+  layout: 'admin',
   middleware: ['auth', roleGuard('admin')],
   data() {
     return {
