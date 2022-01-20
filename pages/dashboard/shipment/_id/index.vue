@@ -98,10 +98,8 @@
 <script>
 import axios from 'axios'
 import Breadcrumb from '~/components/Breadcrumb.vue'
-import { roleGuard } from '~/helper/helper'
 
 export default {
-  middleware: ['auth', roleGuard('admin')],
   components: {
     Breadcrumb,
   },

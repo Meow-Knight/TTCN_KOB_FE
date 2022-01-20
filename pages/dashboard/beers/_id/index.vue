@@ -309,11 +309,9 @@
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import ConfirmModal from '~/components/Modal/ConfirmModal.vue'
 import Overlay from '~/components/Overlay'
-import { roleGuard } from '~/helper/helper'
 export default {
   components: { Breadcrumb, ConfirmModal, Overlay },
   layout: 'admin',
-  middleware: ['auth', roleGuard('admin')],
   data() {
     return {
       showConfirmModal: false,

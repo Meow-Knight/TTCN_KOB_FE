@@ -187,13 +187,11 @@ import ConfirmModal from '~/components/Modal/ConfirmModal.vue'
 import {
   priceFormat,
   afterDiscount,
-  roleGuard,
   getTimeFormat,
 } from '~/helper/helper'
 export default {
   components: { Breadcrumb, ConfirmModal },
   layout: 'admin',
-  middleware: ['auth', roleGuard('admin')],
   data() {
     return {
       showConfirmModal: false,

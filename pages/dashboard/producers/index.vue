@@ -97,11 +97,9 @@
 <script>
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import Modal from '~/components/Modal/ProducerModal.vue'
-import { roleGuard } from '~/helper/helper'
 export default {
   components: { Breadcrumb, Modal },
   layout: 'admin',
-  middleware: ['auth', roleGuard('admin')],
   data() {
     return {
       showModal: false,

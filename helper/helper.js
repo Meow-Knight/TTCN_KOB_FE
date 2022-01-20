@@ -17,7 +17,13 @@ export const roleGuard = (roles) => (context) => {
   ) {
     return
   }
-  return context.redirect('/')
+  if (
+    context.$auth.user &&
+    ['ADMIN', 'STAFF'].includes(context.$auth.user.role)
+  ) {
+    return context.redirect('/dashboard')
+  }
+  context.redirect('/')
 }
 
 export const imageZoom = (imgID, resultID, lensID) => {
