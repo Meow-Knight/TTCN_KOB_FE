@@ -184,7 +184,6 @@ export default {
                 headers: { Authorization: authToken },
               }
             )
-            console.log(data)
             this.isLoading = false
             this.nextPage = data.next
             this.allPurchase = data.results
@@ -250,11 +249,16 @@ export default {
           id: orderId,
         })
         if (data?.detail?.success) {
-          return (this.notification = {
+          this.notification = {
             ...this.notification,
             title: 'Thành công',
             message: 'Hủy đơn hàng thành công',
-          })
+            needConfirm: false,
+          }
+          return setTimeout(() => {
+            this.confirmNotification()
+            this.$router.push(this.purchaseDetailURL(orderId))
+          }, 3000)
         }
         this.notification = {
           ...this.notification,
