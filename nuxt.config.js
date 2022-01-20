@@ -77,7 +77,7 @@ export default {
           property: false,
         },
         endpoints: {
-          login: { url: 'http://localhost:8000/admin_login/', method: 'post' },
+          login: { url: 'http://localhost:8000/api/v1/login/', method: 'post' },
           user: {
             url: 'http://localhost:8000/api/v1/account/info',
             method: 'get',
@@ -99,7 +99,7 @@ export default {
           maxAge: 60 * 60 * 24 * 30,
         },
         endpoints: {
-          token: 'http://localhost:8000/login/',
+          token: 'http://localhost:8000/api/v1/google_login/',
           userInfo: 'http://localhost:8000/api/v1/account/info',
         },
       },

@@ -2,37 +2,23 @@
  * role guard used as middleware
  * @param {*} role specify which role will have access the pages
  * it can be a single string, like "user" , or an array of roles
- * like ["user", admin]
+ * like ["CUSTOMER", "ADMIN", "STAFF", "GUEST"]
  * @returns
  */
 export const roleGuard = (roles) => (context) => {
   console.log('init role guard')
-  // console.log(context)
-  /*
-  here we need the isStaff param and the context.$auth.user.is_staff to be match
-  say true and true for an admin, or false and false for a user
-  otherwise, the user is not authorized to access that page, so maybe we redirect them
-  to error page or home page
-   */
-  // if (!Array.isArray(roles)) roles = [roles]
-  // if (roles.length && !roles.include(context.$auth.user.role)) {
-  //   return context.$router.push("/")
-  // }
+  if (!Array.isArray(roles)) roles = [roles]
+  // the "GUEST" role will be considered as no "user"
+  // no roles param -> open route
   if (
-    !(
-      (context.$auth.user.is_staff && roles === 'admin') ||
-      (!context.$auth.user.is_staff && roles === 'user')
-    )
+    !roles.length ||
+    (roles.includes('GUEST') && !context.$auth.user) ||
+    (context.$auth.user && roles.includes(context.$auth.user.role))
   ) {
-    context.redirect('/')
+    return
   }
+  return context.redirect('/')
 }
-
-// export const getCart = () => (context) => {
-//   console.log('init cart request')
-//   const response = await axios.request("...")
-
-// }
 
 export const imageZoom = (imgID, resultID, lensID) => {
   // source image for zoom

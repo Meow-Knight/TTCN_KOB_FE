@@ -87,7 +87,7 @@ export default {
 
 .container:hover {
   .wrapper {
-    transform: scale(1.1);
+    transform: scale(1.2);
     transition: 0.3s ease;
   }
   .dropdown-cart {
