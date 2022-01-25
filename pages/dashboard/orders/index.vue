@@ -170,13 +170,12 @@
 </template>
 
 <script>
-import { priceFormat, getTimeFormat, roleGuard } from '~/helper/helper'
+import { priceFormat, getTimeFormat } from '~/helper/helper'
 import Breadcrumb from '~/components/Breadcrumb.vue'
 
 export default {
   components: { Breadcrumb },
   layout: 'admin',
-  middleware: ['auth', roleGuard('admin')],
   data() {
     return {
       orders: [],

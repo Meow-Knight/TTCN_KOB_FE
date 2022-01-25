@@ -178,12 +178,10 @@
 
 <script>
 import Breadcrumb from '~/components/Breadcrumb.vue'
-import { roleGuard } from '~/helper/helper'
 
 export default {
   components: { Breadcrumb },
   layout: 'admin',
-  middleware: ['auth', roleGuard('admin')],
   data() {
     return {
       producers: [],

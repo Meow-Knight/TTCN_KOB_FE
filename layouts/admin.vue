@@ -29,7 +29,7 @@ export default {
       setIsInErrorPage: this.setIsInErrorPage,
     }
   },
-  middleware: ['auth', roleGuard('admin')],
+  middleware: ['auth', roleGuard('ADMIN')],
   data() {
     return {
       transparentNavBar: true,

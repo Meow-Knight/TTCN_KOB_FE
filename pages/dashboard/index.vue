@@ -5,7 +5,7 @@
 import { roleGuard } from '~/helper/helper'
 
 export default {
-  middleware: ['auth', roleGuard('admin')],
+  middleware: ['auth', roleGuard('ADMIN')],
   mounted() {
     this.$router.push('/dashboard/beers')
   },

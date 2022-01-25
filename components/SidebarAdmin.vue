@@ -5,7 +5,7 @@
     </div>
     <ul class="menu">
       <li class="menu__item">
-        <nuxt-link to="/dashboard/sales">
+        <nuxt-link to="/dashboard">
           <div class="icon"><i class="far fa-clipboard"></i></div>
           Doanh số
         </nuxt-link>
@@ -18,8 +18,20 @@
       </li>
       <li class="menu__item">
         <nuxt-link to="/dashboard/producers">
-          <div class="icon"><i class="fas fa-users"></i></div>
+          <div class="icon"><i class="far fa-building"></i></div>
           Nhà sản xuất
+        </nuxt-link>
+      </li>
+      <li class="menu__item">
+        <nuxt-link to="/dashboard/customers">
+          <div class="icon"><i class="fas fa-users"></i></div>
+          Khách hàng
+        </nuxt-link>
+      </li>
+      <li class="menu__item">
+        <nuxt-link to="/dashboard/staffs">
+          <div class="icon"><i class="fas fa-user-cog"></i></div>
+          Nhân viên
         </nuxt-link>
       </li>
       <li class="menu__item">
@@ -30,7 +42,7 @@
       </li>
       <li class="menu__item">
         <nuxt-link to="/dashboard/shipment">
-          <div class="icon"><i class="fas fa-beer"></i></div>
+          <div class="icon"><i class="fas fa-cubes"></i></div>
           Lô hàng
         </nuxt-link>
       </li>

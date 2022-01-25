@@ -89,14 +89,12 @@
 import axios from 'axios'
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import ConfirmModal from '~/components/Modal/ConfirmModal.vue'
-import { roleGuard } from '~/helper/helper'
 export default {
   components: {
     Breadcrumb,
     ConfirmModal,
   },
   layout: 'admin',
-  middleware: ['auth', roleGuard('admin')],
   data() {
     return {
       showConfirmModal: false,
