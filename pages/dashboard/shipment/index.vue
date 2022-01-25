@@ -4,7 +4,6 @@
       <Breadcrumb :items="breadcrumbItems" />
     </div>
     <div class="users-container">
-      <div class="left"><sidebar-admin /></div>
       <div class="right">
         <div class="total-users container-fluid">
           <span>Tất cả lô hàng: {{ totalShipment }}</span>
@@ -105,15 +104,12 @@
 <script>
 import axios from 'axios'
 import Breadcrumb from '~/components/Breadcrumb.vue'
-import SidebarAdmin from '~/components/SidebarAdmin.vue'
-import { roleGuard } from '~/helper/helper'
 
 export default {
   components: {
     Breadcrumb,
-    SidebarAdmin,
   },
-  middleware: ['auth', roleGuard('admin')],
+  layout: 'admin',
   data() {
     return {
       breadcrumbItems: [

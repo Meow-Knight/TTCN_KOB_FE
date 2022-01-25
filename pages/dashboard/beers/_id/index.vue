@@ -4,7 +4,6 @@
       <Breadcrumb :name="originBeer.name" />
     </div>
     <div class="add-beer-container">
-      <div class="left"><sidebar-admin /></div>
       <div class="right">
         <div class="right__top">
           <h5 class="subtitle">Thông tin bia</h5>
@@ -308,13 +307,11 @@
 
 <script>
 import Breadcrumb from '~/components/Breadcrumb.vue'
-import SidebarAdmin from '~/components/SidebarAdmin.vue'
 import ConfirmModal from '~/components/Modal/ConfirmModal.vue'
 import Overlay from '~/components/Overlay'
-import { roleGuard } from '~/helper/helper'
 export default {
-  components: { Breadcrumb, SidebarAdmin, ConfirmModal, Overlay },
-  middleware: ['auth', roleGuard('ADMIN')],
+  components: { Breadcrumb, ConfirmModal, Overlay },
+  layout: 'admin',
   data() {
     return {
       showConfirmModal: false,

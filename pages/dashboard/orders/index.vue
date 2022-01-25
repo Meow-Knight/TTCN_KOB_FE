@@ -4,42 +4,65 @@
       <Breadcrumb />
     </div>
     <div class="users-container">
-      <div class="left"><sidebar-admin /></div>
       <div class="right">
         <ul class="nav nav-tabs nav-fill">
-          <li class="nav-item"
-           @click="changeTab('PENDING')">
-            <span :class="orderStatusShow == 'PENDING' ? 'nav-link active' : 'nav-link'" >Chờ xác nhận</span>
+          <li class="nav-item" @click="changeTab('PENDING')">
+            <span
+              :class="
+                orderStatusShow == 'PENDING' ? 'nav-link active' : 'nav-link'
+              "
+              >Chờ xác nhận</span
+            >
           </li>
-          <li class="nav-item"
-            @click="changeTab('CONFIRMED')"
-          >
-            <span :class="orderStatusShow == 'CONFIRMED' ? 'nav-link active' : 'nav-link'" >Đã xác nhận</span>
+          <li class="nav-item" @click="changeTab('CONFIRMED')">
+            <span
+              :class="
+                orderStatusShow == 'CONFIRMED' ? 'nav-link active' : 'nav-link'
+              "
+              >Đã xác nhận</span
+            >
           </li>
-          <li class="nav-item"
-            @click="changeTab('DELIVERING')"
-          >
-            <span :class="orderStatusShow == 'DELIVERING' ? 'nav-link active' : 'nav-link'" >Đang giao hàng</span>
+          <li class="nav-item" @click="changeTab('DELIVERING')">
+            <span
+              :class="
+                orderStatusShow == 'DELIVERING' ? 'nav-link active' : 'nav-link'
+              "
+              >Đang giao hàng</span
+            >
           </li>
-          <li class="nav-item"
-            @click="changeTab('DELIVERED')"
-          >
-            <span :class="orderStatusShow == 'DELIVERED' ? 'nav-link active' : 'nav-link'" >Đã giao hàng</span>
+          <li class="nav-item" @click="changeTab('DELIVERED')">
+            <span
+              :class="
+                orderStatusShow == 'DELIVERED' ? 'nav-link active' : 'nav-link'
+              "
+              >Đã giao hàng</span
+            >
           </li>
-          <li class="nav-item"
-            @click="changeTab('COMPLETED')"
-          >
-            <span :class="orderStatusShow == 'COMPLETED' ? 'nav-link active' : 'nav-link'" >Hoàn thành</span>
+          <li class="nav-item" @click="changeTab('COMPLETED')">
+            <span
+              :class="
+                orderStatusShow == 'COMPLETED' ? 'nav-link active' : 'nav-link'
+              "
+              >Hoàn thành</span
+            >
           </li>
-          <li class="nav-item"
-            @click="changeTab('CANCELED')"
-          >
-            <span :class="orderStatusShow == 'CANCELED' ? 'nav-link active' : 'nav-link'" >Đã hủy</span>
+          <li class="nav-item" @click="changeTab('CANCELED')">
+            <span
+              :class="
+                orderStatusShow == 'CANCELED' ? 'nav-link active' : 'nav-link'
+              "
+              >Đã hủy</span
+            >
           </li>
-          <li class="nav-item"
-            @click="changeTab('NOTRECEIVED')"
-          >
-            <span :class="orderStatusShow == 'NOTRECEIVED' ? 'nav-link active' : 'nav-link'" >Chưa nhận được</span>
+          <li class="nav-item" @click="changeTab('NOTRECEIVED')">
+            <span
+              :class="
+                orderStatusShow == 'NOTRECEIVED'
+                  ? 'nav-link active'
+                  : 'nav-link'
+              "
+              >Chưa nhận được</span
+            >
           </li>
         </ul>
         <div class="total-users container-fluid">
@@ -149,12 +172,10 @@
 <script>
 import { priceFormat, getTimeFormat } from '~/helper/helper'
 import Breadcrumb from '~/components/Breadcrumb.vue'
-import SidebarAdmin from '~/components/SidebarAdmin.vue'
-import { roleGuard } from '~/helper/helper'
 
 export default {
-  components: { Breadcrumb, SidebarAdmin },
-  middleware: ['auth', roleGuard('admin')],
+  components: { Breadcrumb },
+  layout: 'admin',
   data() {
     return {
       orders: [],
@@ -169,7 +190,7 @@ export default {
         asc: true,
       },
       totalOrder: 0,
-      orderStatusShow: "PENDING", 
+      orderStatusShow: 'PENDING',
     }
   },
   computed: {
@@ -216,7 +237,7 @@ export default {
       this.orderStatusShow = status
       const URL = `/order/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}&q=${this.orderStatusShow}`
       this.getData(URL)
-    }
+    },
   },
   created() {
     const URL = `/order/?page=1&page_size=${this.pageSize}&q=${this.orderStatusShow}`
@@ -231,9 +252,6 @@ export default {
 .users-container {
   display: flex;
   flex-direction: row;
-  .left {
-    width: 300px;
-  }
   .right {
     display: flex;
     flex-direction: column;

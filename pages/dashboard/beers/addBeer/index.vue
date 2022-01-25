@@ -4,7 +4,6 @@
       <Breadcrumb />
     </div>
     <div class="add-beer-container">
-      <div class="left"><sidebar-admin /></div>
       <div class="right">
         <form id="needs-validation">
           <p class="notion required-note">(*) Bắt buộc</p>
@@ -179,12 +178,10 @@
 
 <script>
 import Breadcrumb from '~/components/Breadcrumb.vue'
-import SidebarAdmin from '~/components/SidebarAdmin.vue'
-import { roleGuard } from '~/helper/helper'
 
 export default {
-  components: { Breadcrumb, SidebarAdmin },
-  middleware: ['auth', roleGuard('admin')],
+  components: { Breadcrumb },
+  layout: 'admin',
   data() {
     return {
       producers: [],
