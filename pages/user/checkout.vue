@@ -96,8 +96,35 @@
         <div class="total-after-discount">
           {{ priceFormat(totalPrice) + 'đ' }}
         </div>
-        <button class="confirm-button" @click="confirmCheckout()">
-          Xác nhận mua hàng
+        <div class="checkout-methods-container">
+          <div class="method-wrapper">
+            <input
+              v-model="checkoutMethod"
+              type="radio"
+              class="checkout-method-select"
+              value="payOnDelivery"
+            />
+            <label for="checkout-method">Thanh toán khi nhận hàng</label>
+            <br />
+          </div>
+          <div class="method-wrapper">
+            <input
+              v-model="checkoutMethod"
+              type="radio"
+              class="checkout-method-select"
+              value="paypal"
+            />
+            <label for="checkout-method">Thanh toán bằng Paypal</label>
+            <br />
+          </div>
+        </div>
+        <div class="paypal-button-container"></div>
+        <button
+          v-if="checkoutMethod === 'payOnDelivery'"
+          class="confirm-button"
+          @click="confirmCheckout()"
+        >
+          Thanh toán
         </button>
       </div>
     </div>
@@ -124,10 +151,6 @@ export default {
   components: { BaseDialog },
   layout: 'default',
   middleware: ['auth', roleGuard('CUSTOMER')],
-  component: {
-    UserPageDropdown,
-    BaseDialog,
-  },
   data() {
     return {
       cart: [],
@@ -135,6 +158,8 @@ export default {
         phone: '',
         address: '',
       },
+      totalPrice: 0,
+      totalDiscount: 0,
       initialLoading: true,
       isInitialAddress: true,
       notification: {
@@ -142,7 +167,21 @@ export default {
         message: null,
         needConfirm: null,
       },
+      checkoutMethod: null,
     }
+  },
+  head: {
+    script: [
+      {
+        src: 'https://www.paypal.com/sdk/js?client-id=AV9pTdmBBJOrA0EYVfO59o5MjENXaUVtatWWEqo948Y4d0ZB760R-H4CiMhk_LnxnidZgThSvcI_nJIN&currency=USD&disable-funding=credit,card',
+        async: true,
+      },
+    ],
+  },
+
+  component: {
+    UserPageDropdown,
+    BaseDialog,
   },
   computed: {
     totalAfterDiscount() {
@@ -165,22 +204,31 @@ export default {
   },
   async created() {
     // fetch checkout data goes here
-    const {
-      data: {
-        carts,
-        user,
-        total_price: totalPrice,
-        total_discount: totalDiscount,
-      },
-    } = await this.$axios.get(this.checkoutApiURL)
-    this.cart = carts
-    this.receiverInfo = {
-      phone: user.phone,
-      address: user.address,
+    try {
+      const {
+        data: {
+          carts,
+          user,
+          total_price: totalPrice,
+          total_discount: totalDiscount,
+        },
+      } = await this.$axios.get(this.checkoutApiURL)
+      this.cart = carts
+      this.receiverInfo = {
+        phone: user.phone,
+        address: user.address,
+      }
+      this.totalPrice = totalPrice
+      this.totalDiscount = totalDiscount
+      this.initialLoading = false
+      this.checkoutMethod = 'payOnDelivery'
+      this.$nextTick(() => {
+        this.mountPaypalButton()
+      })
+    } catch (err) {
+      console.log(err.response || err)
+      if (err.response) throw err
     }
-    this.totalPrice = totalPrice
-    this.totalDiscount = totalDiscount
-    this.initialLoading = false
   },
   methods: {
     priceFormat,
@@ -191,7 +239,70 @@ export default {
         title: null,
         message: null,
       }
-      // this.
+    },
+    mountPaypalButton() {
+      const that = this
+      window.paypal
+        .Buttons({
+          // Set up the transaction
+          createOrder(data, actions) {
+            return actions.order.create({
+              purchase_units: [
+                {
+                  amount: {
+                    value: that.totalPrice,
+                  },
+                },
+              ],
+            })
+          },
+
+          // Finalize the transaction
+          onApprove(data, actions) {
+            return actions.order.capture().then(async function (orderData) {
+              console.log(
+                'Capture result',
+                orderData,
+                JSON.stringify(orderData, null, 2)
+              )
+              // API calling for capturing order data
+              try {
+                const response = await that.$axios.post(
+                  that.createOrderApiURL,
+                  {
+                    shipping_address: that.receiverInfo.address,
+                    shipping_phone: that.receiverInfo.phone,
+                    total_price: that.totalPrice,
+                    total_discount: that.totalDiscount,
+                    carts: that.cart.map((item) => ({
+                      amount: item.amount,
+                      beer: item.beer.id,
+                    })),
+                    payment_method: 'PAYPAL',
+                    id_paypal: orderData.payer.payer_id,
+                    email_paypal: orderData.payer.email_address,
+                  }
+                )
+                // show notification
+                that.notification = {
+                  ...that.notification,
+                  title: 'Thành công',
+                  message: 'Đặt hàng thành công',
+                }
+                // flush cart data
+                that.$store.commit('cart/setCartData', [])
+                // after 3s hide notification and redirect to order detail page
+                setTimeout(() => {
+                  that.confirmNotification()
+                  that.$router.push(that.orderDetailURL + response.data.id)
+                }, 3000)
+              } catch (err) {
+                console.log(err)
+              }
+            })
+          },
+        })
+        .render('.paypal-button-container')
     },
     async confirmCheckout() {
       if (this.receiverInfo.address === '' || this.receiverInfo.phone === '') {
@@ -212,6 +323,7 @@ export default {
             amount: item.amount,
             beer: item.beer.id,
           })),
+          payment_method: 'DIRECT',
         })
         // show notification
         this.notification = {
@@ -462,17 +574,49 @@ input:focus {
     color: $red;
   }
 
+  .checkout-methods-container {
+    .method-wrapper {
+      display: flex;
+      margin-bottom: 20px;
+      label {
+        margin-left: 20px;
+      }
+      input {
+        cursor: pointer;
+      }
+    }
+  }
+
   .confirm-button {
     grid-column-start: 4;
     grid-column-end: 5;
-    height: fit-content;
-    width: 80%;
-    padding: 10px;
-    margin: 20px auto;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    height: 35px;
+    width: 200px;
+    padding: 5px 10px;
     border: none;
+    display: block;
+    margin: 0 auto 25px 0;
     border-radius: 3px;
-    background: $red;
-    color: $white;
+    background: #ffc439;
+    color: black;
+    font-size: 17px;
+    font-weight: 500;
+    z-index: 5;
+  }
+
+  .paypal-button-container {
+    grid-column-start: 4;
+    grid-column-end: 5;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    height: 60px;
+    width: 200px;
+    z-index: 1;
+
+    /* visibility: hidden;
+    opacity: 0; */
   }
 }
 </style>

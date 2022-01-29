@@ -10,6 +10,7 @@
         </div>
       </div>
       <div
+        v-if="orderProgress.length"
         class="purchase-deliver-progress"
         :class="{
           'order-canceled':
@@ -130,6 +131,15 @@
             {{ priceFormat(totalPrice) + 'đ' }}
           </div>
         </div>
+        <div class="panel-row">
+          <div v-if="paymentMethod === 'PAYPAL'" class="payment-status">
+            (Bạn đã thanh toán {{ priceFormat(totalPrice) + 'đ' }} qua Paypal)
+          </div>
+          <div v-if="paymentMethod === 'DIRECT'" class="payment-status">
+            (Vui lòng thanh toán {{ priceFormat(totalPrice) + 'đ' }} khi nhận
+            hàng)
+          </div>
+        </div>
       </div>
       <div class="action-panel">
         <button
@@ -138,6 +148,20 @@
           @click="cancelOrder"
         >
           Hủy đơn hàng
+        </button>
+        <button
+          v-if="orderStatus === 'DELIVERED'"
+          class="items-not-receive"
+          @click="notReceivedItems"
+        >
+          Chưa nhận hàng
+        </button>
+        <button
+          v-if="orderStatus === 'DELIVERED'"
+          class="items-received"
+          @click="confirmReceivedItems"
+        >
+          Đã nhận hàng
         </button>
       </div>
     </div>
@@ -190,6 +214,7 @@ export default {
       shippingPhone: null,
       totalDiscount: null,
       totalPrice: null,
+      paymentMethod: null,
       orderProgress: [],
       progressMapper: {
         PENDING: {
@@ -213,6 +238,9 @@ export default {
           display: 'Đơn hàng đã hoàn thành',
           component: 'progress-completed',
         },
+        NOTRECEIVED: {
+          display: 'Chưa nhận được hàng',
+        },
         CANCELED: {
           display: 'Đơn hàng đã hủy',
           component: 'progress-canceled',
@@ -235,12 +263,20 @@ export default {
     cancelOrderApiURL() {
       return '/api/v1/order/cancel'
     },
+    changeOrderStatusApiURL() {
+      return '/api/v1/order/user_change_order_status'
+    },
   },
-  created() {
-    this.fetchOrderData()
+  async created() {
+    try {
+      await this.fetchOrderData()
+    } catch (err) {
+      if (err.response) throw err
+    }
   },
   methods: {
     async fetchOrderData() {
+      // try {
       const {
         data: { detail },
       } = await this.$axios.get(this.purchaseDetailURL)
@@ -255,8 +291,26 @@ export default {
       this.shippingPhone = detail.shipping_phone || 'Default phone'
       this.totalDiscount = detail.total_discount || 0
       this.totalPrice = detail.total_price || 'Default price'
-      this.orderProgress = detail.progress
+      // cut out not-received progress
+      const progress = [...detail.progress]
+      const index = progress.findIndex(
+        ({ order_status: status }) => status === 'NOTRECEIVED'
+      )
+      if (index >= 0) {
+        progress.splice(
+          index,
+          progress.slice(-1)[0].order_status === 'COMPLETED'
+            ? progress.length - 1 - index
+            : progress.length - index
+        )
+      }
+      this.orderProgress = progress
+      this.paymentMethod = detail.payment_method
       this.initialLoading = false
+      // } catch (error) {
+      //   console.log(error.response || error)
+      //   if (error.response) throw error
+      // }
     },
     priceFormat,
     afterDiscount,
@@ -281,6 +335,52 @@ export default {
           ...this.notification,
           title: 'Thất bại',
           message: 'Hủy đơn hàng thất bại',
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    async notReceivedItems() {
+      try {
+        const { data } = await this.$axios.put(this.changeOrderStatusApiURL, {
+          id: this.orderId,
+          key_change: 'NOTRECEIVED',
+        })
+        if (data?.detail?.success) {
+          await this.fetchOrderData()
+          return (this.notification = {
+            ...this.notification,
+            title: 'Thành công',
+            message: 'Xác nhận thành công',
+          })
+        }
+        this.notification = {
+          ...this.notification,
+          title: 'Thất bại',
+          message: 'Xác nhận thất bại',
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    async confirmReceivedItems() {
+      try {
+        const { data } = await this.$axios.put(this.changeOrderStatusApiURL, {
+          id: this.orderId,
+          key_change: 'COMPLETED',
+        })
+        if (data?.detail?.success) {
+          await this.fetchOrderData()
+          return (this.notification = {
+            ...this.notification,
+            title: 'Thành công',
+            message: 'Xác nhận thành công',
+          })
+        }
+        this.notification = {
+          ...this.notification,
+          title: 'Thất bại',
+          message: 'Xác nhận thất bại',
         }
       } catch (err) {
         console.log(err)
@@ -568,17 +668,31 @@ export default {
       font-size: 25px;
       color: $red;
     }
+
+    .payment-status {
+      grid-column-start: 1;
+      grid-column-end: 2;
+      text-align: left;
+      font-weight: 400;
+      font-style: italic;
+    }
   }
 }
 
-.cancel-order {
-  display: block;
-  border: none;
-  background: $red;
-  color: $white2;
-  padding: 10px 15px;
-  border-radius: 3px;
-  margin: 30px 0 0 auto;
+.action-panel {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  button {
+    display: block;
+    border: none;
+    background: $red;
+    color: $white2;
+    padding: 10px 15px;
+    border-radius: 3px;
+    margin: 30px 0 0 20px;
+  }
 }
 
 @keyframes progress-line {
