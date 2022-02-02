@@ -130,6 +130,10 @@ export default {
       return sortOptionText
     },
   },
+  created() {
+    const URL = `/beer/?page=1&page_size=${this.pageSize}`
+    this.getData(URL)
+  },
   methods: {
     async getData(url) {
       if (!url) return
@@ -159,10 +163,6 @@ export default {
       const URL = `/beer/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
       this.getData(URL)
     },
-  },
-  created() {
-    const URL = `/beer/?page=1&page_size=${this.pageSize}`
-    this.getData(URL)
   },
 }
 </script>

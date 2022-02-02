@@ -1,6 +1,6 @@
 /* eslint-disable vue/no-multiple-template-root */
 <template>
-  <teleport to="body">
+  <div>
     <div @click="$emit('close')"></div>
     <dialog open>
       <header>
@@ -17,7 +17,7 @@
         </slot>
       </menu>
     </dialog>
-  </teleport>
+  </div>
 </template>
 
 <script>
