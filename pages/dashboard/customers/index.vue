@@ -29,31 +29,43 @@
             <thead>
               <tr>
                 <th scope="col">STT</th>
+                <th scope="col">Tên đăng nhập</th>
                 <th scope="col">Tên</th>
-                <th scope="col">Nồng độ cồn</th>
-                <th scope="col">Dung tích</th>
-                <th scope="col">Giá</th>
-                <th scope="col">SL Chai</th>
-                <th scope="col">NSX</th>
+                <th scope="col">Ngày tham gia</th>
+                <th scope="col">Đã kích hoạt</th>
+                <th scope="col">Tổng số đơn</th>
+                <th scope="col">Doanh thu</th>
               </tr>
             </thead>
             <tbody>
-              <!-- <tr
+              <tr
                 v-for="(customer, index) in customers"
                 :key="customer.id"
                 class="user-list__item"
                 @click="$router.push(`customers/${customer.id}`)"
               >
                 <th scope="row">{{ index + 1 }}</th>
-                <td>{{ customer.name }}</td>
-                <td>{{ customer.alcohol_concentration }}</td>
-                <td>{{ customer.capacity }}</td>
-                <td>{{ customer.price }}</td>
-                <td>{{ customer.bottle_amount }}</td>
-                <td>
-                  <span v-if="beer.producer">{{ beer.producer.name }}</span>
+                <td>{{ customer.username }}</td>
+                <td>{{ customer.full_name }}</td>
+                <td>{{ getTimeFormat(customer.date_joined) }}</td>
+                <td
+                  :class="
+                    customer.is_active
+                      ? 'activation text-align-center actived'
+                      : 'activation not-actived'
+                  "
+                >
+                  <i class="fas fa-circle"></i>
                 </td>
-              </tr> -->
+                <td>{{ customer.order_count }}</td>
+                <td class="total-sale">
+                  {{
+                    customer.total_sale
+                      ? priceFormat(customer.total_sale) + 'đ'
+                      : '--'
+                  }}
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -95,6 +107,7 @@
 </template>
 
 <script>
+import { priceFormat, getTimeFormat } from '~/helper/helper'
 import Breadcrumb from '~/components/Breadcrumb.vue'
 
 export default {
@@ -116,6 +129,10 @@ export default {
       totalCustomer: 0,
     }
   },
+  created() {
+    const URL = `/account/customers/?page=1&page_size=${this.pageSize}`
+    this.getData(URL)
+  },
   computed: {
     sortOption() {
       let sortOptionText = this.sortBy.field
@@ -126,6 +143,8 @@ export default {
     },
   },
   methods: {
+    priceFormat,
+    getTimeFormat,
     async getData(url) {
       if (!url) return
       if (process.client) {
@@ -154,10 +173,6 @@ export default {
       const URL = `/account/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
       this.getData(URL)
     },
-  },
-  created() {
-    const URL = `/account/?page=1&page_size=${this.pageSize}`
-    this.getData(URL)
   },
 }
 </script>
@@ -207,5 +222,18 @@ export default {
   &__arrow {
     font-size: 30px;
   }
+}
+.activation {
+  font-size: 13px;
+  text-align: center;
+}
+.actived {
+  color: rgb(11, 177, 105);
+}
+.not-actived {
+  color: rgb(99, 99, 99);
+}
+.total-sale {
+  text-align: right;
 }
 </style>

@@ -26,6 +26,7 @@ export default {
         '/dashboard/beers/addBeer': 'Thêm mới bia',
         '/dashboard/shipment': 'Lô hàng',
         '/dashboard/shipment/addShipment': 'Thêm lô hàng',
+        '/dashboard/customers': 'Khách hàng',
       },
     }
   },
