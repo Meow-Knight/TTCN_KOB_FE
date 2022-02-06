@@ -1,14 +1,22 @@
 <template>
   <div>
-    <NavBar :transparent="transparent" />
-    <div class="container-fluid">
-      <div class="admin-layout-container">
-        <div class="left">
-          <SidebarAdmin class="side-bar"></SidebarAdmin>
+    <div>
+      <NavBar :transparent="transparent" />
+      <div class="container-fluid">
+        <div class="admin-layout-container">
+          <div class="left">
+            <SidebarAdmin class="side-bar"></SidebarAdmin>
+          </div>
+          <div class="right">
+            <Nuxt />
+          </div>
         </div>
-        <div class="right">
-          <Nuxt />
-        </div>
+      </div>
+    </div>
+    <div v-if="loadingState" class="loading">
+      <div class="icon-container">
+        <i class="fas fa-wine-glass-alt"></i>
+        <i class="fas fa-wine-glass"></i>
       </div>
     </div>
   </div>
@@ -39,6 +47,9 @@ export default {
   computed: {
     transparent() {
       return this.transparentNavBar && !this.isInErrorPage
+    },
+    loadingState() {
+      return this.$store.state.loadingState
     },
   },
   async created() {
@@ -95,6 +106,43 @@ export default {
     display: flex;
     flex-direction: column;
     width: 100%;
+  }
+}
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  opacity: 0.7;
+  background-size: cover;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .icon-container {
+    color: $white;
+    font-size: 70px;
+    .fas {
+      position: absolute;
+    }
+    .fa-wine-glass {
+      animation-name: loading;
+      animation-iteration-count: infinite;
+      animation-duration: 2s;
+      color: yellow;
+    }
+  }
+}
+
+@keyframes loading {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 </style>
