@@ -42,12 +42,14 @@ export default {
     return {
       transparentNavBar: true,
       isInErrorPage: false,
-      loadingState: this.$store.state.loadingState,
     }
   },
   computed: {
     transparent() {
       return this.transparentNavBar && !this.isInErrorPage
+    },
+    loadingState() {
+      return this.$store.state.loadingState
     },
   },
   async created() {
@@ -136,7 +138,11 @@ export default {
 }
 
 @keyframes loading {
-  from {opacity: 0;}
-  to {opacity: 1;}
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 </style>

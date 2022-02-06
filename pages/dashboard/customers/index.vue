@@ -42,7 +42,6 @@
                 v-for="(customer, index) in customers"
                 :key="customer.id"
                 class="user-list__item"
-                @click="$router.push(`customers/${customer.id}`)"
               >
                 <th scope="row">{{ index + 1 }}</th>
                 <td>{{ customer.username }}</td>
@@ -64,6 +63,26 @@
                       ? priceFormat(customer.total_sale) + 'đ'
                       : '--'
                   }}
+                </td>
+                <td class="action">
+                  <button
+                    v-if="customer.is_active"
+                    class="btn btn-danger"
+                    @click="
+                      changeStatusAccount(customer.is_active, customer.id)
+                    "
+                  >
+                    Vô hiệu hóa
+                  </button>
+                  <button
+                    v-else
+                    class="btn btn-primary"
+                    @click="
+                      changeStatusAccount(customer.is_active, customer.id)
+                    "
+                  >
+                    Kích hoạt
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -146,31 +165,58 @@ export default {
     priceFormat,
     getTimeFormat,
     async getData(url) {
+      this.$store.commit('setLoadingState', true)
       if (!url) return
       if (process.client) {
-        const authToken = this.$auth.strategy.token.get()
-        const response = await this.$axios.get(`/api/v1${url}`, {
-          headers: { Authorization: authToken },
-        })
-        this.customers = response.data.results
-        this.rows = response.data.count
-        this.previous = response.data.previous
-        this.next = response.data.next
-        this.totalCustomer = response.data.count
+        try {
+          const authToken = this.$auth.strategy.token.get()
+          const response = await this.$axios.get(`/api/v1${url}`, {
+            headers: { Authorization: authToken },
+          })
+          this.customers = response.data.results
+          this.rows = response.data.count
+          this.previous = response.data.previous
+          this.next = response.data.next
+          this.totalCustomer = response.data.count
+        } catch (err) {
+          alert(err)
+        }
       }
+      this.$store.commit('setLoadingState', false)
     },
     changePage(pageNumber) {
-      const URL = `/account/?page=${pageNumber}&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
+      const URL = `/account/customers/?page=${pageNumber}&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
       this.getData(URL)
     },
     search() {
-      const URL = `/account/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
+      const URL = `/account/customers/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
       this.getData(URL)
     },
     sort(field) {
       this.sortBy.field = field
       this.sortBy.asc = !this.sortBy.asc
-      const URL = `/account/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
+      const URL = `/account/customers/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
+      this.getData(URL)
+    },
+    async changeStatusAccount(currentStatus, customerId) {
+      let URL = `/account/${customerId}`
+      const isActive = !currentStatus
+      this.$store.commit('setLoadingState', true)
+      if (process.client) {
+        try {
+          const authToken = this.$auth.strategy.token.get()
+          await this.$axios.patch(
+            `/api/v1${URL}`,
+            { is_active: isActive },
+            {
+              headers: { Authorization: authToken },
+            }
+          )
+        } catch (err) {
+          alert(err)
+        }
+      }
+      URL = `/account/customers/?page=1&page_size=${this.pageSize}`
       this.getData(URL)
     },
   },
@@ -235,5 +281,11 @@ export default {
 }
 .total-sale {
   text-align: right;
+}
+.action {
+  .btn {
+    font-size: 13px;
+    padding: 0 5px;
+  }
 }
 </style>
