@@ -136,18 +136,26 @@ export default {
   },
   methods: {
     async getData(url) {
+      this.$store.commit('setLoadingState', true)
+
       if (!url) return
+
       if (process.client) {
-        const authToken = this.$auth.strategy.token.get()
-        const response = await this.$axios.get(`/api/v1${url}`, {
-          headers: { Authorization: authToken },
-        })
-        this.beers = response.data.results
-        this.rows = response.data.count
-        this.previous = response.data.previous
-        this.next = response.data.next
-        this.totalBeer = response.data.count
+        try {
+          const authToken = this.$auth.strategy.token.get()
+          const response = await this.$axios.get(`/api/v1${url}`, {
+            headers: { Authorization: authToken },
+          })
+          this.beers = response.data.results
+          this.rows = response.data.count
+          this.previous = response.data.previous
+          this.next = response.data.next
+          this.totalBeer = response.data.count
+        } catch (err) {
+          alert(err)
+        }
       }
+      this.$store.commit('setLoadingState', false)
     },
     changePage(pageNumber) {
       const URL = `/beer/?page=${pageNumber}&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
