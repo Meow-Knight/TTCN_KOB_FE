@@ -22,7 +22,7 @@
                 <i class="fas fa-search"></i>
               </button>
               <nuxt-link
-                to="/dashboard/beers/addBeer"
+                to="/dashboard/vouchers/addVoucher"
                 class="btn btn-add-beer btn-primary"
                 >Thêm Khuyến mãi</nuxt-link
               >
@@ -47,7 +47,7 @@
                 v-for="(discount, index) in discounts"
                 :key="discount.id"
                 class="user-list__item"
-                @click="$router.push(`discounts/${discount.id}`)"
+                @click="$router.push(`vouchers/${discount.id}`)"
               >
                 <th scope="row">{{ index + 1 }}</th>
                 <td>{{ discount.name }}</td>
@@ -62,22 +62,6 @@
                   "
                 >
                   <i class="fas fa-circle"></i>
-                </td>
-                <td class="action">
-                  <button
-                    v-if="discount.is_activate"
-                    class="btn btn-danger"
-                    @click="changeStatus(discount.is_activate, discount.id)"
-                  >
-                    Hủy kích hoạt
-                  </button>
-                  <button
-                    v-else
-                    class="btn btn-primary"
-                    @click="changeStatus(discount.is_activate, discount.id)"
-                  >
-                    Kích hoạt
-                  </button>
                 </td>
               </tr>
             </tbody>
@@ -193,7 +177,6 @@ export default {
       const URL = `/beer/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}`
       this.getData(URL)
     },
-    changeStatus(currentStatus, discountId) {},
   },
 }
 </script>

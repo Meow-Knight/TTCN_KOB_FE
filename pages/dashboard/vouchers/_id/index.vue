@@ -175,6 +175,28 @@
                 Thêm
               </button>
             </div>
+            <div class="select-date-container">
+              <div class="select-date start">
+                <label for="">Ngày bắt đầu </label>
+                <input
+                  v-model="updatedDiscount.start_date"
+                  class="form-control"
+                  type="date"
+                  disabled
+                  required
+                />
+              </div>
+              <div class="select-date end">
+                <label for="">Ngày kết thúc </label>
+                <input
+                  v-model="updatedDiscount.end_date"
+                  class="form-control"
+                  type="date"
+                  disabled
+                  required
+                />
+              </div>
+            </div>
             <div v-if="!editting" class="action">
               <button
                 class="btn btn-danger"
@@ -189,6 +211,27 @@
               </button>
               <button class="btn btn-primary" @click="changeState">
                 Chỉnh sửa
+              </button>
+              <button
+                v-if="originDiscount.is_activate"
+                class="btn btn-danger"
+                @click="
+                  (event) => {
+                    event.preventDefault()
+                    changeStatus(originDiscount.is_activate, originDiscount.id)
+                  }
+                "
+              >
+                Hủy kích hoạt
+              </button>
+              <button
+                v-else
+                class="btn btn-primary"
+                @click="
+                  changeStatus(originDiscount.is_activate, originDiscount.id)
+                "
+              >
+                Kích hoạt
               </button>
             </div>
             <div v-else class="action">
@@ -287,11 +330,11 @@ export default {
       if (!this.editting) {
         Object.assign(this.updatedDiscount, this.originDiscount)
       }
-      //   const inputs = document.getElementsByClassName('form-control')
+      const inputs = document.getElementsByClassName('form-control')
       const notes = document.getElementsByClassName('required-note')
-      //   for (let i = 0; i < inputs.length; i++) {
-      //     inputs[i].disabled = !inputs[i].disabled
-      //   }
+      for (let i = 0; i < inputs.length; i++) {
+        inputs[i].disabled = !inputs[i].disabled
+      }
       for (let i = 0; i < notes.length; i++) {
         notes[i].style.visibility =
           notes[i].style.visibility === 'visible' ? 'hidden' : 'visible'
@@ -313,15 +356,16 @@ export default {
       this.$store.commit('setLoadingState', true)
       const isValid = this.validate(event)
       if (isValid) {
-        const URL = '/beer/beer_discount/'
+        const beerDiscountURL = '/beer/beer_discount/'
         if (process.client) {
           const authToken = localStorage.getItem('auth._token.local')
 
+          // Updates beer_discount for voucher
           for (const discount of this.updatedDiscount.beer_discounts) {
             if (discount.id) {
               try {
                 await this.$axios.patch(
-                  `/api/v1${URL}${discount.id}/`,
+                  `/api/v1${beerDiscountURL}${discount.id}/`,
                   { discount_percent: discount.discount_percent },
                   {
                     headers: { Authorization: authToken },
@@ -333,7 +377,7 @@ export default {
             } else {
               try {
                 await this.$axios.post(
-                  `/api/v1${URL}`,
+                  `/api/v1${beerDiscountURL}`,
                   {
                     ...discount,
                     discount: this.originDiscount.id,
@@ -347,11 +391,13 @@ export default {
               }
             }
           }
+
+          // Remove beer_discount out of voucher
           for (const discount of this.originDiscount.beer_discounts) {
             if (!this.updatedDiscount.beer_discounts.includes(discount)) {
               try {
                 await this.$axios.delete(
-                  `/api/v1${URL}${discount.id}/`,
+                  `/api/v1${beerDiscountURL}${discount.id}/`,
                   { discount_percent: discount.discount_percent },
                   {
                     headers: { Authorization: authToken },
@@ -362,6 +408,27 @@ export default {
               }
             }
           }
+
+          // Updates name, start_date, end_date of voucher
+          const discountURL = '/beer/discount/'
+          const updatedDiscountInput = {
+            name: this.updatedDiscount.name,
+            start_date: this.updatedDiscount.start_date,
+            end_date: this.updatedDiscount.end_date,
+          }
+
+          try {
+            await this.$axios.patch(
+              `/api/v1${discountURL}${this.discountId}/`,
+              updatedDiscountInput,
+              {
+                headers: { Authorization: authToken },
+              }
+            )
+          } catch (err) {
+            alert(err)
+          }
+
           window.location.reload(true)
         }
       }
@@ -397,6 +464,26 @@ export default {
               .includes(beer.id)
         )
       }
+    },
+    async changeStatus(currentStatus) {
+      const URL = '/beer/discount/'
+      this.$store.commit('setLoadingState', true)
+
+      if (process.client) {
+        const authToken = localStorage.getItem('auth._token.local')
+        try {
+          await this.$axios.patch(
+            `/api/v1${URL}${this.discountId}/`,
+            { is_activate: !currentStatus },
+            {
+              headers: { Authorization: authToken },
+            }
+          )
+        } catch (err) {
+          alert(err)
+        }
+      }
+      window.location.reload(true)
     },
   },
 }
@@ -473,7 +560,6 @@ export default {
   }
 }
 .btn {
-  width: 100px;
   margin-bottom: 30px;
 }
 .list-group-flush {
@@ -501,5 +587,19 @@ export default {
   .btn-primary {
     margin-left: 10px;
   }
+}
+.select-date {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  width: 60%;
+  input {
+    width: 200px !important;
+  }
+}
+.btn {
+  white-space: nowrap !important;
+  display: inline-block;
 }
 </style>
