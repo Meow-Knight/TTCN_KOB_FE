@@ -4,6 +4,18 @@
       <Breadcrumb />
     </div>
     <div class="dashboard-container">
+      <div class="dashboard-item sum">
+        <div class="sum__item sum__sales">
+          <i class="fa-solid fa-hand-holding-dollar"></i>
+          <p>Tổng doanh thu</p>
+          <p> {{sales}}</p>
+        </div>
+        <div class="sum__item sum__sales">
+          <i class="fa-solid fa-hand-holding-dollar"></i>
+          <p>Tổng doanh số</p>
+          <p> {{amount}}</p>
+        </div>
+      </div>
       <div class="dashboard-item sale">
         <div class="chart-controller">
           <ul class="nav nav-tabs">
@@ -50,6 +62,28 @@
       </div>
       <div class="dashboard-item top-products">
         <label for="">Sản phẩm bán chạy</label>
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Sản phẩm</th>
+                <th scope="col">Đã bán </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(product, index) in topProducts"
+                :key="product.id"
+                class="user-list__item"
+              >
+                <th scope="row">{{ index + 1 }}</th>
+                <td>
+                  <img :src="product.photo" height="40px" width="60px" alt="">
+                  {{ product.name }}</td>
+                <td>{{ product.total_sum }}</td>
+              </tr>
+            </tbody>
+          </table>
       </div>
     </div>
   </div>
@@ -67,6 +101,9 @@ export default {
       type: 'sale',
       labels: [],
       dataChart: [],
+      topProducts: [],
+      sales: 0,
+      amount: 0,
     }
   },
   computed: {
@@ -116,6 +153,7 @@ export default {
   },
   created() {
     this.getChartData()
+    this.getTopProducts()
   },
   methods: {
     changeType(newType) {
@@ -151,13 +189,43 @@ export default {
         }
       }
     },
+    async getTopProducts() {
+      const URL = '/beer/top/'
+
+      if (process.client) {
+        const authToken = localStorage.getItem('auth._token.local')
+        try {
+          const response = await this.$axios.get(`/api/v1${URL}`, {
+            headers: { Authorization: authToken },
+          })
+          this.topProducts = response.data
+        } catch (err) {
+          alert(err)
+        }
+      }
+    },
   },
 }
 </script>
 <style lang="scss" scoped>
+@import '~assets/scss/variables';
+
 .dashboard-item {
   margin-top: 20px;
 }
+  .sum {
+    display: flex;
+    flex-direction: row;
+    &__item {
+      text-align: center;
+      margin-left: 20px;
+      background-color: $hoverSidebar;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    &__sales {
+    }
+  }
 .nav-item {
   cursor: pointer;
   .active {
