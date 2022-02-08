@@ -23,6 +23,7 @@ export default {
         '/dashboard/orders': 'Đơn hàng',
         '/dashboard/producers': 'Nhà sản xuất',
         '/dashboard/vouchers': 'Khuyến mãi',
+        '/dashboard/vouchers/addVoucher': 'Thêm khuyến mãi',
         '/dashboard/beers/addBeer': 'Thêm mới bia',
         '/dashboard/shipment': 'Lô hàng',
         '/dashboard/shipment/addShipment': 'Thêm lô hàng',
