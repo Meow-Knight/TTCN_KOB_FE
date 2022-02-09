@@ -29,6 +29,97 @@
                 </div>
               </div>
             </div>
+            <div class="beer-discounts">
+              <label
+                >Các sản phẩm được hưởng khuyến mãi
+                <span class="required-note">*</span></label
+              >
+              <ul class="list-group list-group-flush">
+                <li
+                  v-for="beerDiscount in beerDiscounts"
+                  :key="beerDiscount.id"
+                  class="list-group-item beer-discounts__item"
+                >
+                  <label for="" class="beer-name">
+                    {{
+                      beers.find((beer) => beer.id === beerDiscount.beer)
+                        ? beers.find((beer) => beer.id === beerDiscount.beer)
+                            .name
+                        : ''
+                    }}</label
+                  >
+                  <div class="beer-discounts__item__right">
+                    <div class="form-group">
+                      <div class="input-box">
+                        <div class="d-flex align-items-center">
+                          <input
+                            v-model="beerDiscount.discount_percent"
+                            type="number"
+                            min="0"
+                            max="100"
+                            class="form-control info__content__percent"
+                            required
+                          />
+                          <span>%</span>
+                        </div>
+                        <div class="invalid-feedback">
+                          Vui lòng nhập chiết khấu !
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      class="btn btn-danger"
+                      @click="
+                        (event) => {
+                          event.preventDefault()
+                          beerDiscounts = beerDiscounts.filter(
+                            (element) => element.beer !== beerDiscount.beer
+                          )
+                        }
+                      "
+                    >
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="form-group select-beer">
+              <label for="">Thêm sản phẩm</label>
+              <div class="input-box">
+                <select
+                  v-model="newBeerDiscount.beer"
+                  class="form-select form-control"
+                  aria-label=""
+                >
+                  <option
+                    v-for="beer in beersNotHaveDiscount"
+                    :key="beer.id"
+                    :value="beer.id"
+                  >
+                    {{ beer.name }}
+                  </option>
+                </select>
+                <div class="invalid-feedback">Vui lòng chọn bia !</div>
+              </div>
+              <div class="form-group">
+                <div class="input-box">
+                  <div class="d-flex align-items-center mx-1">
+                    <input
+                      v-model="newBeerDiscount.discount_percent"
+                      type="number"
+                      min="0"
+                      max="100"
+                      class="form-control info__content__percent"
+                    />
+                    <span>%</span>
+                  </div>
+                </div>
+              </div>
+              <button class="btn btn-primary" @click="addBeerForUpdate">
+                Thêm
+              </button>
+            </div>
             <div class="select-date-container">
               <div class="select-date start">
                 <label for=""
@@ -103,8 +194,32 @@ export default {
     return {
       showConfirmModal: false,
       beers: [],
+      beersNotHaveDiscount: [],
       newDiscount: {},
+      beerDiscounts: [],
+      newBeerDiscount: {
+        beer: '',
+        discount_percent: null,
+      },
     }
+  },
+  async created() {
+    const BEER_URL = '/beer/get_all_with_name/'
+    this.$store.commit('setLoadingState', true)
+
+    if (process.client) {
+      const authToken = localStorage.getItem('auth._token.local')
+      try {
+        const responseBeer = await this.$axios.get(`/api/v1${BEER_URL}`, {
+          headers: { Authorization: authToken },
+        })
+        this.beers = responseBeer.data
+        this.beersNotHaveDiscount = responseBeer.data
+      } catch (err) {
+        alert(err)
+      }
+    }
+    this.$store.commit('setLoadingState', false)
   },
   methods: {
     validate() {
@@ -117,16 +232,20 @@ export default {
 
       return true
     },
-    async addDiscount(event) {
+    async addDiscount() {
       const isValid = this.validate()
       const DISCOUNT_URL = '/beer/discount/'
       this.$store.commit('setLoadingState', true)
       if (isValid && process.client) {
         const authToken = localStorage.getItem('auth._token.local')
         try {
-          await this.$axios.post(`/api/v1${DISCOUNT_URL}`, this.newDiscount, {
-            headers: { Authorization: authToken },
-          })
+          await this.$axios.post(
+            `/api/v1${DISCOUNT_URL}`,
+            { ...this.newDiscount, beers: this.beerDiscounts },
+            {
+              headers: { Authorization: authToken },
+            }
+          )
           this.$router.push('/dashboard/vouchers')
         } catch (err) {
           alert(err)
@@ -134,6 +253,18 @@ export default {
       }
       this.showConfirmModal = false
       this.$store.commit('setLoadingState', false)
+    },
+    addBeerForUpdate(event) {
+      event.preventDefault()
+      if (this.newBeerDiscount.beer || this.newBeerDiscount.discount_percent) {
+        const beerDiscountAdded = {}
+        Object.assign(beerDiscountAdded, this.newBeerDiscount)
+        this.beerDiscounts.push(beerDiscountAdded)
+        this.beersNotHaveDiscount = this.beers.filter(
+          (beer) =>
+            !this.beerDiscounts.map((element) => element.beer).includes(beer.id)
+        )
+      }
     },
   },
 }
