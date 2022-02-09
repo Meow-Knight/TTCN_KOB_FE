@@ -6,7 +6,7 @@
     <div class="users-container">
       <div class="right">
         <div class="total-users container-fluid">
-          <span>Tất cả sản phẩm: {{ totalBeer }}</span>
+          <span>Tất cả khuyến mãi: {{ totalDiscount }}</span>
           <div class="search-bar">
             <form class="form-inline">
               <input
@@ -22,9 +22,9 @@
                 <i class="fas fa-search"></i>
               </button>
               <nuxt-link
-                to="/dashboard/beers/addBeer"
+                to="/dashboard/vouchers/addVoucher"
                 class="btn btn-add-beer btn-primary"
-                >Thêm bia mới</nuxt-link
+                >Thêm Khuyến mãi</nuxt-link
               >
             </form>
           </div>
@@ -35,28 +35,33 @@
               <tr>
                 <th scope="col">STT</th>
                 <th scope="col">Tên</th>
-                <th scope="col">Nồng độ cồn</th>
-                <th scope="col">Dung tích</th>
-                <th scope="col">Giá</th>
-                <th scope="col">SL Chai</th>
-                <th scope="col">NSX</th>
+                <th scope="col">Ngày tạo</th>
+                <th scope="col">Ngày bắt đầu</th>
+                <th scope="col">Ngày kết thúc</th>
+                <th scope="col">Đã kích hoạt</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
               <tr
-                v-for="(beer, index) in beers"
-                :key="beer.id"
+                v-for="(discount, index) in discounts"
+                :key="discount.id"
                 class="user-list__item"
-                @click="$router.push(`beers/${beer.id}`)"
+                @click="$router.push(`vouchers/${discount.id}`)"
               >
                 <th scope="row">{{ index + 1 }}</th>
-                <td>{{ beer.name }}</td>
-                <td>{{ beer.alcohol_concentration }}</td>
-                <td>{{ beer.capacity }}</td>
-                <td>{{ beer.price }}</td>
-                <td>{{ beer.bottle_amount }}</td>
-                <td>
-                  <span v-if="beer.producer">{{ beer.producer.name }}</span>
+                <td>{{ discount.name }}</td>
+                <td>{{ getTimeFormat(discount.created_at) }}</td>
+                <td>{{ getTimeFormat(discount.start_date) }}</td>
+                <td>{{ getTimeFormat(discount.end_date) }}</td>
+                <td
+                  :class="
+                    discount.is_activate
+                      ? 'activation text-align-center actived'
+                      : 'activation not-actived'
+                  "
+                >
+                  <i class="fas fa-circle"></i>
                 </td>
               </tr>
             </tbody>
@@ -100,6 +105,7 @@
 </template>
 
 <script>
+import { getTimeFormat } from '~/helper/helper'
 import Breadcrumb from '~/components/Breadcrumb.vue'
 
 export default {
@@ -107,7 +113,7 @@ export default {
   layout: 'admin',
   data() {
     return {
-      beers: [],
+      discounts: [],
       next: null,
       previous: null,
       rows: 0,
@@ -118,7 +124,7 @@ export default {
         field: 'name',
         asc: true,
       },
-      totalBeer: 0,
+      totalDiscount: 0,
     }
   },
   computed: {
@@ -131,26 +137,26 @@ export default {
     },
   },
   created() {
-    const URL = `/beer/?page=1&page_size=${this.pageSize}`
+    const URL = `/beer/discount/?page=1&page_size=${this.pageSize}`
     this.getData(URL)
   },
   methods: {
+    getTimeFormat,
     async getData(url) {
       this.$store.commit('setLoadingState', true)
 
       if (!url) return
-
       if (process.client) {
         try {
           const authToken = this.$auth.strategy.token.get()
           const response = await this.$axios.get(`/api/v1${url}`, {
             headers: { Authorization: authToken },
           })
-          this.beers = response.data.results
+          this.discounts = response.data.results
           this.rows = response.data.count
           this.previous = response.data.previous
           this.next = response.data.next
-          this.totalBeer = response.data.count
+          this.totalDiscount = response.data.count
         } catch (err) {
           alert(err)
         }
@@ -222,6 +228,22 @@ export default {
   }
   &__arrow {
     font-size: 30px;
+  }
+}
+.activation {
+  font-size: 13px;
+  text-align: center;
+}
+.actived {
+  color: rgb(11, 177, 105);
+}
+.not-actived {
+  color: rgb(99, 99, 99);
+}
+.action {
+  .btn {
+    font-size: 13px;
+    padding: 0 10px;
   }
 }
 </style>
