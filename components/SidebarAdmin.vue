@@ -22,13 +22,13 @@
           Nhà sản xuất
         </nuxt-link>
       </li>
-      <li class="menu__item">
+      <li v-if="isAdmin" class="menu__item">
         <nuxt-link to="/dashboard/customers">
           <div class="icon"><i class="fas fa-users"></i></div>
           Khách hàng
         </nuxt-link>
       </li>
-      <li class="menu__item">
+      <li v-if="isAdmin" class="menu__item">
         <nuxt-link to="/dashboard/staffs">
           <div class="icon"><i class="fas fa-user-cog"></i></div>
           Nhân viên
@@ -46,7 +46,7 @@
           Lô hàng
         </nuxt-link>
       </li>
-      <li class="menu__item">
+      <li v-if="isAdmin" class="menu__item">
         <nuxt-link to="/dashboard/vouchers">
           <div class="icon"><i class="fas fa-gift"></i></div>
           Khuyến mãi
@@ -57,7 +57,13 @@
 </template>
 
 <script>
-export default {}
+export default {
+  computed: {
+    isAdmin() {
+      return this.$auth.user.is_superuser
+    },
+  },
+}
 </script>
 
 <style lang="scss" scoped>
