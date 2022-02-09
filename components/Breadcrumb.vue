@@ -28,6 +28,8 @@ export default {
         '/dashboard/shipment': 'Lô hàng',
         '/dashboard/shipment/addShipment': 'Thêm lô hàng',
         '/dashboard/customers': 'Khách hàng',
+        '/dashboard/staffs': 'Nhân viên',
+        '/dashboard/staffs/addStaff': 'Thêm nhân viên',
       },
     }
   },

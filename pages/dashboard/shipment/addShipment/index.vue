@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid">
     <div class="breadcrumb-container">
-      <Breadcrumb :items="breadcrumbItems" />
+      <Breadcrumb />
     </div>
     <div class="add-beer-container">
       <div class="right">
@@ -88,11 +88,6 @@ export default {
   layout: 'admin',
   data() {
     return {
-      breadcrumbItems: [
-        { name: 'Trang chủ', url: '/' },
-        { name: 'Quản lý', url: '/dashboard' },
-        { name: 'Thêm bia mới', url: '/dashboard/beers/addBeer' },
-      ],
       newShipment: {
         shipment_date: null,
         amount: null,
