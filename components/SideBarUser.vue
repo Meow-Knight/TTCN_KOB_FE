@@ -21,7 +21,8 @@
       >
         <div class="menu-item__header">
           <div class="menu-icon-wrapper">
-            <img class="menu-icon" :src="item.icon" />
+            <img :src="item.icon" class="menu-icon" />
+            <!-- <i class="fa-solid fa-user menu-icon"></i> -->
           </div>
           <nuxt-link class="menu-item__display" :to="item.path">{{
             item.name
@@ -67,18 +68,6 @@ export default {
               path: '/user/account/info',
               name: 'Hồ sơ',
             },
-            // {
-            //   path: '/user/account/info',
-            //   name: 'Hồ sơ',
-            // },
-            {
-              path: '/user/account/address',
-              name: 'Địa chỉ',
-            },
-            // {
-            //   path: '/user/account/info',
-            //   name: 'Hồ sơ',
-            // },
           ],
         },
         {
@@ -86,14 +75,14 @@ export default {
           category: 'cart',
           basePath: '/user/cart',
           path: '/user/cart',
-          icon: require('~/assets/img/cart.jpg'),
+          icon: require('~/assets/img/shopping-cart.png'),
         },
         {
           name: 'Đơn hàng',
           category: 'purchase',
           basePath: '/user/purchase',
           path: '/user/purchase',
-          icon: require('~/assets/img/purchase-icon.jpg'),
+          icon: require('~/assets/img/purchase.png'),
         },
       ]
     },

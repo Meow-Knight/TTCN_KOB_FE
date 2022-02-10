@@ -14,12 +14,12 @@
               >Tất cả sản phẩm</nuxt-link
             >
           </li>
-          <li class="nav__tab-list__item">
+          <!-- <li class="nav__tab-list__item">
             <nuxt-link to="/dashboard">Ưu đãi</nuxt-link>
           </li>
           <li class="nav__tab-list__item">
             <nuxt-link to="/about">Giới thiệu</nuxt-link>
-          </li>
+          </li> -->
         </ul>
         <div class="icon">
           <div class="dropdown" @mouseover="showDropdown = true">

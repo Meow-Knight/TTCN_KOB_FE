@@ -5,7 +5,7 @@
         <nuxt-link :to="beerURL" class="link">
           <img :src="beerImg" alt="Beer image" height="100%" width="100%" />
         </nuxt-link>
-        <div class="discount-label">
+        <div v-if="beer.discount_percent" class="discount-label">
           {{ (-beer.discount_percent || defaultStat.discount_percent) + '%' }}
         </div>
       </div>
@@ -22,7 +22,7 @@
             priceFormat(afterDiscount(beer.price, beer.discount_percent)) + 'đ'
           }}
         </div>
-        <div class="origin-price">
+        <div v-if="beer.discount_percent" class="origin-price">
           {{ priceFormat(beer.price) + 'đ' }}
         </div>
       </div>

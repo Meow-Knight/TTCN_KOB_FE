@@ -339,6 +339,7 @@ export default {
 .purchase-card-container {
   margin-bottom: 30px;
   height: fit-content;
+  background: rgba(245, 245, 245, 0.8);
 }
 
 .card-top {

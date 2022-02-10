@@ -149,13 +149,13 @@
         >
           Hủy đơn hàng
         </button>
-        <button
+        <!-- <button
           v-if="orderStatus === 'DELIVERED'"
           class="items-not-receive"
           @click="notReceivedItems"
         >
           Chưa nhận hàng
-        </button>
+        </button> -->
         <button
           v-if="orderStatus === 'DELIVERED'"
           class="items-received"

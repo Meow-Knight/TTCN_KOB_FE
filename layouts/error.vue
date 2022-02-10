@@ -4,7 +4,7 @@
       <img src="~/assets/gif/404Animation_fff.gif" alt="" />
     </div>
     <div class="text">
-      <h1>404 <span>Error</span></h1>
+      <h1><span>Error</span></h1>
       <h2>
         <span class="typed-text">{{ typeValue }}</span>
         <span class="cursor" :class="{ typing: typeStatus }">&nbsp;</span>
@@ -24,11 +24,7 @@ export default {
     return {
       typeValue: '',
       typeStatus: false,
-      typeArray: [
-        'Bạn say cmnr!!!',
-        'Hoặc là chúng tôi ko có trang này =))))',
-        'Hoặc là có thể bạn say thiệt',
-      ],
+      typeArray: ['Oops, đã có lỗi xảy ra', 'Vui lòng quay lại sau'],
       typingSpeed: 100,
       erasingSpeed: 120,
       newTextDelay: 3800,
