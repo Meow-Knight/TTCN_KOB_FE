@@ -174,7 +174,7 @@ export default {
         // set status and fetch data
         this.currentStatus = statusQuery ? to.query.status.toUpperCase() : 'ALL'
         if (process.client) {
-          const authToken = localStorage.getItem('auth._token.google')
+          const authToken = this.$auth.strategy.token.get()
           this.isLoading = true
           try {
             const { data } = await this.$axios.get(
@@ -234,7 +234,7 @@ export default {
           return
         // loading more item here
         this.isLoadingMore = true
-        // const authToken = localStorage.getItem('auth._token.google')
+        // const authToken = this.$auth.strategy.token.get()
         const { data } = await this.$axios.get(this.nextPage)
         this.allPurchase.push(...data.results)
         this.nextPage = data.next

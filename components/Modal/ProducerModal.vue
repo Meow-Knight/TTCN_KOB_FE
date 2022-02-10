@@ -52,10 +52,10 @@ export default {
     async createProducer() {
       try {
         const producer = {
-          name: this.name,
+          company_name: this.name,
           address: this.address,
         }
-        const authToken = localStorage.getItem("auth._token.google")
+        const authToken = this.$auth.strategy.token.get()
         const URL = '/beer/producer/'
         const response = await axios.post(`/api/v1${URL}`, producer, {
           headers: {"Authorization" : authToken}

@@ -303,7 +303,7 @@ export default {
   async created() {
     const BEER_URL = '/beer/'
     if (process.client) {
-      const authToken = localStorage.getItem('auth._token.google')
+      const authToken = this.$auth.strategy.token.get()
       this.isInitialLoading = true
 
       try {

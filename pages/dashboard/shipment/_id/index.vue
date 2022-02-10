@@ -220,7 +220,7 @@ export default {
     async removeShipment(event) {
       event.preventDefault()
       if (process.client) {
-        const authToken = localStorage.getItem('auth._token.google')
+        const authToken = this.$auth.strategy.token.get()
         try {
           await axios.delete(`/api/v1${this.SHIPMENT_URL}${this.shipmentId}/`, {
             headers: { Authorization: authToken },

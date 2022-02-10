@@ -324,7 +324,7 @@ export default {
       async handler(to, from) {
         this.searchQuery = to.query.q
         if (process.client) {
-          const authToken = localStorage.getItem('auth._token.google')
+          const authToken = this.$auth.strategy.token.get()
           this.isLoading = true
           try {
             const { data: searchBeers } = await this.$axios.get(

@@ -62,7 +62,7 @@ export default {
   async created() {
     const URL = '/beer/homepage'
     if (process.client) {
-      const authToken = localStorage.getItem('auth._token.google')
+      const authToken = this.$auth.strategy.token.get()
       try {
         const {
           data: { randoms, discounts },

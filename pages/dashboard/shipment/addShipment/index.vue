@@ -119,7 +119,7 @@ export default {
         const URL = '/beer/shipment/'
 
         if (process.client) {
-          const authToken = localStorage.getItem('auth._token.google')
+          const authToken = this.$auth.strategy.token.get()
           try {
             await axios.post(`/api/v1${URL}`, this.newShipment, {
               headers: { Authorization: authToken },

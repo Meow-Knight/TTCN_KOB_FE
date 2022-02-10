@@ -310,7 +310,7 @@ export default {
           this.yourReview.canMake = false
           return
         }
-        const authToken = localStorage.getItem('auth._token.google')
+        const authToken = this.$auth.strategy.token.get()
         const { data } = await this.$axios.get(this.checkCanReviewURL(), {
           headers: { Authorization: authToken },
         })
@@ -336,7 +336,7 @@ export default {
           message: 'Vui lòng nhập đánh giá',
         })
       try {
-        const authToken = localStorage.getItem('auth._token.google')
+        const authToken = this.$auth.strategy.token.get()
         await this.$axios.post(this.makeNewReviewURL(), {
           rate: this.yourReview.ratingScore,
           comment: this.yourReview.comment,
@@ -465,7 +465,7 @@ export default {
         if (!this.shouldFetchMoreReview()) return
         // loading more review here
         this.isLoadingMore = true
-        const authToken = localStorage.getItem('auth._token.google')
+        const authToken = this.$auth.strategy.token.get()
         const { data } = await this.$axios.get(this.nextPage, {
           Authorization: authToken,
         })

@@ -95,25 +95,6 @@
               />
             </div>
           </div>
-
-          <div class="form-group info__content__producer">
-            <label for=""
-              >Quyền hạn <span class="required-note">*</span>:</label
-            >
-            <div class="input-box">
-              <select
-                v-model="newStaff.role"
-                class="form-select form-control"
-                aria-label=""
-                required
-              >
-                <option v-for="role in roles" :key="role.id" :value="role.id">
-                  {{ role.name }}
-                </option>
-              </select>
-              <div class="invalid-feedback">Vui lòng chọn quyền hạn !</div>
-            </div>
-          </div>
           <div class="action">
             <nuxt-link to="/dashboard/shipment" class="btn btn-danger"
               >Hủy</nuxt-link
@@ -141,7 +122,6 @@ export default {
         address: null,
         phone: null,
         age: null,
-        role: null,
       },
       roles: [],
     }
