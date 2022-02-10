@@ -8,7 +8,7 @@
 
         <div class="modal-body">
           <div class="form-group">
-            <label for="inputAddress">Nhập Tên Nhà Máy</label>
+            <label for="inputAddress">Nhãn hiệu</label>
             <input
               v-model="name"
               type="text"
@@ -16,7 +16,16 @@
               placeholder="Nhà Máy Bia "
               required
             />
-            <br/>
+            <br />
+            <label for="inputAddress">Tên Nhà Máy</label>
+            <input
+              v-model="company_name"
+              type="text"
+              class="form-control"
+              placeholder="Nhà Máy Bia "
+              required
+            />
+            <br />
             <label for="inputAddress">Địa Chỉ</label>
             <input
               v-model="address"
@@ -45,6 +54,7 @@ export default {
   data() {
     return {
       name: '',
+      company_name: '',
       address: '',
     }
   },
@@ -52,15 +62,16 @@ export default {
     async createProducer() {
       try {
         const producer = {
-          company_name: this.name,
+          name: this.name,
+          company_name: this.company_name,
           address: this.address,
         }
         const authToken = this.$auth.strategy.token.get()
         const URL = '/beer/producer/'
         const response = await axios.post(`/api/v1${URL}`, producer, {
-          headers: {"Authorization" : authToken}
-        });
-        console.log(response);
+          headers: { Authorization: authToken },
+        })
+        console.log(response)
         this.$toast.success('YE! You did it!')
         location.reload()
       } catch (err) {
