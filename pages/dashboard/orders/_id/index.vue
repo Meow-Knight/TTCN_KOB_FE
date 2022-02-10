@@ -104,6 +104,17 @@
               <td></td>
               <td class="price">{{ priceFormat(order.total_price) }}đ</td>
             </tr>
+            <tr>
+              <th>Phương thức thanh toán:</th>
+              <td></td>
+              <td class="price">
+                {{
+                  order.payment_method === 'DIRECT'
+                    ? 'Thanh toán khi nhận hàng'
+                    : 'Thanh toán bằng Paypal'
+                }}
+              </td>
+            </tr>
           </table>
         </div>
         <div class="left__item order-history">
