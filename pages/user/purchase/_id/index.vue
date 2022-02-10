@@ -149,13 +149,13 @@
         >
           Hủy đơn hàng
         </button>
-        <button
+        <!-- <button
           v-if="orderStatus === 'DELIVERED'"
           class="items-not-receive"
           @click="notReceivedItems"
         >
           Chưa nhận hàng
-        </button>
+        </button> -->
         <button
           v-if="orderStatus === 'DELIVERED'"
           class="items-received"
@@ -480,13 +480,11 @@ export default {
     }
 
     .status-display {
-      height: 30%;
       padding: 5px 0;
       text-align: center;
     }
 
     .status-time {
-      height: 10%;
       text-align: center;
       font-size: 14px;
       font-weight: 400;

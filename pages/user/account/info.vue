@@ -125,20 +125,11 @@
 
 <script>
 import BaseDialog from '~/components/Modal/BaseDialog.vue'
-// import { roleGuard } from '~/helper/helper'
-// import UserPageDropdown from '~/components/UserPageDropdown.vue'
-// import provinceData from '~/provinceData.json'
 export default {
   components: { BaseDialog },
   layout: 'user',
   data() {
     return {
-      // selectedDate: {
-      //   day: null,
-      //   month: null,
-      //   year: null,
-      // },
-      // avatar: this.user.avatar,
       user: null,
       selectedAvatar: null,
       userInfo: {
@@ -152,71 +143,12 @@ export default {
         title: null,
         message: null,
       },
-      // selectedAddress: {
-      //   province: null,
-      //   district: null,
-      //   ward: null,
-      // },
-      // initialAddress: true,
-      /**
-       * each province in provinceList have the following shape:
-       *  code: 1
-          codename: "thanh_pho_ha_noi"
-          districts: Array(30)
-          division_type: "thành phố trung ương"
-          name: "Thành phố Hà Nội"
-          phone_code: 24
-       */
-      // provinceList: [],
-      /**
-       * each district in districtList have the following shape:
-       *  code: 1
-          codename: "quan_ba_dinh"
-          division_type: "quận"
-          name: "Quận Ba Đình"
-          short_codename: "ba_dinh"
-          wards: Array(14)
-       */
-      // districtList: [],
-      /**
-       * each ward in wardList have the following shape:
-       *  code: 1
-          codename: "phuong_phuc_xa"
-          division_type: "phường"
-          name: "Phường Phúc Xá"
-          short_codename: "phuc_xa"
-       */
-      // wardList: [],
     }
   },
   computed: {
     editPath() {
       return '/api/v1/account/edit'
     },
-    // dayOfMonth() {
-    //   return Array(31)
-    //     .fill(null)
-    //     .map((val, index) => index + 1)
-    // },
-    // monthOfYear() {
-    //   return Array(12)
-    //     .fill(null)
-    //     .map((val, index) => index + 1)
-    // },
-    // year() {
-    //   return Array(100)
-    //     .fill(null)
-    //     .map((val, index) => new Date().getFullYear() - index)
-    // },
-    // provinceOptions() {
-    //   return this.provinceList.map((province) => province.name)
-    // },
-    // districtOptions() {
-    //   return this.districtList.map((district) => district.name)
-    // },
-    // wardOptions() {
-    //   return this.wardList.map((ward) => ward.name)
-    // },
     acceptAvatarMIMEType() {
       return ['image/png', 'image/jpeg']
     },
@@ -243,64 +175,11 @@ export default {
       }
       fr.readAsDataURL(cur)
     },
-    // when user select a new province, we will need to get all the district of that
-    // province, and also flush previous selected district and ward
-    // 'selectedAddress.province'(cur, prev) {
-    //   if (this.initialAddress) return
-    //   const newProvince = this.provinceList.find(
-    //     (province) => province.name === cur
-    //   )
-    //   // maybe throw error because this shit shouldn't happen but whatever
-    //   if (!newProvince) return
-    //   this.districtList = newProvince.districts
-    //   this.wardList = []
-    //   this.selectedAddress = {
-    //     ...this.selectedAddress,
-    //     district: null,
-    //     ward: null,
-    //   }
-    // },
-    // // the same thing applied to the case when user select a new district
-    // 'selectedAddress.district'(cur, prev) {
-    //   if (this.initialAddress) return
-    //   const newDistrict = this.districtList.find(
-    //     (district) => district.name === cur
-    //   )
-    //   // like above
-    //   if (!newDistrict) return
-    //   this.wardList = newDistrict.wards
-    //   this.selectedAddress = {
-    //     ...this.selectedAddress,
-    //     ward: null,
-    //   }
-    // },
   },
   created() {
     this.user = this.$auth.user
-    // after set initial address, set the flag to false but wait after next DOM update
-    // this.$nextTick(() => {
-    //   this.initialAddress = false
-    // })
   },
   methods: {
-    // set a new birthday
-    // setSelectedDate(type) {
-    //   return (newVal) => {
-    //     this.selectedDate = {
-    //       ...this.selectedDate,
-    //       [type]: newVal,
-    //     }
-    //   }
-    // },
-    // // set a new address
-    // setSelectedAddress(type) {
-    //   return (newVal) => {
-    //     this.selectedAddress = {
-    //       ...this.selectedAddress,
-    //       [type]: newVal,
-    //     }
-    //   }
-    // },
     // handle event when user click on change avatar button
     uploadFile() {
       const fileInput = document.querySelector('.input-change-avatar')
@@ -360,7 +239,8 @@ export default {
           })
         const formData = new FormData(event.target)
         if (this.selectedAvatar) formData.append('avatar', this.selectedAvatar)
-        const response = await this.$axios.patch(this.editPath, formData)
+        await this.$axios.patch(this.editPath, formData)
+        const response = await this.$axios.get('/api/v1/account/info')
         this.$auth.setUser(response.data)
         this.notification = {
           title: 'Thành công',

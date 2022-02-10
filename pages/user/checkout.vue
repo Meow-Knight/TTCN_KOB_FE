@@ -159,6 +159,7 @@ export default {
         address: '',
       },
       totalPrice: 0,
+      totalPriceInUSD: 0,
       totalDiscount: 0,
       initialLoading: true,
       isInitialAddress: true,
@@ -201,6 +202,9 @@ export default {
     orderDetailURL() {
       return '/user/purchase/'
     },
+    checkOrderApiURL() {
+      return 'api/v1/order/check_amount_order'
+    },
   },
   async created() {
     // fetch checkout data goes here
@@ -210,6 +214,7 @@ export default {
           carts,
           user,
           total_price: totalPrice,
+          total_price_usd: totalPriceUSD,
           total_discount: totalDiscount,
         },
       } = await this.$axios.get(this.checkoutApiURL)
@@ -219,6 +224,7 @@ export default {
         address: user.address,
       }
       this.totalPrice = totalPrice
+      this.totalPriceInUSD = totalPriceUSD
       this.totalDiscount = totalDiscount
       this.initialLoading = false
       this.checkoutMethod = 'payOnDelivery'
@@ -245,16 +251,44 @@ export default {
       window.paypal
         .Buttons({
           // Set up the transaction
-          createOrder(data, actions) {
-            return actions.order.create({
-              purchase_units: [
-                {
-                  amount: {
-                    value: that.totalPrice,
+          async createOrder(data, actions) {
+            // check if we can create the order
+            if (
+              that.receiverInfo.address === '' ||
+              that.receiverInfo.phone === ''
+            ) {
+              return (that.notification = {
+                ...that.notification,
+                title: 'Lỗi',
+                message: 'Vui lòng nhập đầy đủ số điện thoại và địa chỉ',
+                needConfirm: true,
+              })
+            }
+            try {
+              await that.$axios.get(that.checkOrderApiURL)
+              return actions.order.create({
+                purchase_units: [
+                  {
+                    amount: {
+                      value: that.totalPriceInUSD,
+                    },
                   },
-                },
-              ],
-            })
+                ],
+              })
+            } catch (err) {
+              if (err.response && err.response.status === 400)
+                that.notification = {
+                  ...that.notification,
+                  title: 'Đặt hàng thất bại',
+                  message:
+                    'Xin lỗi quý khách, hiện chúng tôi đã hết các mặt hàng sau:' +
+                    err.response.data.carts.reduce(
+                      (prev, cur) => prev + '\n - ' + cur.beer.name,
+                      ''
+                    ),
+                  needConfirm: true,
+                }
+            }
           },
 
           // Finalize the transaction
@@ -288,6 +322,7 @@ export default {
                   ...that.notification,
                   title: 'Thành công',
                   message: 'Đặt hàng thành công',
+                  needConfirm: false,
                 }
                 // flush cart data
                 that.$store.commit('cart/setCartData', [])
@@ -330,6 +365,7 @@ export default {
           ...this.notification,
           title: 'Thành công',
           message: 'Đặt hàng thành công',
+          needConfirm: false,
         }
         // flush cart data
         this.$store.commit('cart/setCartData', [])
@@ -339,7 +375,19 @@ export default {
           this.$router.push(this.orderDetailURL + response.data.id)
         }, 3000)
       } catch (err) {
-        console.log(err.response || err)
+        if (err.response && err.response.status === 400) {
+          return (this.notification = {
+            ...this.notification,
+            title: 'Đặt hàng thất bại',
+            message:
+              'Xin lỗi quý khách, hiện chúng tôi đã hết các mặt hàng sau:' +
+              err.response.data.carts.reduce(
+                (prev, cur) => prev + '\n - ' + cur.beer.name,
+                ''
+              ),
+            needConfirm: true,
+          })
+        }
       }
     },
   },
@@ -614,9 +662,10 @@ input:focus {
     height: 60px;
     width: 200px;
     z-index: 1;
-
-    /* visibility: hidden;
-    opacity: 0; */
   }
+}
+
+h3 {
+  white-space: pre-line;
 }
 </style>
