@@ -47,7 +47,10 @@
             </i>
           </div>
         </div>
-        <nav-cart-icon v-if="isUser" :transparent="transparent"></nav-cart-icon>
+        <nav-cart-icon
+          v-if="isUser && !isAdmin"
+          :transparent="transparent"
+        ></nav-cart-icon>
       </div>
     </div>
     <div class="dummy">abc</div>
@@ -71,10 +74,10 @@ export default {
       return this.$auth.user
     },
     isAdmin() {
-      return this.user && this.user.is_staff
+      return this.user && this.user.role === 'ADMIN'
     },
     isUser() {
-      return this.user && !this.user.is_staff
+      return this.user && this.user.role !== 'STAFF'
     },
   },
   created() {
