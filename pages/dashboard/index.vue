@@ -4,18 +4,6 @@
       <Breadcrumb />
     </div>
     <div class="dashboard-container">
-      <div class="dashboard-item sum">
-        <div class="sum__item sum__sales">
-          <i class="fa-solid fa-hand-holding-dollar"></i>
-          <p>Tổng doanh thu</p>
-          <p> {{sales}}</p>
-        </div>
-        <div class="sum__item sum__sales">
-          <i class="fa-solid fa-hand-holding-dollar"></i>
-          <p>Tổng doanh số</p>
-          <p> {{amount}}</p>
-        </div>
-      </div>
       <div class="dashboard-item sale">
         <div class="chart-controller">
           <ul class="nav nav-tabs">
@@ -31,11 +19,6 @@
             </li>
           </ul>
           <ul class="mx-5 mt-3 nav nav-tabs">
-            <li class="nav-item" @click="changeDuration('day')">
-              <span :class="duration == 'day' ? 'nav-link active' : 'nav-link'"
-                >Ngày</span
-              >
-            </li>
             <li class="nav-item" @click="changeDuration('week')">
               <span :class="duration == 'week' ? 'nav-link active' : 'nav-link'"
                 >Tuần</span
@@ -63,27 +46,28 @@
       <div class="dashboard-item top-products">
         <label for="">Sản phẩm bán chạy</label>
         <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Sản phẩm</th>
-                <th scope="col">Đã bán </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(product, index) in topProducts"
-                :key="product.id"
-                class="user-list__item"
-              >
-                <th scope="row">{{ index + 1 }}</th>
-                <td>
-                  <img :src="product.photo" height="40px" width="60px" alt="">
-                  {{ product.name }}</td>
-                <td>{{ product.total_sum }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Sản phẩm</th>
+              <th scope="col">Đã bán</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(product, index) in topProducts"
+              :key="product.id"
+              class="user-list__item"
+            >
+              <th scope="row">{{ index + 1 }}</th>
+              <td>
+                <img :src="product.photo" height="40px" width="60px" alt="" />
+                {{ product.name }}
+              </td>
+              <td>{{ product.total_sum }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -131,9 +115,7 @@ export default {
         title: {
           display: true,
           text:
-            this.duration === 'day'
-              ? 'Ngày qua'
-              : this.duration === 'week'
+            this.duration === 'week'
               ? 'Tuần qua'
               : this.duration === 'month'
               ? 'Tháng qua'
@@ -213,19 +195,19 @@ export default {
 .dashboard-item {
   margin-top: 20px;
 }
-  .sum {
-    display: flex;
-    flex-direction: row;
-    &__item {
-      text-align: center;
-      margin-left: 20px;
-      background-color: $hoverSidebar;
-      padding: 10px;
-      border-radius: 10px;
-    }
-    &__sales {
-    }
+.sum {
+  display: flex;
+  flex-direction: row;
+  &__item {
+    text-align: center;
+    margin-left: 20px;
+    background-color: $hoverSidebar;
+    padding: 10px;
+    border-radius: 10px;
   }
+  &__sales {
+  }
+}
 .nav-item {
   cursor: pointer;
   .active {
