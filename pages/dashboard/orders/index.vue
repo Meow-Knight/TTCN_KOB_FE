@@ -193,6 +193,24 @@ export default {
       orderStatusShow: 'PENDING',
     }
   },
+  created() {
+    const URL = `/order/?page=1&page_size=${this.pageSize}&q=${this.orderStatusShow}`
+    this.getData(URL)
+
+    // // Load order expried and convert to completed
+    // const checkURL = `/order/check_expired_order/`
+    // if (process.client) {
+    //   const authToken = this.$auth.strategy.token.get()
+    //   try {
+    //     const response = await this.$axios.get(`/api/v1${checkURL}`, {
+    //       headers: { Authorization: authToken },
+    //     })
+    //     console.log(response.data)
+    //   } catch (err) {
+    //     alert(err)
+    //   }
+    // }
+  },
   computed: {
     sortOption() {
       let sortOptionText = this.sortBy.field
@@ -244,10 +262,6 @@ export default {
       const URL = `/order/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}&q=${this.orderStatusShow}`
       this.getData(URL)
     },
-  },
-  created() {
-    const URL = `/order/?page=1&page_size=${this.pageSize}&q=${this.orderStatusShow}`
-    this.getData(URL)
   },
 }
 </script>
