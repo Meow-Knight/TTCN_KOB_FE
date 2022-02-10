@@ -106,7 +106,7 @@
       @close="confirmError()"
     >
       <template #default>
-        <h3>Tên tài khoản hoặc mật khẩu không đúng!</h3>
+        <h3>Đăng nhập không thành công!</h3>
       </template>
     </base-dialog>
   </div>
@@ -153,9 +153,9 @@ export default {
     haveError(loginData) {
       const inputError = {
         username:
-          loginData.username === '' ? 'Please enter your username' : null,
+          loginData.username === '' ? 'Tên đăng nhập không được để trống' : null,
         password:
-          loginData.password === '' ? 'Please enter your password' : null,
+          loginData.password === '' ? 'Mật khẩu không được để trống' : null,
       }
       this.inputError = inputError
       for (const key in inputError) {
