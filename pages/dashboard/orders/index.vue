@@ -54,7 +54,7 @@
               >Đã hủy</span
             >
           </li>
-          <li class="nav-item" @click="changeTab('NOTRECEIVED')">
+          <!-- <li class="nav-item" @click="changeTab('NOTRECEIVED')">
             <span
               :class="
                 orderStatusShow == 'NOTRECEIVED'
@@ -63,7 +63,7 @@
               "
               >Chưa nhận được</span
             >
-          </li>
+          </li> -->
         </ul>
         <div class="total-users container-fluid">
           <span>Tất cả đơn hàng: {{ totalOrder }}</span>
