@@ -14,7 +14,7 @@
         <div class="slogan">Drink to death</div>
       </div>
       <form class="login-section" @submit.prevent="adminLogin">
-        <div class="form-title">Login</div>
+        <div class="form-title">Đăng nhập</div>
         <div class="option-choose">
           <div
             role="button"
@@ -28,7 +28,7 @@
               alt="Admin login"
               src="~assets/img/admin.png"
             />
-            <div class="option-description">Admin</div>
+            <div class="option-description">Admin/Nhân viên</div>
           </div>
           <div
             role="button"
@@ -42,7 +42,7 @@
               alt="User login"
               src="~assets/img/user1.png"
             />
-            <div class="option-description">User</div>
+            <div class="option-description">Khách hàng</div>
           </div>
         </div>
         <!-- <div v-if="loginStrategy === 'user'"> -->
@@ -60,7 +60,7 @@
                 alt="Google sign-in"
                 src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"
               />
-              Login with Google
+              Đăng nhập với Google
             </a>
           </div>
           <div v-else class="admin-login__container">
@@ -68,7 +68,7 @@
               <input
                 ref="username"
                 type="text"
-                placeholder="Username"
+                placeholder="Tên đăng nhập"
                 class="input"
               />
               <div v-if="inputError.username" class="input-error">
@@ -79,14 +79,14 @@
               <input
                 ref="password"
                 type="password"
-                placeholder="Password"
+                placeholder="Mật khẩu"
                 class="input"
               />
               <div v-if="inputError.password" class="input-error">
                 {{ inputError.password }}
               </div>
             </div>
-            <button class="btn btn-outline-dark login-btn">Login</button>
+            <button class="btn btn-outline-dark login-btn">Đăng nhập</button>
           </div>
         </div>
         <!-- </form> -->
@@ -106,7 +106,7 @@
       @close="confirmError()"
     >
       <template #default>
-        <h3>Your username or password is wrong. Please check and try again!</h3>
+        <h3>Tên tài khoản hoặc mật khẩu không đúng!</h3>
       </template>
     </base-dialog>
   </div>
@@ -254,7 +254,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  width: 100px;
+  width: 150px;
   height: 90px;
   margin: 0 20px;
   border: 1px solid rgb(153, 134, 134);
@@ -281,7 +281,7 @@ export default {
   color: $white;
 }
 .option-description {
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 .form-content {
   height: 300px;
