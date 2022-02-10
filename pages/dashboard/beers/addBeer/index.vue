@@ -203,6 +203,7 @@ export default {
     }
   },
   async created() {
+    this.$store.commit('setLoadingState', true)
     const PRODUCER_URL = '/beer/producer/get_all_with_name/'
     const BEER_UNIT_URL = '/beer/unit/'
     const NATION_URL = '/beer/nation/'
@@ -231,12 +232,14 @@ export default {
         alert(err)
       }
     }
+    this.$store.commit('setLoadingState', false)
   },
   methods: {
     async addBeer(event) {
       const isValid = this.validate(event)
       if (isValid) {
         const URL = '/beer/'
+        this.$store.commit('setLoadingState', true)
 
         if (process.client) {
           const authToken = localStorage.getItem('auth._token.local')
@@ -262,6 +265,7 @@ export default {
             alert(err)
           }
         }
+        this.$store.commit('setLoadingState', false)
       }
     },
     validate(event) {

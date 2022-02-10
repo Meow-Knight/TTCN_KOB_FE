@@ -201,6 +201,7 @@ export default {
     },
   },
   async created() {
+    this.$store.commit('setLoadingState', true)
     const URL = `/order/${this.orderId}`
 
     if (process.client) {
@@ -215,6 +216,8 @@ export default {
         alert(err)
       }
     }
+
+    this.$store.commit('setLoadingState', false)
   },
   methods: {
     priceFormat,
@@ -224,6 +227,7 @@ export default {
       return '/beers/' + beerId
     },
     async changeStatus(newStatus) {
+      this.$store.commit('setLoadingState', true)
       const URL = `/order/admin_change_order_status/`
       if (process.client) {
         const authToken = localStorage.getItem('auth._token.local')
@@ -249,8 +253,10 @@ export default {
           alert(err)
         }
       }
+      this.$store.commit('setLoadingState', false)
     },
     async cancelOrder() {
+      this.$store.commit('setLoadingState', true)
       const URL = '/order/admin_cancel_order/'
       if (process.client) {
         const authToken = localStorage.getItem('auth._token.local')
@@ -275,6 +281,7 @@ export default {
           alert(err)
         }
       }
+      this.$store.commit('setLoadingState', false)
     },
   },
 }

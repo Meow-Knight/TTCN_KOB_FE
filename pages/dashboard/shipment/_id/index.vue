@@ -143,6 +143,7 @@ export default {
   },
   async created() {
     if (process.client) {
+      this.$store.commit('setLoadingState', true)
       const authToken = this.$auth.strategy.token.get()
       try {
         const responseBeerUnit = await axios.get(`/api/v1${this.BEER_URL}`, {
@@ -165,6 +166,7 @@ export default {
       } catch (err) {
         alert(err)
       }
+      this.$store.commit('setLoadingState', false)
     }
   },
   methods: {
@@ -197,6 +199,7 @@ export default {
       const isValid = this.validate(event)
       if (isValid) {
         if (process.client) {
+          this.$store.commit('setLoadingState', true)
           const authToken = this.$auth.strategy.token.get()
           const newShipmentInput = {
             ...this.newShipment,
@@ -214,12 +217,14 @@ export default {
           } catch (err) {
             alert(err)
           }
+          this.$store.commit('setLoadingState', false)
         }
       }
     },
     async removeShipment(event) {
       event.preventDefault()
       if (process.client) {
+        this.$store.commit('setLoadingState', true)
         const authToken = this.$auth.strategy.token.get()
         try {
           await axios.delete(`/api/v1${this.SHIPMENT_URL}${this.shipmentId}/`, {
@@ -229,6 +234,7 @@ export default {
         } catch (err) {
           alert(err)
         }
+        this.$store.commit('setLoadingState', false)
       }
     },
   },

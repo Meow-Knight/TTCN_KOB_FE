@@ -130,6 +130,7 @@ export default {
     const roleURL = '/account/role/'
 
     if (process.client) {
+      this.$store.commit('setLoadingState', true)
       const authToken = this.$auth.strategy.token.get()
       try {
         const response = await axios.get(`/api/v1${roleURL}`, {
@@ -139,6 +140,7 @@ export default {
       } catch (err) {
         alert(err)
       }
+      this.$store.commit('setLoadingState', false)
     }
   },
   methods: {
@@ -146,7 +148,7 @@ export default {
       const isValid = this.validate(event)
       if (isValid) {
         const URL = '/admin/create_staff/'
-
+        this.$store.commit('setLoadingState', true)
         if (process.client) {
           const authToken = this.$auth.strategy.token.get()
           try {
@@ -158,6 +160,7 @@ export default {
             alert(err)
           }
         }
+        this.$store.commit('setLoadingState', false)
       }
     },
     validate(event) {

@@ -110,6 +110,7 @@ export default {
   },
   async created() {
     if (process.client) {
+      this.$store.commit('setLoadingState', true)
       const authToken = localStorage.getItem('auth._token.local')
       try {
         const response = await axios.get(
@@ -122,6 +123,7 @@ export default {
       } catch (err) {
         alert(err)
       }
+      this.$store.commit('setLoadingState', false)
     }
   },
   methods: {
@@ -154,6 +156,7 @@ export default {
       const isValid = this.validate(event)
       if (isValid) {
         if (process.client) {
+          this.$store.commit('setLoadingState', true)
           const authToken = localStorage.getItem('auth._token.local')
           try {
             await axios.patch(
@@ -167,11 +170,13 @@ export default {
           } catch (err) {
             alert(err)
           }
+          this.$store.commit('setLoadingState', false)
         }
       }
     },
     async removeProducer(event) {
       if (process.client) {
+        this.$store.commit('setLoadingState', true)
         const authToken = localStorage.getItem('auth._token.local')
         try {
           await axios.delete(`/api/v1${this.PRODUCER_URL}${this.producerId}/`, {
@@ -181,6 +186,7 @@ export default {
         } catch (err) {
           alert(err)
         }
+        this.$store.commit('setLoadingState', false)
       }
     },
   },

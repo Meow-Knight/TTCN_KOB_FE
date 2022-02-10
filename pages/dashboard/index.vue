@@ -148,6 +148,7 @@ export default {
     },
     async getChartData() {
       const URL = '/beer/chart_data/'
+      this.$store.commit('setLoadingState', true)
 
       if (process.client) {
         const authToken = localStorage.getItem('auth._token.local')
@@ -170,8 +171,10 @@ export default {
           alert(err)
         }
       }
+      this.$store.commit('setLoadingState', false)
     },
     async getTopProducts() {
+      this.$store.commit('setLoadingState', true)
       const URL = '/beer/top/'
 
       if (process.client) {
@@ -185,6 +188,7 @@ export default {
           alert(err)
         }
       }
+      this.$store.commit('setLoadingState', false)
     },
   },
 }

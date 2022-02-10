@@ -355,6 +355,7 @@ export default {
     const NATION_URL = '/beer/nation/'
     const BEER_URL = '/beer/'
 
+    this.$store.commit('setLoadingState', true)
     if (process.client) {
       const authToken = localStorage.getItem('auth._token.local')
       try {
@@ -403,9 +404,11 @@ export default {
         alert(err)
       }
     }
+    this.$store.commit('setLoadingState', false)
   },
   methods: {
     changeState(event) {
+      this.$store.commit('setLoadingState', true)
       event.preventDefault()
       this.editting = !this.editting
       if (!this.editting) {
@@ -420,6 +423,7 @@ export default {
         notes[i].style.visibility =
           notes[i].style.visibility === 'visible' ? 'hidden' : 'visible'
       }
+      this.$store.commit('setLoadingState', false)
     },
     validate(event) {
       const form = document.getElementById('needs-validation')
@@ -434,6 +438,7 @@ export default {
       return true
     },
     async updateBeer(event) {
+      this.$store.commit('setLoadingState', true)
       const isValid = this.validate(event)
       if (isValid) {
         const URL = '/beer/'
@@ -460,8 +465,11 @@ export default {
           }
         }
       }
+
+      this.$store.commit('setLoadingState', false)
     },
     async removeBeer(event) {
+      this.$store.commit('setLoadingState', true)
       const URL = '/beer/'
       if (process.client) {
         const authToken = localStorage.getItem('auth._token.local')
@@ -474,8 +482,11 @@ export default {
           alert(err)
         }
       }
+      this.$store.commit('setLoadingState', false)
     },
     async saveImage() {
+      this.$store.commit('setLoadingState', true)
+      this.$store.commit('setLoadingState', true)
       const URL = '/beer/photo/'
       if (process.client) {
         const authToken = localStorage.getItem('auth._token.local')
@@ -499,6 +510,7 @@ export default {
           alert(err)
         }
       }
+      this.$store.commit('setLoadingState', false)
     },
     addImage(event) {
       const imageFile = document.querySelector('#image')
@@ -526,6 +538,7 @@ export default {
       }
     },
     async removeImage(imageId) {
+      this.$store.commit('setLoadingState', true)
       const URL = '/beer/photo'
       if (process.client) {
         const authToken = localStorage.getItem('auth._token.local')
@@ -543,6 +556,7 @@ export default {
           alert(err)
         }
       }
+      this.$store.commit('setLoadingState', false)
     },
   },
 }
