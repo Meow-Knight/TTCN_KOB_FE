@@ -209,7 +209,7 @@ export default {
     const NATION_URL = '/beer/nation/'
 
     if (process.client) {
-      const authToken = localStorage.getItem('auth._token.local')
+      const authToken = this.$auth.strategy.token.get()
       try {
         const response = await this.$axios.get(`/api/v1${PRODUCER_URL}`, {
           headers: { Authorization: authToken },
@@ -242,7 +242,7 @@ export default {
         this.$store.commit('setLoadingState', true)
 
         if (process.client) {
-          const authToken = localStorage.getItem('auth._token.local')
+          const authToken = this.$auth.strategy.token.get()
           try {
             const formData = new FormData()
 

@@ -357,7 +357,7 @@ export default {
 
     this.$store.commit('setLoadingState', true)
     if (process.client) {
-      const authToken = localStorage.getItem('auth._token.local')
+      const authToken = this.$auth.strategy.token.get()
       try {
         const response = await this.$axios.get(`/api/v1${PRODUCER_URL}`, {
           headers: { Authorization: authToken },
@@ -443,7 +443,7 @@ export default {
       if (isValid) {
         const URL = '/beer/'
         if (process.client) {
-          const authToken = localStorage.getItem('auth._token.local')
+          const authToken = this.$auth.strategy.token.get()
           const newBeerInput = {
             ...this.newBeer,
             origin_nation: this.newBeer.origin_nation.id,
@@ -472,7 +472,7 @@ export default {
       this.$store.commit('setLoadingState', true)
       const URL = '/beer/'
       if (process.client) {
-        const authToken = localStorage.getItem('auth._token.local')
+        const authToken = this.$auth.strategy.token.get()
         try {
           await this.$axios.delete(`/api/v1${URL}${this.beerId}/`, {
             headers: { Authorization: authToken },
@@ -489,7 +489,7 @@ export default {
       this.$store.commit('setLoadingState', true)
       const URL = '/beer/photo/'
       if (process.client) {
-        const authToken = localStorage.getItem('auth._token.local')
+        const authToken = this.$auth.strategy.token.get()
 
         try {
           const formData = new FormData()
@@ -541,7 +541,7 @@ export default {
       this.$store.commit('setLoadingState', true)
       const URL = '/beer/photo'
       if (process.client) {
-        const authToken = localStorage.getItem('auth._token.local')
+        const authToken = this.$auth.strategy.token.get()
 
         try {
           await this.$axios.delete(`/api/v1${URL}/${imageId}`, {

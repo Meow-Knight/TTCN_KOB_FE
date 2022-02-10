@@ -208,7 +208,7 @@ export default {
     this.$store.commit('setLoadingState', true)
 
     if (process.client) {
-      const authToken = localStorage.getItem('auth._token.local')
+      const authToken = this.$auth.strategy.token.get()
       try {
         const responseBeer = await this.$axios.get(`/api/v1${BEER_URL}`, {
           headers: { Authorization: authToken },
@@ -237,7 +237,7 @@ export default {
       const DISCOUNT_URL = '/beer/discount/'
       this.$store.commit('setLoadingState', true)
       if (isValid && process.client) {
-        const authToken = localStorage.getItem('auth._token.local')
+        const authToken = this.$auth.strategy.token.get()
         try {
           await this.$axios.post(
             `/api/v1${DISCOUNT_URL}`,

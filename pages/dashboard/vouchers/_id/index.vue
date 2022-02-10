@@ -296,7 +296,7 @@ export default {
     this.$store.commit('setLoadingState', true)
 
     if (process.client) {
-      const authToken = localStorage.getItem('auth._token.local')
+      const authToken = this.$auth.strategy.token.get()
       try {
         const responseDiscount = await this.$axios.get(
           `/api/v1${DISCOUNT_URL}${this.discountId}`,
@@ -358,7 +358,7 @@ export default {
       if (isValid) {
         const beerDiscountURL = '/beer/beer_discount/'
         if (process.client) {
-          const authToken = localStorage.getItem('auth._token.local')
+          const authToken = this.$auth.strategy.token.get()
 
           // Updates beer_discount for voucher
           for (const discount of this.updatedDiscount.beer_discounts) {
@@ -439,7 +439,7 @@ export default {
       this.$store.commit('setLoadingState', true)
 
       if (process.client) {
-        const authToken = localStorage.getItem('auth._token.local')
+        const authToken = this.$auth.strategy.token.get()
         try {
           await this.$axios.delete(`/api/v1${URL}${this.discountId}/`, {
             headers: { Authorization: authToken },
@@ -470,7 +470,7 @@ export default {
       this.$store.commit('setLoadingState', true)
 
       if (process.client) {
-        const authToken = localStorage.getItem('auth._token.local')
+        const authToken = this.$auth.strategy.token.get()
         try {
           await this.$axios.patch(
             `/api/v1${URL}${this.discountId}/`,
