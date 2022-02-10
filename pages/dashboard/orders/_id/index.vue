@@ -184,11 +184,7 @@
 <script>
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import ConfirmModal from '~/components/Modal/ConfirmModal.vue'
-import {
-  priceFormat,
-  afterDiscount,
-  getTimeFormat,
-} from '~/helper/helper'
+import { priceFormat, afterDiscount, getTimeFormat } from '~/helper/helper'
 export default {
   components: { Breadcrumb, ConfirmModal },
   layout: 'admin',
@@ -243,6 +239,12 @@ export default {
             }
           )
           this.orderStatus = newStatus
+
+          const ORDER_URL = `/order/${this.orderId}`
+          const response = await this.$axios.get(`/api/v1${ORDER_URL}`, {
+            headers: { Authorization: authToken },
+          })
+          this.order = response.data
         } catch (err) {
           alert(err)
         }
@@ -263,6 +265,12 @@ export default {
             }
           )
           this.orderStatus = 'CANCELED'
+
+          const ORDER_URL = `/order/${this.orderId}`
+          const response = await this.$axios.get(`/api/v1${ORDER_URL}`, {
+            headers: { Authorization: authToken },
+          })
+          this.order = response.data
         } catch (err) {
           alert(err)
         }
