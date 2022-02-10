@@ -480,13 +480,11 @@ export default {
     }
 
     .status-display {
-      height: 30%;
       padding: 5px 0;
       text-align: center;
     }
 
     .status-time {
-      height: 10%;
       text-align: center;
       font-size: 14px;
       font-weight: 400;
