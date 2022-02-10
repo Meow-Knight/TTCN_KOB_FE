@@ -126,7 +126,7 @@ export default {
       currentPage: 1,
       searchText: '',
       sortBy: {
-        field: 'name',
+        field: 'created_at',
         asc: true,
       },
       totalShipment: 0,
