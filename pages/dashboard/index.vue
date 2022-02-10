@@ -43,6 +43,13 @@
           :height="100"
         />
       </div>
+      <div class="staff-dashboard mt-5">
+        <BarChart
+          :data="barChartData"
+          :options="barChartOptions"
+          :height="100"
+        />
+      </div>
       <div class="dashboard-item top-products">
         <label for="">Sản phẩm bán chạy</label>
         <table class="table">
@@ -74,17 +81,20 @@
 </template>
 <script>
 import LineChart from '~/components/Chart/LineChart.vue'
+import BarChart from '~/components/Chart/Barchart.vue'
 import Breadcrumb from '~/components/Breadcrumb.vue'
 
 export default {
-  components: { Breadcrumb, LineChart },
+  components: { Breadcrumb, LineChart, BarChart },
   layout: 'admin',
   data() {
     return {
       duration: 'month',
       type: 'sale',
-      labels: [],
-      dataChart: [],
+      lineChartLabels: [],
+      barChartLabels: [],
+      dataLineChart: [],
+      dataBarChart: [],
       topProducts: [],
       sales: 0,
       amount: 0,
@@ -93,11 +103,11 @@ export default {
   computed: {
     lineChartData() {
       return {
-        labels: this.labels,
+        labels: this.lineChartLabels,
         datasets: [
           {
             label: this.type === 'sale' ? 'Doanh thu' : 'Doanh số',
-            data: this.dataChart,
+            data: this.dataLineChart,
             fill: false,
             borderColor: 'rgb(75, 192, 192)',
             tension: 0.1,
@@ -127,6 +137,49 @@ export default {
               ticks: {
                 beginAtZero: true,
               },
+              scaleLabel: {
+                display: true,
+                labelString: this.type === 'sale' ? 'VND' : 'Đơn',
+              },
+            },
+          ],
+        },
+      }
+    },
+    barChartData() {
+      return {
+        labels: this.barChartLabels,
+        datasets: [
+          {
+            label: 'Doanh số',
+            data: this.dataBarChart,
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgb(255, 99, 132)',
+            borderWidth: 1,
+          },
+        ],
+      }
+    },
+    barChartOptions() {
+      return {
+        responsive: true,
+        legend: {
+          display: false,
+        },
+        title: {
+          display: true,
+          text: 'Thống kê nhân viên',
+        },
+        scales: {
+          yAxes: [
+            {
+              ticks: {
+                beginAtZero: true,
+              },
+              scaleLabel: {
+                display: true,
+                labelString: 'Đơn',
+              },
             },
           ],
         },
@@ -134,19 +187,20 @@ export default {
     },
   },
   created() {
-    this.getChartData()
+    this.getLineChartData()
+    this.getBarChartData()
     this.getTopProducts()
   },
   methods: {
     changeType(newType) {
       this.type = newType
-      this.getChartData()
+      this.getLineChartData()
     },
     changeDuration(newDuration) {
       this.duration = newDuration
-      this.getChartData()
+      this.getLineChartData()
     },
-    async getChartData() {
+    async getLineChartData() {
       const URL = '/beer/chart_data/'
       this.$store.commit('setLoadingState', true)
 
@@ -165,8 +219,32 @@ export default {
             labels.push(key)
             dataChart.push(response.data[key])
           }
-          this.labels = labels
-          this.dataChart = dataChart
+          this.lineChartLabels = labels
+          this.dataLineChart = dataChart
+        } catch (err) {
+          alert(err)
+        }
+      }
+      this.$store.commit('setLoadingState', false)
+    },
+    async getBarChartData() {
+      const URL = `/account/staffs/?page=1&page_size=1000`
+      this.$store.commit('setLoadingState', true)
+
+      if (process.client) {
+        const authToken = this.$auth.strategy.token.get()
+        try {
+          const response = await this.$axios.get(`/api/v1${URL}`, {
+            headers: { Authorization: authToken },
+          })
+          const labels = []
+          const dataChart = []
+          for (const staff of response.data.results) {
+            labels.push(staff.username)
+            dataChart.push(staff.total_confirmed)
+          }
+          this.barChartLabels = labels
+          this.dataBarChart = dataChart
         } catch (err) {
           alert(err)
         }
