@@ -14,32 +14,14 @@ import { Bar } from 'vue-chartjs'
 // }
 export default {
   extends: Bar,
-  props: ['data'],
-  data() {
-    return {
-      options: {
-        responsive: true,
-        legend: {
-          display: false,
-        },
-        title: {
-          display: true,
-          text: 'Monthly Income',
-        },
-        scales: {
-          yAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-              },
-            },
-          ],
-        },
-      },
-    }
-  },
+  props: ['data', 'options'],
   mounted() {
     this.renderChart(this.data, this.options)
+  },
+  watch: {
+    data(val) {
+      this.renderChart(val, this.options)
+    },
   },
 }
 </script>

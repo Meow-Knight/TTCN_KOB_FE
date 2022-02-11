@@ -104,6 +104,17 @@
               <td></td>
               <td class="price">{{ priceFormat(order.total_price) }}đ</td>
             </tr>
+            <tr>
+              <th>Phương thức thanh toán:</th>
+              <td></td>
+              <td class="price">
+                {{
+                  order.payment_method === 'DIRECT'
+                    ? 'Thanh toán khi nhận hàng'
+                    : 'Thanh toán bằng Paypal'
+                }}
+              </td>
+            </tr>
           </table>
         </div>
         <div class="left__item order-history">
@@ -184,11 +195,7 @@
 <script>
 import Breadcrumb from '~/components/Breadcrumb.vue'
 import ConfirmModal from '~/components/Modal/ConfirmModal.vue'
-import {
-  priceFormat,
-  afterDiscount,
-  getTimeFormat,
-} from '~/helper/helper'
+import { priceFormat, afterDiscount, getTimeFormat } from '~/helper/helper'
 export default {
   components: { Breadcrumb, ConfirmModal },
   layout: 'admin',
@@ -205,10 +212,11 @@ export default {
     },
   },
   async created() {
+    this.$store.commit('setLoadingState', true)
     const URL = `/order/${this.orderId}`
 
     if (process.client) {
-      const authToken = localStorage.getItem('auth._token.local')
+      const authToken = this.$auth.strategy.token.get()
       try {
         const response = await this.$axios.get(`/api/v1${URL}`, {
           headers: { Authorization: authToken },
@@ -219,6 +227,8 @@ export default {
         alert(err)
       }
     }
+
+    this.$store.commit('setLoadingState', false)
   },
   methods: {
     priceFormat,
@@ -228,9 +238,10 @@ export default {
       return '/beers/' + beerId
     },
     async changeStatus(newStatus) {
+      this.$store.commit('setLoadingState', true)
       const URL = `/order/admin_change_order_status/`
       if (process.client) {
-        const authToken = localStorage.getItem('auth._token.local')
+        const authToken = this.$auth.strategy.token.get()
         try {
           await this.$axios.put(
             `/api/v1${URL}`,
@@ -243,15 +254,23 @@ export default {
             }
           )
           this.orderStatus = newStatus
+
+          const ORDER_URL = `/order/${this.orderId}`
+          const response = await this.$axios.get(`/api/v1${ORDER_URL}`, {
+            headers: { Authorization: authToken },
+          })
+          this.order = response.data
         } catch (err) {
           alert(err)
         }
       }
+      this.$store.commit('setLoadingState', false)
     },
     async cancelOrder() {
+      this.$store.commit('setLoadingState', true)
       const URL = '/order/admin_cancel_order/'
       if (process.client) {
-        const authToken = localStorage.getItem('auth._token.local')
+        const authToken = this.$auth.strategy.token.get()
         try {
           await this.$axios.put(
             `/api/v1${URL}`,
@@ -263,10 +282,17 @@ export default {
             }
           )
           this.orderStatus = 'CANCELED'
+
+          const ORDER_URL = `/order/${this.orderId}`
+          const response = await this.$axios.get(`/api/v1${ORDER_URL}`, {
+            headers: { Authorization: authToken },
+          })
+          this.order = response.data
         } catch (err) {
           alert(err)
         }
       }
+      this.$store.commit('setLoadingState', false)
     },
   },
 }

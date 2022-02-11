@@ -95,25 +95,6 @@
               />
             </div>
           </div>
-
-          <div class="form-group info__content__producer">
-            <label for=""
-              >Quyền hạn <span class="required-note">*</span>:</label
-            >
-            <div class="input-box">
-              <select
-                v-model="newStaff.role"
-                class="form-select form-control"
-                aria-label=""
-                required
-              >
-                <option v-for="role in roles" :key="role.id" :value="role.id">
-                  {{ role.name }}
-                </option>
-              </select>
-              <div class="invalid-feedback">Vui lòng chọn quyền hạn !</div>
-            </div>
-          </div>
           <div class="action">
             <nuxt-link to="/dashboard/shipment" class="btn btn-danger"
               >Hủy</nuxt-link
@@ -141,7 +122,6 @@ export default {
         address: null,
         phone: null,
         age: null,
-        role: null,
       },
       roles: [],
     }
@@ -150,6 +130,7 @@ export default {
     const roleURL = '/account/role/'
 
     if (process.client) {
+      this.$store.commit('setLoadingState', true)
       const authToken = this.$auth.strategy.token.get()
       try {
         const response = await axios.get(`/api/v1${roleURL}`, {
@@ -159,6 +140,7 @@ export default {
       } catch (err) {
         alert(err)
       }
+      this.$store.commit('setLoadingState', false)
     }
   },
   methods: {
@@ -166,7 +148,7 @@ export default {
       const isValid = this.validate(event)
       if (isValid) {
         const URL = '/admin/create_staff/'
-
+        this.$store.commit('setLoadingState', true)
         if (process.client) {
           const authToken = this.$auth.strategy.token.get()
           try {
@@ -178,6 +160,7 @@ export default {
             alert(err)
           }
         }
+        this.$store.commit('setLoadingState', false)
       }
     },
     validate(event) {

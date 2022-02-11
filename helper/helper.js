@@ -19,9 +19,15 @@ export const roleGuard = (roles) => (context) => {
   }
   if (
     context.$auth.user &&
-    ['ADMIN', 'STAFF'].includes(context.$auth.user.role)
+    ['ADMIN'].includes(context.$auth.user.role)
   ) {
     return context.redirect('/dashboard')
+  }
+  if (
+    context.$auth.user &&
+    ['STAFF'].includes(context.$auth.user.role)
+  ) {
+    return context.redirect('/dashboard/orders')
   }
   context.redirect('/')
 }

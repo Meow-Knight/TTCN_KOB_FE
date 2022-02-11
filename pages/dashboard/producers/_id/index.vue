@@ -110,7 +110,8 @@ export default {
   },
   async created() {
     if (process.client) {
-      const authToken = localStorage.getItem('auth._token.local')
+      this.$store.commit('setLoadingState', true)
+      const authToken = this.$auth.strategy.token.get()
       try {
         const response = await axios.get(
           `/api/v1${this.PRODUCER_URL}${this.producerId}`,
@@ -122,6 +123,7 @@ export default {
       } catch (err) {
         alert(err)
       }
+      this.$store.commit('setLoadingState', false)
     }
   },
   methods: {
@@ -154,7 +156,8 @@ export default {
       const isValid = this.validate(event)
       if (isValid) {
         if (process.client) {
-          const authToken = localStorage.getItem('auth._token.local')
+          this.$store.commit('setLoadingState', true)
+          const authToken = this.$auth.strategy.token.get()
           try {
             await axios.patch(
               `/api/v1${this.PRODUCER_URL}${this.producerId}/`,
@@ -167,12 +170,14 @@ export default {
           } catch (err) {
             alert(err)
           }
+          this.$store.commit('setLoadingState', false)
         }
       }
     },
     async removeProducer(event) {
       if (process.client) {
-        const authToken = localStorage.getItem('auth._token.local')
+        this.$store.commit('setLoadingState', true)
+        const authToken = this.$auth.strategy.token.get()
         try {
           await axios.delete(`/api/v1${this.PRODUCER_URL}${this.producerId}/`, {
             headers: { Authorization: authToken },
@@ -181,6 +186,7 @@ export default {
         } catch (err) {
           alert(err)
         }
+        this.$store.commit('setLoadingState', false)
       }
     },
   },

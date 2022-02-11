@@ -4,7 +4,7 @@
       <img src="~assets/img/logo3.png" alt="" />
     </div>
     <ul class="menu">
-      <li class="menu__item">
+      <li v-if="isAdmin" class="menu__item">
         <nuxt-link to="/dashboard">
           <div class="icon"><i class="far fa-clipboard"></i></div>
           Doanh số
@@ -16,7 +16,7 @@
           Đơn hàng
         </nuxt-link>
       </li>
-      <li class="menu__item">
+      <li v-if="isAdmin" class="menu__item">
         <nuxt-link to="/dashboard/producers">
           <div class="icon"><i class="far fa-building"></i></div>
           Nhà sản xuất
@@ -34,13 +34,13 @@
           Nhân viên
         </nuxt-link>
       </li>
-      <li class="menu__item">
+      <li v-if="isAdmin" class="menu__item">
         <nuxt-link to="/dashboard/beers">
           <div class="icon"><i class="fas fa-beer"></i></div>
           Sản phẩm
         </nuxt-link>
       </li>
-      <li class="menu__item">
+      <li v-if="isAdmin" class="menu__item">
         <nuxt-link to="/dashboard/shipment">
           <div class="icon"><i class="fas fa-cubes"></i></div>
           Lô hàng

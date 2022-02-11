@@ -122,11 +122,11 @@ export default {
       next: null,
       previous: null,
       rows: 0,
-      pageSize: 3,
+      pageSize: 12,
       currentPage: 1,
       searchText: '',
       sortBy: {
-        field: 'name',
+        field: 'created_at',
         asc: true,
       },
       totalShipment: 0,
@@ -145,15 +145,21 @@ export default {
     async getData(url) {
       if (!url) return
       if (process.client) {
+        this.$store.commit('setLoadingState', true)
         const authToken = this.$auth.strategy.token.get()
-        const response = await axios.get(`/api/v1${url}`, {
-          headers: { Authorization: authToken },
-        })
-        this.shipments = response.data.results
-        this.rows = response.data.count
-        this.previous = response.data.previous
-        this.next = response.data.next
-        this.totalShipment = response.data.count
+        try {
+          const response = await axios.get(`/api/v1${url}`, {
+            headers: { Authorization: authToken },
+          })
+          this.shipments = response.data.results
+          this.rows = response.data.count
+          this.previous = response.data.previous
+          this.next = response.data.next
+          this.totalShipment = response.data.count
+        } catch (err) {
+          alert(err)
+        }
+        this.$store.commit('setLoadingState', false)
       }
     },
     changePage(pageNumber) {

@@ -54,7 +54,7 @@
               >Đã hủy</span
             >
           </li>
-          <li class="nav-item" @click="changeTab('NOTRECEIVED')">
+          <!-- <li class="nav-item" @click="changeTab('NOTRECEIVED')">
             <span
               :class="
                 orderStatusShow == 'NOTRECEIVED'
@@ -63,7 +63,7 @@
               "
               >Chưa nhận được</span
             >
-          </li>
+          </li> -->
         </ul>
         <div class="total-users container-fluid">
           <span>Tất cả đơn hàng: {{ totalOrder }}</span>
@@ -193,6 +193,24 @@ export default {
       orderStatusShow: 'PENDING',
     }
   },
+  created() {
+    const URL = `/order/?page=1&page_size=${this.pageSize}&q=${this.orderStatusShow}`
+    this.getData(URL)
+
+    // // Load order expried and convert to completed
+    // const checkURL = `/order/check_expired_order/`
+    // if (process.client) {
+    //   const authToken = this.$auth.strategy.token.get()
+    //   try {
+    //     const response = await this.$axios.get(`/api/v1${checkURL}`, {
+    //       headers: { Authorization: authToken },
+    //     })
+    //     console.log(response.data)
+    //   } catch (err) {
+    //     alert(err)
+    //   }
+    // }
+  },
   computed: {
     sortOption() {
       let sortOptionText = this.sortBy.field
@@ -208,15 +226,21 @@ export default {
     async getData(url) {
       if (!url) return
       if (process.client) {
+        this.$store.commit('setLoadingState', true)
         const authToken = this.$auth.strategy.token.get()
-        const response = await this.$axios.get(`/api/v1${url}`, {
-          headers: { Authorization: authToken },
-        })
-        this.orders = response.data.results
-        this.rows = response.data.count
-        this.previous = response.data.previous
-        this.next = response.data.next
-        this.totalOrder = response.data.count
+        try {
+          const response = await this.$axios.get(`/api/v1${url}`, {
+            headers: { Authorization: authToken },
+          })
+          this.orders = response.data.results
+          this.rows = response.data.count
+          this.previous = response.data.previous
+          this.next = response.data.next
+          this.totalOrder = response.data.count
+        } catch (err) {
+          alert(err)
+        }
+        this.$store.commit('setLoadingState', false)
       }
     },
     changePage(pageNumber) {
@@ -238,10 +262,6 @@ export default {
       const URL = `/order/?page=1&page_size=${this.pageSize}&q=${this.searchText}&sort=${this.sortOption}&q=${this.orderStatusShow}`
       this.getData(URL)
     },
-  },
-  created() {
-    const URL = `/order/?page=1&page_size=${this.pageSize}&q=${this.orderStatusShow}`
-    this.getData(URL)
   },
 }
 </script>

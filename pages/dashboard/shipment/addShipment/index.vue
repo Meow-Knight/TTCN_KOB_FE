@@ -115,11 +115,11 @@ export default {
   methods: {
     async addShipment(event) {
       const isValid = this.validate(event)
-      if (isValid) {
+      if (isValid && this.newShipment.shipment_date) {
         const URL = '/beer/shipment/'
-
+        this.$store.commit('setLoadingState', true)
         if (process.client) {
-          const authToken = localStorage.getItem('auth._token.google')
+          const authToken = this.$auth.strategy.token.get()
           try {
             await axios.post(`/api/v1${URL}`, this.newShipment, {
               headers: { Authorization: authToken },
@@ -129,6 +129,7 @@ export default {
             alert(err)
           }
         }
+        this.$store.commit('setLoadingState', false)
       }
     },
     validate(event) {

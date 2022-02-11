@@ -203,12 +203,13 @@ export default {
     }
   },
   async created() {
+    this.$store.commit('setLoadingState', true)
     const PRODUCER_URL = '/beer/producer/get_all_with_name/'
     const BEER_UNIT_URL = '/beer/unit/'
     const NATION_URL = '/beer/nation/'
 
     if (process.client) {
-      const authToken = localStorage.getItem('auth._token.local')
+      const authToken = this.$auth.strategy.token.get()
       try {
         const response = await this.$axios.get(`/api/v1${PRODUCER_URL}`, {
           headers: { Authorization: authToken },
@@ -231,15 +232,17 @@ export default {
         alert(err)
       }
     }
+    this.$store.commit('setLoadingState', false)
   },
   methods: {
     async addBeer(event) {
       const isValid = this.validate(event)
       if (isValid) {
         const URL = '/beer/'
+        this.$store.commit('setLoadingState', true)
 
         if (process.client) {
-          const authToken = localStorage.getItem('auth._token.local')
+          const authToken = this.$auth.strategy.token.get()
           try {
             const formData = new FormData()
 
@@ -262,6 +265,7 @@ export default {
             alert(err)
           }
         }
+        this.$store.commit('setLoadingState', false)
       }
     },
     validate(event) {
