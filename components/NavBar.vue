@@ -1,7 +1,6 @@
 <template>
   <div>
-    <!-- <div class="nav_line"></div> -->
-    <div id="nav" class="nav">
+    <div id="nav" class="nav" :class="{ transparent }">
       <div class="logo">
         <img src="~assets/img/logo3.png" alt="" />
       </div>
@@ -11,61 +10,93 @@
             <nuxt-link to="/">Trang Chủ</nuxt-link>
           </li>
           <li class="nav__tab-list__item">
-            <nuxt-link to="/test">tất cả sản phẩm</nuxt-link>
+            <nuxt-link :to="isAdmin ? '/dashboard/beers' : '/beers'"
+              >Tất cả sản phẩm</nuxt-link
+            >
+          </li>
+          <!-- <li class="nav__tab-list__item">
+            <nuxt-link to="/dashboard">Ưu đãi</nuxt-link>
           </li>
           <li class="nav__tab-list__item">
-            <nuxt-link to="/">Ưu đãi</nuxt-link>
-          </li>
-          <li class="nav__tab-list__item">
-            <nuxt-link to="/">Giới thiệu</nuxt-link>
-          </li>
+            <nuxt-link to="/about">Giới thiệu</nuxt-link>
+          </li> -->
         </ul>
         <div class="icon">
-          <div class="dropdown">
-            <i class="fas fa-user">
-              <ul class="dropdown_list">
-                <li v-if="$auth.loggedIn" class="dropdown_item">
-                  <nuxt-link to="/profile" class="dropdown_text"
-                    >Trang cá nhân</nuxt-link
-                  >
-                </li>
-                <li v-if="!$auth.loggedIn" class="dropdown_item">
-                  <nuxt-link to="/login" class="dropdown_text"
-                    >Đăng nhập</nuxt-link
-                  >
-                </li>
-                <li v-else class="dropdown_item">
-                  <span class="dropdown_text" @click="userLogOut()"
-                    >Đăng xuất</span
-                  >
-                </li>
+          <div class="dropdown" @mouseover="showDropdown = true">
+            <i class="fas fa-user icon-user">
+              <div v-if="$auth.loggedIn" class="username">
+                {{ user.username }}
+              </div>
+              <ul v-if="showDropdown" class="dropdown_list">
+                <div class="dropdown-container">
+                  <li v-if="$auth.loggedIn" class="dropdown_item first">
+                    <nuxt-link to="/user/account/info" class="dropdown_text"
+                      >Trang cá nhân</nuxt-link
+                    >
+                  </li>
+                  <li v-if="!$auth.loggedIn" class="dropdown_item first">
+                    <nuxt-link to="/login" class="dropdown_text"
+                      >Đăng nhập</nuxt-link
+                    >
+                  </li>
+                  <li v-else class="dropdown_item" @click="logout()">
+                    <span class="dropdown_text">Đăng xuất</span>
+                  </li>
+                </div>
               </ul>
             </i>
           </div>
-          <i class="fas fa-shopping-cart"></i>
         </div>
+        <nav-cart-icon
+          v-if="isUser && !isAdmin"
+          :transparent="transparent"
+        ></nav-cart-icon>
       </div>
     </div>
+    <div class="dummy">abc</div>
   </div>
 </template>
 
 <script>
+import NavCartIcon from './UI/NavCartIcon.vue'
 export default {
+  components: {
+    NavCartIcon,
+  },
+  props: ['transparent'],
+  data() {
+    return {
+      showDropdown: false,
+    }
+  },
   computed: {
     user() {
       return this.$auth.user
     },
+    isAdmin() {
+      return this.user && this.user.role === 'ADMIN'
+    },
+    isUser() {
+      return this.user && this.user.role !== 'STAFF'
+    },
+  },
+  created() {
+    // this component will be used for all pages, so we will leverage it to fetch cart data
+    this.$store.commit('cart/setLoadingState', true)
+    this.$store.dispatch('cart/getCartData')
   },
   methods: {
-    async userLogOut() {
+    async logout() {
+      const data = {
+        refreshToken: this.user.is_staff
+          ? localStorage.getItem('auth._token.local')
+          : localStorage.getItem('auth._token.google'),
+      }
       try {
-        const response = await this.$auth.logout({
-          data: {
-            refreshToken: this.$auth.strategies.google.refreshToken.get(),
-          },
+        await this.$auth.logout({
+          data,
         })
-        this.$router.go('/')
-        console.log(response)
+        this.$router.push('/')
       } catch (err) {
         console.log(err)
       }
@@ -86,21 +117,19 @@ export default {
   height: 20px;
   background: $black;
 }
-// .nav_slide {
-//   width: 100%;
-//   height: 50px;
-//   background: $white2;
-// }
 .nav {
+  position: fixed;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   background: $red;
   padding: 15px 0px;
   z-index: 99;
   height: 90px;
+  width: 100%;
   font-family: 'Roboto Condensed', sans-serif;
   font-weight: 200;
+  transition: 0.5s;
   &__right {
     display: flex;
     align-items: center;
@@ -109,31 +138,54 @@ export default {
   &__tab-list {
     &__item {
       position: relative;
+      display: inline-block;
     }
-    &__item:hover a::before {
-      visibility: visible;
-      animation: show-underline 1s;
-      animation-fill-mode: forwards;
+    &__item:hover a::after {
+      width: 100%;
     }
-    a::before {
+    a::after {
       content: '';
-      position: absolute;
-      bottom: 1px;
+      display: block;
+      background: $white;
+      width: 0;
       height: 1px;
-      // width: 100%;
-      background-color: $white;
-      visibility: hidden;
+      position: absolute;
+      left: 0;
+      transition: 0.75s;
     }
   }
 }
+.nav.transparent {
+  background: transparent;
+  transition: 0.5s;
+  .nav__tab-list {
+    a {
+      color: $red;
+    }
+    a::after {
+      background: $red;
+    }
+  }
+  .icon-user::before {
+    color: $red;
+  }
+  .username {
+    color: $red;
+  }
+  /* .cart-icon {
+    color: $red;
+  } */
+}
+.nav__right {
+  margin-right: 200px;
+}
+
 .logo {
   height: 100%;
+  margin-left: 130px;
   img {
     height: 100%;
     transform: scale(1.9);
-    // width: 130px;
-    // height: 100%;
-    // object-fit: cover;
   }
 }
 .icon {
@@ -141,22 +193,32 @@ export default {
   display: flex;
   flex-direction: row;
   cursor: pointer;
+  width: fit-content;
+  margin-right: 30px;
   i {
     font-size: 1.3rem;
     margin-left: 10px;
     color: $white;
+    display: flex;
+    align-items: center;
   }
+}
+.username {
+  margin-left: 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  font-size: 20px;
 }
 ul {
   display: flex;
   list-style: none;
   font-size: 1.2rem;
-  padding: 10px;
+  padding: 5px 10px;
   margin: 10px;
 
   li {
     text-transform: uppercase;
-    margin-left: 15px;
+    margin-left: 30px;
     letter-spacing: 0;
   }
 }
@@ -173,30 +235,81 @@ a {
 }
 .dropdown_list {
   text-align: center;
-  width: 200px;
-  margin: 10px;
+  width: fit-content;
+  padding: 13px 10px 0 10px;
+  margin: 0;
   display: flex;
   flex-direction: column;
   position: absolute;
-  right: -20px;
-  top: 10px;
-  display: none;
-  font-weight: bold;
-  transition: 0.3s ease-in-out;
+  left: -25px;
+  top: 20px;
+  animation: hideDropdown 0.3s cubic-bezier(0.4, 0, 0.6, 1);
+  transform: scale(0);
+  will-change: transform;
+  transform-origin: calc(19.5%) 2px;
+  opacity: 0;
 }
+
+.dropdown-container {
+  border: 1px solid rgb(143, 129, 129);
+}
+
 .dropdown:hover .dropdown_list {
-  display: block;
+  will-change: transform;
+  transform: scale(1);
+  animation: showDropdown 0.3s cubic-bezier(0.4, 0, 0.6, 1);
+  opacity: 1;
 }
+
 .dropdown_item {
-  padding: 10px;
+  padding: 8px;
+  margin: 0;
   background: $white;
   color: $black;
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1.1rem;
+  width: 200px;
   cursor: pointer;
   a {
     color: $black;
+    font-weight: normal;
   }
+  transition: 0.5s ease-in-out;
+}
+
+.dropdown_item:hover {
+  background: rgb(199, 178, 178);
+  color: $red;
+  a {
+    color: $red;
+  }
+}
+
+.dropdown_item.first::after {
+  position: absolute;
+  content: '';
+  box-sizing: border-box;
+  width: 12px;
+  height: 12px;
+  transform: rotate(45deg) translateX(-50%);
+  background: $white;
+  top: 11.5px;
+  left: 19.5%;
+  border-top: 1px solid rgb(143, 129, 129);
+  border-left: 1px solid rgb(143, 129, 129);
+  transition: 0.5s ease-in-out;
+}
+
+.dropdown_item.first:hover::after {
+  background: rgb(199, 178, 178);
+}
+
+.dropdown_text {
+  font-size: 1rem;
+}
+
+.dummy {
+  margin-bottom: 80px;
+  visibility: hidden;
 }
 
 @keyframes show-underline {
@@ -205,6 +318,28 @@ a {
   }
   to {
     width: 100%;
+  }
+}
+
+@keyframes showDropdown {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes hideDropdown {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0);
   }
 }
 </style>

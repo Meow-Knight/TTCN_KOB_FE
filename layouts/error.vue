@@ -4,13 +4,13 @@
       <img src="~/assets/gif/404Animation_fff.gif" alt="" />
     </div>
     <div class="text">
-      <h1>404 <span>Errors</span></h1>
+      <h1><span>Error</span></h1>
       <h2>
         <span class="typed-text">{{ typeValue }}</span>
         <span class="cursor" :class="{ typing: typeStatus }">&nbsp;</span>
       </h2>
       <button class="button-50" role="button">
-        <nuxt-link to="/">Về lại trang chủ đêii</nuxt-link>
+        <nuxt-link to="/">Quay lại trang chủ</nuxt-link>
       </button>
     </div>
   </div>
@@ -18,18 +18,26 @@
 
 <script>
 export default {
+  inject: ['setIsInErrorPage'],
   layout: 'default',
   data: () => {
     return {
       typeValue: '',
       typeStatus: false,
-      typeArray: ['Bạn say cmnr!!!', 'Hoặc là chúng tôi ko có trang này =))))','Hoặc là có thể bạn say thiệt'],
+      typeArray: ['Oops, đã có lỗi xảy ra', 'Vui lòng quay lại sau'],
       typingSpeed: 100,
       erasingSpeed: 120,
       newTextDelay: 3800,
       typeArrayIndex: 0,
       charIndex: 0,
     }
+  },
+  beforeDestroy() {
+    this.setIsInErrorPage(false)
+  },
+  mounted() {
+    this.setIsInErrorPage(true)
+    setTimeout(this.typeText, this.newTextDelay + 200)
   },
   methods: {
     typeText() {
@@ -63,9 +71,6 @@ export default {
       }
     },
   },
-  created() {
-    setTimeout(this.typeText, this.newTextDelay + 200)
-  },
 }
 </script>
 
@@ -75,20 +80,30 @@ export default {
   width: 100%;
   height: 80vh;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
 }
+img {
+  height: 300px;
+  width: fit-content;
+}
+
 h1 {
   font-size: 5rem;
   span {
     color: $red;
   }
 }
+.text {
+  margin-left: 0px;
+}
 h2 {
-  font-size: 3.2rem;
+  font-size: 2.5rem;
   font-weight: normal;
+  width: 750px;
   span.typed-text {
     color: $yellow;
+    overflow-wrap: break-word;
   }
   span.cursor {
     display: inline-block;
@@ -155,7 +170,7 @@ h2 {
     text-decoration: none;
     color: $white2;
     font-weight: bold;
-    font-size:1rem;
+    font-size: 1rem;
   }
 }
 
